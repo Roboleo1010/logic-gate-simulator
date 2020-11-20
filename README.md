@@ -6,7 +6,8 @@ You can follow a Intro into Logic gates or even browse other Users creations.
 
 ## Terminology
 
-Chip: One ore more logic Gates
+**Chip:**  A Chip consists of one or many Chips. 
+**Gate:** Smallest component has chip wrapper so they can be used more easily.
 
 ## Scripts
 
