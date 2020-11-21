@@ -7,7 +7,7 @@ import { GateType, TriState } from "../simulator.types";
 class ChipFactory {
 
     public buildANDChip(id: string, topLevelIn1?: string, topLevelIn2?: string): Chip {
-        let chip = new Chip(id, "AND", "AND", "#4a4a4a");
+        let chip = new Chip(id);
 
         let in1 = new Chiplet("AND_IN1", GateType.Relay, topLevelIn1);
         let in2 = new Chiplet("AND_IN2", GateType.Relay, topLevelIn2);
@@ -28,32 +28,52 @@ class ChipFactory {
         return chip;
     }
 
+    public buildNOTChip(id: string, topLevelIn1?: string): Chip {
+        let chip = new Chip(id);
+
+        let in1 = new Chiplet("NOT_IN1", GateType.Relay, topLevelIn1);
+
+        let not1 = new Chiplet("NOT_NOT1", GateType.NOT);
+
+        let out1 = new Chiplet("NOT_OUT1", GateType.Relay);
+
+        let edges: Edge[] = [
+            { from: in1.id, to: not1.id },
+            { from: not1.id, to: out1.id },
+        ];
+
+        chip.graph.addNodes([in1, not1, out1]);
+        chip.graph.addEdges(edges);
+
+        return chip;
+    }
+
     public buildNANDChip(id: string, topLevelIn1?: string, topLevelIn2?: string): Chip {
-        let chip = new Chip(id, "NAND", "NAND", "#565656");
+        let chip = new Chip(id);
 
         let in1 = new Chiplet("NAND_IN1", GateType.Relay, topLevelIn1);
         let in2 = new Chiplet("NAND_IN2", GateType.Relay, topLevelIn2);
 
         let and1 = this.buildANDChip("");
-        let not1 = new Chiplet("NAND_NOT1", GateType.NOT);
+        let not1 = this.buildNOTChip("");
 
         let out1 = new Chiplet("NAND_OUT1", GateType.Relay);
 
         let edges: Edge[] = [
             { from: in1.id, to: and1.graph.getNodeById("AND_IN1").id },
             { from: in2.id, to: and1.graph.getNodeById("AND_IN2").id },
-            { from: and1.graph.getNodeById("AND_OUT1").id, to: not1.id },
-            { from: not1.id, to: out1.id }
+            { from: and1.graph.getNodeById("AND_OUT1").id, to: not1.graph.getNodeById("NOT_IN1").id },
+            { from: not1.graph.getNodeById("NOT_OUT1").id, to: out1.id }
         ];
 
-        chip.graph.addNodes([in1, in2, not1, out1, ...and1.graph.nodes]);
-        chip.graph.addEdges([...edges, ...and1.graph.edges]);
+        chip.graph.addNodes([in1, in2, out1, ...not1.graph.nodes, ...and1.graph.nodes]);
+        chip.graph.addEdges([...edges, ...and1.graph.edges, ...not1.graph.edges]);
 
         return chip;
     }
 
     public buildORChip(id: string, topLevelIn1?: string, topLevelIn2?: string): Chip {
-        let chip: Chip = new Chip(id, "OR", "OR", "#5d5d5d");
+        let chip: Chip = new Chip(id);
 
         let in1 = new Chiplet("OR_IN1", GateType.Relay, topLevelIn1);
         let in2 = new Chiplet("OR_IN2", GateType.Relay, topLevelIn2);
