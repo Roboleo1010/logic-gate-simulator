@@ -1,11 +1,11 @@
-import { ChipletType } from "./chip.types";
+import { GateType } from "../simulator.types";
 
 class Chiplet {
     id: string;
-    type: ChipletType;
+    type: GateType;
     extraInputs: string;
 
-    constructor(id: string, type: ChipletType, extraInputs: string = '') {
+    constructor(id: string, type: GateType, extraInputs: string = '') {
         this.id = id;
         this.type = type;
         this.extraInputs = extraInputs;
