@@ -6,8 +6,7 @@ import './app.scss';
 class App extends Component {
 
   componentDidMount() {
-    let simulator = new Simulator();
-    simulator.simulate();
+    Simulator.getInstance().simulate();
   }
 
   render() {

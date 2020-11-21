@@ -1,15 +1,35 @@
-import ChipFactory from "./chip/ChipFactory";
+import ChipFactory from "./ChipFactory";
 import Gate from "./gate";
-import { GateType, TriState } from "./simulator.types";
+import { ExtraOutputConfig, GateType, TriState } from "./simulator.types";
 
 class Simulator {
-    gates: Gate[] = [
-        new Gate("IN1", GateType.Controlled, TriState.False, []),
-        new Gate("IN2", GateType.Controlled, TriState.False, []),
-        ...ChipFactory.getInstance().getGates(ChipFactory.getInstance().buildORChip("", "IN1", "IN2"))
-    ];
+    private static instance: Simulator;
+
+    gates: Gate[] = [];
+    extraOutputConfig: ExtraOutputConfig[] = []; //this is responsible for wiering external outputs to chip internal outputs
 
     evalsPerStep: number = 5;
+
+    private constructor() {
+        Simulator.instance = this;
+
+        let in1 = new Gate("IN1", GateType.Controlled, TriState.True, []);
+        let in2 = new Gate("IN2", GateType.Controlled, TriState.True, []);
+        let out1 = new Gate("OUT1", GateType.Relay, TriState.False, []);
+
+        this.gates.push(in1, in2, out1);
+
+        let or = ChipFactory.getInstance().buildORChip(in1.id, in2.id);
+
+        this.extraOutputConfig.push({ outputId: "OUT1", input: or[0] });
+    }
+
+    public static getInstance() {
+        if (!Simulator.instance)
+            new Simulator();
+
+        return Simulator.instance;
+    }
 
     getGateById(id: string): Gate {
         return this.gates.filter(chip => chip.id === id)[0];
@@ -42,24 +62,28 @@ class Simulator {
 
     printState(gateIds: string[] = []) {
 
-        if (gateIds === [])
-            this.gates.forEach(gate => {
-                console.log(`${gate.id} ${gate.state}`);
-            })
-        else
+        if (gateIds.length > 0)
             this.gates.forEach(gate => {
                 if (gateIds.indexOf(gate.id) >= 0)
                     console.log(`${gate.id} ${gate.state}`);
-            })
+            });
+        else
+            this.gates.forEach(gate => {
+                console.log(`${gate.id} ${gate.state}`);
+            });
     }
 
     public simulate() {
-        console.log("Starting Simulaton");
+        console.log(`Starting simulaton with ${this.gates.length} Gates`);
+
+        this.extraOutputConfig.forEach(config => {
+            this.getGateById(config.outputId).inputs = [config.input];
+        });
 
         for (let i = 0; i < this.evalsPerStep; i++)
             this.evaluate();
 
-        this.printState(["IN1", "IN2", "OR_OUT1"]);
+        this.printState(["IN1", "IN2", "OUT1"]);
     }
 }
 

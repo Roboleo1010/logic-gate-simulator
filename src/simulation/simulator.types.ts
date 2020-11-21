@@ -10,3 +10,8 @@ export enum GateType {
     AND = "AND",
     NOT = "NOT",
 }
+
+export interface ExtraOutputConfig {
+    outputId: string;
+    input: string;
+}
