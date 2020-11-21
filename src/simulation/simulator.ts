@@ -40,10 +40,17 @@ class Simulator {
         });
     }
 
-    printState() {
-        this.gates.forEach(chip => {
-            console.log(`${chip.id} ${chip.state}`);
-        })
+    printState(gateIds: string[] = []) {
+
+        if (gateIds === [])
+            this.gates.forEach(gate => {
+                console.log(`${gate.id} ${gate.state}`);
+            })
+        else
+            this.gates.forEach(gate => {
+                if (gateIds.indexOf(gate.id) >= 0)
+                    console.log(`${gate.id} ${gate.state}`);
+            })
     }
 
     public simulate() {
@@ -52,7 +59,7 @@ class Simulator {
         for (let i = 0; i < this.evalsPerStep; i++)
             this.evaluate();
 
-        this.printState();
+        this.printState(["IN1", "IN2", "OR_OUT1"]);
     }
 }
 
