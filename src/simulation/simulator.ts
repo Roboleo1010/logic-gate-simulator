@@ -4,9 +4,9 @@ import { GateType, TriState } from "./simulator.types";
 
 class Simulator {
     gates: Gate[] = [
-        new Gate("IN1", GateType.Controlled, TriState.False, []),
+        new Gate("IN1", GateType.Controlled, TriState.True, []),
         new Gate("IN2", GateType.Controlled, TriState.False, []),
-        ...new ChipFactory().buildORChip("", "IN1", "IN2", "OUT1").graph.getAllNodes()
+        ...new ChipFactory().getGates(new ChipFactory().buildORChip("", "IN1", "IN2"))
     ];
 
     evalsPerStep: number = 5;
@@ -19,7 +19,11 @@ class Simulator {
         this.gates.forEach((gate: Gate) => {
             if (gate.type === GateType.Controlled)
                 return;
-            if (gate.type === GateType.And) {
+            if (gate.type === GateType.Relay) {
+                const inputA: Gate = this.getGateById(gate.inputs[0]);
+                gate.state = inputA.state;
+            }
+            if (gate.type === GateType.AND) {
                 const inputA: Gate = this.getGateById(gate.inputs[0]);
                 const inputB: Gate = this.getGateById(gate.inputs[1]);
 
@@ -27,7 +31,7 @@ class Simulator {
                 else if (inputA.state === TriState.True && inputB.state === TriState.True) gate.state = TriState.True
                 else gate.state = TriState.False;
             }
-            if (gate.type === GateType.Not) {
+            if (gate.type === GateType.NOT) {
                 const inputA: Gate = this.getGateById(gate.inputs[0]);
                 if (inputA.state === TriState.True) gate.state = TriState.False;
                 else if (inputA.state === TriState.False) gate.state = TriState.True;

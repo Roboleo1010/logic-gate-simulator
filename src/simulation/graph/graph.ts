@@ -1,8 +1,8 @@
 import Edge from "./edge";
-import { GraphTest } from "./graph.types";
+import { GraphNodeType } from "./graph.types";
 
 class Graph<T> {
-    nodes: GraphTest<T>[];
+    nodes: GraphNodeType<T>[];
     edges: Edge[];
 
     constructor() {
@@ -10,7 +10,7 @@ class Graph<T> {
         this.edges = [];
     }
 
-    public addNode(newNode: GraphTest<T>) {
+    public addNode(newNode: GraphNodeType<T>) {
         if (this.nodes.find(node => node.id === newNode.id)) {
             console.warn(`Node ${newNode.id} already exsists.`);
             return;
@@ -19,7 +19,7 @@ class Graph<T> {
         this.nodes.push(newNode);
     }
 
-    public addNodes(newNodes: GraphTest<T>[]) {
+    public addNodes(newNodes: GraphNodeType<T>[]) {
         newNodes.forEach(node => this.addNode(node));
     }
 
@@ -46,8 +46,12 @@ class Graph<T> {
         newEdges.forEach(edge => this.addEdge(edge));
     }
 
-    public getAllNodes(): T[] {
-        return this.nodes;
+    public getEdgesPointingTo(id: string): string[] {
+        return this.edges.filter(edge => edge.to === id).map(edge => edge.from);
+    }
+
+    public getNodeById(id: string): GraphNodeType<T> {
+        return this.nodes.filter(node => node.id === id)[0];
     }
 }
 export default Graph;

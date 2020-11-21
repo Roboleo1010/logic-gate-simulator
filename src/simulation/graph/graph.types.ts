@@ -2,4 +2,4 @@ export interface GraphNode {
     id: string;
 }
 
-export type GraphTest<T> = T & GraphNode;
+export type GraphNodeType<T> = T & GraphNode;
