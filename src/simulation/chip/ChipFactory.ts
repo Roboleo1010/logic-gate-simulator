@@ -4,25 +4,24 @@ import Chip from "./chip";
 
 class ChipFactory {
 
-    constructor() {
-        this.buildOrChip();
+    public buildNANDChip(id: string, in1: string, in2: string, out1: string) {
+        let chip = new Chip(id, "NAND", "NAND", "#565656");
+
+        chip.graph.addNode(this.buildANDGate(`AND1`, [in1, in2]));
+        chip.graph.addNode(this.buildNOTGate(out1, [`AND1`]));
+
+        return chip;
     }
 
-    public buildOrChip(): Chip {
-        let or: Chip = new Chip("OR", "OR", "#5d5d5d");
+    public buildORChip(id: string, in1: string, in2: string, out1: string): Chip {
+        let chipOR: Chip = new Chip(id, "OR", "OR", "#5d5d5d");
 
-        or.graph.addNodes([this.buildInput("IN1", TriState.False), this.buildInput("IN2", TriState.False)]);
-        or.graph.addNodes([this.buildNOTGate("NOT1", ["IN1"]), this.buildNOTGate("NOT2", ["IN2"])]);
-        or.graph.addNode(this.buildANDGate("AND1", ["NOT1", "NOT2"]));
-        or.graph.addNode(this.buildNOTGate("NOT3", ["AND1"]));
+        chipOR.graph.addNodes([this.buildNOTGate(`NOT1`, [in1]), this.buildNOTGate(`NOT2`, [in2])]);
+        chipOR.graph.addNodes(this.buildNANDChip(id, `NOT1`, `NOT2`, out1).graph.nodes);
 
-        or.graph.addEdges([{ from: "IN1", to: "NOT1" }, { from: "IN2", to: "NOT2" }])
-        or.graph.addEdges([{ from: "NOT1", to: "AND1" }, { from: "NOT2", to: "AND1" }])
-        or.graph.addEdge({ from: "AND1", to: "NOT3" });
+        console.log(chipOR);
 
-        console.log(or);
-
-        return or;
+        return chipOR;
     }
 
     private buildANDGate(id: string, inputs: string[]): Gate {

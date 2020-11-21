@@ -5,7 +5,7 @@ export enum TriState {
 }
 
 export enum GateType {
-    Controlled,
-    And,
-    Not,
+    Controlled = "Controlled",
+    And = "AND",
+    Not = "NOT",
 }

@@ -4,7 +4,9 @@ import { GateType, TriState } from "./simulator.types";
 
 class Simulator {
     gates: Gate[] = [
-        ...new ChipFactory().buildOrChip().graph.getAllNodes()
+        new Gate("IN1", GateType.Controlled, TriState.False, []),
+        new Gate("IN2", GateType.Controlled, TriState.False, []),
+        ...new ChipFactory().buildORChip("", "IN1", "IN2", "OUT1").graph.getAllNodes()
     ];
 
     evalsPerStep: number = 5;
