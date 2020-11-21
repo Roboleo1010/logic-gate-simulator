@@ -5,6 +5,18 @@ import Chiplet from "./chiplet";
 import { GateType, TriState } from "../simulator.types";
 
 class ChipFactory {
+    private static instance: ChipFactory;
+
+    private constructor() {
+        ChipFactory.instance = this;
+    }
+
+    public static getInstance() {
+        if (!ChipFactory.instance)
+            new ChipFactory();
+
+        return ChipFactory.instance;
+    }
 
     public buildANDChip(id: string, topLevelIn1?: string, topLevelIn2?: string): Chip {
         let chip = new Chip(id);

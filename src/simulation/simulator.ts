@@ -6,7 +6,7 @@ class Simulator {
     gates: Gate[] = [
         new Gate("IN1", GateType.Controlled, TriState.False, []),
         new Gate("IN2", GateType.Controlled, TriState.False, []),
-        ...new ChipFactory().getGates(new ChipFactory().buildORChip("", "IN1", "IN2"))
+        ...ChipFactory.getInstance().getGates(ChipFactory.getInstance().buildORChip("", "IN1", "IN2"))
     ];
 
     evalsPerStep: number = 5;
