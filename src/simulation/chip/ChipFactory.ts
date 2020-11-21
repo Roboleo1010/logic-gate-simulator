@@ -1,5 +1,5 @@
 import Gate from "../gate";
-import Edge from "../graph/edge";
+import Edge from "../../utility/graph/edge";
 import Chip from "./chip";
 import Chiplet from "./chiplet";
 import { GateType, TriState } from "../simulator.types";

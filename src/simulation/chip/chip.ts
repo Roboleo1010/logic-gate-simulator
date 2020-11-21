@@ -1,4 +1,4 @@
-import Graph from "../graph/graph";
+import Graph from "../../utility/graph/graph";
 import Chiplet from "./chiplet";
 
 class Chip {

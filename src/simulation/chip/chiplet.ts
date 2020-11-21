@@ -1,5 +1,6 @@
 import { GateType } from "../simulator.types";
 
+//just a wrapper around gate
 class Chiplet {
     id: string;
     type: GateType;

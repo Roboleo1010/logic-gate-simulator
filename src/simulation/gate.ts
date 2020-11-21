@@ -1,5 +1,5 @@
 import { GateType, TriState } from "./simulator.types";
-import { GraphNode } from "./graph/graph.types"
+import { GraphNode } from "../utility/graph/graph.types"
 
 class Gate implements GraphNode {
     id: string;
