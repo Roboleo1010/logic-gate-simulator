@@ -1,13 +1,10 @@
+import ChipFactory from "./chip/ChipFactory";
 import Gate from "./gate";
 import { GateType, TriState } from "./simulator.types";
 
 class Simulator {
     gates: Gate[] = [
-        new Gate('in1', GateType.Controlled, TriState.True, []),
-        new Gate('in2', GateType.Controlled, TriState.True, []),
-        new Gate('in3', GateType.Controlled, TriState.False, []),
-        new Gate('and1', GateType.And, TriState.False, ['in1', 'in2']),
-        new Gate('and2', GateType.And, TriState.False, ['in2', 'in3']),
+        ...new ChipFactory().buildOrChip().graph.getAllNodes()
     ];
 
     evalsPerStep: number = 5;

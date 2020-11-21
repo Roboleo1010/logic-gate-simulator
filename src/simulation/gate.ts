@@ -1,8 +1,7 @@
-//Gate is the smallest possible unit.
+import { GateType, TriState } from "./simulator.types";
+import { GraphNode } from "./graph/graph.types"
 
-import { GateType as GateType, TriState } from "./simulator.types";
-
-class Gate {
+class Gate implements GraphNode {
     id: string;
     type: GateType;
     state: TriState;
