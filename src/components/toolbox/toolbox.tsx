@@ -22,7 +22,7 @@ class Toolbox extends Component<{}, ToolboxState> {
         this.state = {
             selectedTab: 'chips-logic',
             chipsLogic: [new ChipBlueprint("AND", "#729B79"), new ChipBlueprint("NOT", "#D05353"), new ChipBlueprint("OR", "#FFA69E"), new ChipBlueprint("XOR", "#8EF9F3")],
-            chipsInOut: [new ChipBlueprint("Switch", "#386FA4"), new ChipBlueprint("Constant On", "#6DA34D"), new ChipBlueprint("Constant Off", "#D10000")],
+            chipsInOut: [new ChipBlueprint("Switch", "#386FA4"), new ChipBlueprint("Constant On", "#6DA34D"), new ChipBlueprint("Constant Off", "#D10000"), new ChipBlueprint("Oscilloscope In", "#000000")],
             chipsCustom: []
         };
     }

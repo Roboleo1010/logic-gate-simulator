@@ -1,11 +1,25 @@
 import React, { Component } from "react";
+import Draggable from "react-draggable";
+import ChipBlueprint from "../../model/chip-blueprint";
 
-class Chip extends Component {
+import "./chip.scss";
+
+interface ChipProps {
+    chip: ChipBlueprint;
+}
+
+class Chip extends Component<ChipProps> {
     render() {
-        return (
-            <div>
+        let style = { backgroundColor: this.props.chip.color };
 
-            </div>
+        return (
+            <Draggable grid={[25, 25]}>
+                <div className="chip chip-on-board" style={style}>
+                    <span>
+                        {this.props.chip.name}
+                    </span>
+                </div>
+            </Draggable>
         );
     }
 }
