@@ -1,18 +1,19 @@
 import ChipFactory from "./ChipFactory";
 import Gate from "./gate";
-import { ExtraOutputConfig, GateType, TriState } from "./simulator.types";
+import { WireConnection, GateType, TriState } from "./simulator.types";
 
 class Simulator {
     private static instance: Simulator;
 
     gates: Gate[] = [];
-    extraOutputConfig: ExtraOutputConfig[] = []; //this is responsible for wiering external outputs to chip internal outputs
+    wireConnections: WireConnection[] = []; //this is responsible for wiering external outputs to chip internal outputs
 
     evalsPerStep: number = 5;
 
     private constructor() {
         Simulator.instance = this;
 
+        //on board only
         let in1 = new Gate("IN1", GateType.Controlled, TriState.True, []);
         let in2 = new Gate("IN2", GateType.Controlled, TriState.True, []);
         let out1 = new Gate("OUT1", GateType.Relay, TriState.False, []);
@@ -21,7 +22,7 @@ class Simulator {
 
         let or = ChipFactory.getInstance().buildORChip(in1.id, in2.id);
 
-        this.extraOutputConfig.push({ outputId: "OUT1", input: or[0] });
+        this.wireConnections.push({ outputId: "OUT1", input: or[0] });
     }
 
     public static getInstance() {
@@ -76,7 +77,7 @@ class Simulator {
     public simulate() {
         console.log(`Starting simulaton with ${this.gates.length} Gates`);
 
-        this.extraOutputConfig.forEach(config => {
+        this.wireConnections.forEach(config => {
             this.getGateById(config.outputId).inputs = [config.input];
         });
 

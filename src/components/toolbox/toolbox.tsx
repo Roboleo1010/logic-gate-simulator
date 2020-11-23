@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import ChipBlueprint from "../../model/chip-blueprint";
+import ConnectorBlueprint, { ConnectorDirection, ConnectorSide } from "../../model/connector-blueprint";
 import ChipToolbox from "../chip/chip-toolbox";
 import { TabData } from "../tabs/tab.types";
 import Tab from "../tabs/tab/tab";
@@ -25,8 +26,8 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
 
         this.state = {
             selectedTab: 'chips-logic',
-            chipsLogic: [new ChipBlueprint("AND", "#729B79"), new ChipBlueprint("NOT", "#D05353"), new ChipBlueprint("OR", "#FFA69E"), new ChipBlueprint("XOR", "#8EF9F3")],
-            chipsInOut: [new ChipBlueprint("Switch", "#386FA4"), new ChipBlueprint("Constant On", "#6DA34D"), new ChipBlueprint("Constant Off", "#D10000"), new ChipBlueprint("Oscilloscope In", "#000000")],
+            chipsLogic: [new ChipBlueprint("AND", "#729B79", [new ConnectorBlueprint("in1", ConnectorSide.Left, ConnectorDirection.SignalIn), new ConnectorBlueprint("in2", ConnectorSide.Left, ConnectorDirection.SignalIn), new ConnectorBlueprint("out1", ConnectorSide.Right, ConnectorDirection.SignalOut)]), new ChipBlueprint("NOT", "#D05353", [new ConnectorBlueprint("in1", ConnectorSide.Left, ConnectorDirection.SignalIn), new ConnectorBlueprint("out1", ConnectorSide.Right, ConnectorDirection.SignalOut)])],
+            chipsInOut: [new ChipBlueprint("Input", "#386FA4", [new ConnectorBlueprint("out1", ConnectorSide.Right, ConnectorDirection.SignalOut)]), new ChipBlueprint("Output", "#386FA4", [new ConnectorBlueprint("out1", ConnectorSide.Right, ConnectorDirection.SignalOut)]), new ChipBlueprint("Constant On", "#6DA34D", [new ConnectorBlueprint("out1", ConnectorSide.Right, ConnectorDirection.SignalOut)]), new ChipBlueprint("Constant Off", "#D10000", [new ConnectorBlueprint("out1", ConnectorSide.Right, ConnectorDirection.SignalOut)]), new ChipBlueprint("Oscilloscope", "#000000", [new ConnectorBlueprint("in1", ConnectorSide.Left, ConnectorDirection.SignalIn)])],
             chipsCustom: []
         };
     }

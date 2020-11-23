@@ -11,7 +11,7 @@ export enum GateType {
     NOT = "NOT",
 }
 
-export interface ExtraOutputConfig {
+export interface WireConnection {
     outputId: string;
     input: string;
 }
