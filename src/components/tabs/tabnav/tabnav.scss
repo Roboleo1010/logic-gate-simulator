@@ -1,0 +1,25 @@
+@import "../../../design.scss";
+
+.tabnav {
+    .tabnav-tabs {
+        display: inline-block;
+        padding: 0 5px;
+        width: calc(100% - 10px);
+
+        .tabnav-tab {
+            display: inline-block;
+            min-width: 80px;
+            padding: 10px 20px;
+            margin: 0px 2px;
+
+            text-align: center;
+            cursor: pointer;
+
+            background-color: $tab-color;
+            border-radius: 3px 3px 0px 0px;
+        }
+        .tabnav-active {
+            border-top: 3px solid #ff6363;
+        }
+    }
+}

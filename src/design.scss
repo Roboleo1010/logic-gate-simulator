@@ -1,0 +1,12 @@
+$color-board: #1e1e1e;
+$color-drawer: #202040;
+$height-drawer: 140px;
+$tab-color: #ffffff;
+
+.unselectable {
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+}

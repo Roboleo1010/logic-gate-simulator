@@ -1,0 +1,7 @@
+@import "../../design.scss";
+
+.board {
+    width: 100%;
+    height: calc(100% - #{$height-drawer});
+    background-color: $color-board;
+}
