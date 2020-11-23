@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import ChipBlueprint from "../../model/chip-blueprint";
+import ChipDrawer from "../chip-drawer/chip-drawer";
 import Tab from "../tabs/tab/tab";
 import TabNav from "../tabs/tabnav/tabnav";
 
@@ -8,7 +10,7 @@ interface toolboxState {
     selectedTab: string;
 }
 
-class toolbox extends Component<{}, toolboxState> {
+class Toolbox extends Component<{}, toolboxState> {
 
     constructor(props: any) {
         super(props);
@@ -23,10 +25,9 @@ class toolbox extends Component<{}, toolboxState> {
     render() {
         return (
             <div className="toolbox">
-                <div className="toolbox-header"></div>
                 <TabNav tabs={['Chips', 'I/O', 'Oscilloscope']} selected={this.state.selectedTab} setSelected={this.setSelected.bind(this)}>
                     <Tab isSelected={this.state.selectedTab === 'Chips'}>
-                        Chips
+                        <ChipDrawer chips={[new ChipBlueprint("AND", "#729B79"), new ChipBlueprint("NOT", "#D05353"), new ChipBlueprint("OR", "#FFA69E"), new ChipBlueprint("XOR", "#8EF9F3")]}></ChipDrawer>
                     </Tab>
                     <Tab isSelected={this.state.selectedTab === 'I/O'}>
                         I/O
@@ -40,4 +41,4 @@ class toolbox extends Component<{}, toolboxState> {
     }
 }
 
-export default toolbox;
+export default Toolbox;

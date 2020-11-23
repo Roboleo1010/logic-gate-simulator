@@ -1,4 +1,3 @@
-import { table } from "console";
 import React, { Component } from "react";
 
 import "./tabnav.scss"
