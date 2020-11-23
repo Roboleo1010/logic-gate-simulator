@@ -2,13 +2,13 @@ import React, { Component } from "react";
 import Tab from "../tabs/tab/tab";
 import TabNav from "../tabs/tabnav/tabnav";
 
-import "./drawer.scss"
+import "./toolbox.scss"
 
-interface DrawerState {
+interface toolboxState {
     selectedTab: string;
 }
 
-class Drawer extends Component<{}, DrawerState> {
+class toolbox extends Component<{}, toolboxState> {
 
     constructor(props: any) {
         super(props);
@@ -22,8 +22,8 @@ class Drawer extends Component<{}, DrawerState> {
 
     render() {
         return (
-            <div className="drawer">
-                <div className="drawer-header"></div>
+            <div className="toolbox">
+                <div className="toolbox-header"></div>
                 <TabNav tabs={['Chips', 'I/O', 'Oscilloscope']} selected={this.state.selectedTab} setSelected={this.setSelected.bind(this)}>
                     <Tab isSelected={this.state.selectedTab === 'Chips'}>
                         Chips
@@ -40,4 +40,4 @@ class Drawer extends Component<{}, DrawerState> {
     }
 }
 
-export default Drawer;
+export default toolbox;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Simulator from '../../simulation/simulator';
 import Board from '../board/board';
-import Drawer from '../drawer/drawer';
+import Toolbox from '../toolbox/toolbox';
 
 import './app.scss';
 
@@ -15,7 +15,7 @@ class App extends Component {
     return (
       <div className="App">
         <Board></Board>
-        <Drawer></Drawer>
+        <Toolbox></Toolbox>
       </div>
     );
   }
