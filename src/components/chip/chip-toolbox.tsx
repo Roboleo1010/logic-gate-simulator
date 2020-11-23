@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import ChipBlueprint from "../../model/chip-blueprint";
 import "./chip.scss";
 
-interface ChipInToolboxProps {
+interface ChipToolboxProps {
     chip: ChipBlueprint;
 }
 
-class ChipPrefab extends Component<ChipInToolboxProps> {
+class ChipToolbox extends Component<ChipToolboxProps> {
     render() {
         let style = { backgroundColor: this.props.chip.color };
 
@@ -20,4 +20,4 @@ class ChipPrefab extends Component<ChipInToolboxProps> {
     }
 }
 
-export default ChipPrefab;
+export default ChipToolbox;

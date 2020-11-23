@@ -1,9 +1,0 @@
-@import "../../design.scss";
-
-.chip-drawer {
-    width: 100%;
-    height: calc(#{$height-toolbox} - 54px);
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-}
