@@ -14,9 +14,13 @@ interface ToolboxState {
     chipsCustom: ChipBlueprint[];
 }
 
-class Toolbox extends Component<{}, ToolboxState> {
+interface ToolboxProps {
+    onChipClicked: (chip: ChipBlueprint) => void;
+}
 
-    constructor(props: any) {
+class Toolbox extends Component<ToolboxProps, ToolboxState> {
+
+    constructor(props: ToolboxProps) {
         super(props);
 
         this.state = {
@@ -40,21 +44,21 @@ class Toolbox extends Component<{}, ToolboxState> {
                     <Tab isSelected={this.state.selectedTab === tabs[0].id}>
                         <div className="tab-chips">
                             {this.state.chipsLogic.map(chip => {
-                                return <ChipToolbox chip={chip} key={chip.name}></ChipToolbox>;
+                                return <ChipToolbox chip={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
                             })}
                         </div>
                     </Tab>
                     <Tab isSelected={this.state.selectedTab === tabs[1].id}>
                         <div className="tab-chips">
                             {this.state.chipsInOut.map(chip => {
-                                return <ChipToolbox chip={chip} key={chip.name}></ChipToolbox>;
+                                return <ChipToolbox chip={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
                             })}
                         </div>
                     </Tab>
                     <Tab isSelected={this.state.selectedTab === tabs[2].id}>
                         <div className="tab-chips">
                             {this.state.chipsCustom.map(chip => {
-                                return <ChipToolbox chip={chip} key={chip.name}></ChipToolbox>;
+                                return <ChipToolbox chip={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
                             })}
                         </div>
                     </Tab>

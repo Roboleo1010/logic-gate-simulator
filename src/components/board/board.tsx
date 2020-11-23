@@ -4,23 +4,16 @@ import Chip from "../chip/chip";
 
 import "./board.scss";
 
-interface BoardState {
+interface BoardProps {
     chips: ChipBlueprint[];
 }
 
-class Board extends Component<{}, BoardState>{
-
-    constructor(props: any) {
-        super(props);
-
-        this.state = { chips: [new ChipBlueprint("AND", "#729B79")] }
-    }
-
+class Board extends Component<BoardProps>{
     render() {
         return (
             <div className="board">
-                {this.state.chips.map(chip => {
-                    return <Chip chip={chip}></Chip>
+                {this.props.chips.map((chip, index) => {
+                    return <Chip key={`${chip.name}_${index}`} chip={chip}></Chip>
                 })}
             </div>);
     }
