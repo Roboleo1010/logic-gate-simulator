@@ -1,11 +1,12 @@
 import React, { Component } from "react";
+import { TabData } from "../tab.types";
 
 import "./tabnav.scss"
 
 interface TabNavProps {
-    selected: string;
-    tabs: string[]
-    setSelected: (tap: string) => void;
+    selectedId: string;
+    tabs: TabData[]
+    setSelected: (tap: TabData) => void;
 }
 
 class TabNav extends Component<TabNavProps> {
@@ -15,10 +16,10 @@ class TabNav extends Component<TabNavProps> {
             <div className="tabnav-tabs">
                 {this.props.tabs.map(tap => {
                     let classNames = 'tabnav-tab unselectable  ';
-                    if (this.props.selected === tap)
+                    if (this.props.selectedId === tap.id)
                         classNames += 'tabnav-active '
 
-                    return <div key={tap} className={classNames} onClick={() => this.props.setSelected(tap)}>{tap}</div>
+                    return <div key={tap.id} className={classNames} onClick={() => this.props.setSelected(tap)}>{tap.name}</div>
                 })}
             </div>
 
