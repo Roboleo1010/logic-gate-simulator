@@ -10,8 +10,3 @@ export enum GateType {
     AND = "AND",
     NOT = "NOT",
 }
-
-export interface WireConnection {
-    outputId: string;
-    input: string;
-}

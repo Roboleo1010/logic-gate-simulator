@@ -1,11 +1,12 @@
 import React, { Component } from "react";
-import ConnectorBlueprint, { ConnectorDirection, ConnectorSide } from "../../model/connector-blueprint";
+import ConnectorModel, { ConnectorDirection, ConnectorSide } from "../../model/connector-model";
 import "./connector.scss";
 
 interface ConnectorProps {
-    connectorBlueprint: ConnectorBlueprint;
+    connectorBlueprint: ConnectorModel;
     connectorsForSideCount: number;
     connectorForSideIndex: number;
+    onClick: (connector: ConnectorModel) => void;
 }
 
 class Connector extends Component<ConnectorProps>{
@@ -42,9 +43,7 @@ class Connector extends Component<ConnectorProps>{
                 break;
         }
 
-
-
-        return (<div className={className} style={style}></div>);
+        return (<div data-connectorid={this.props.connectorBlueprint.name} className={className} style={style} onClick={() => this.props.onClick(this.props.connectorBlueprint)}></div >);
     }
 }
 

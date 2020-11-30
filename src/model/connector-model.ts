@@ -1,17 +1,17 @@
 export enum ConnectorSide {
-    Top,
-    Bottom,
-    Left,
-    Right
+    Top = "Top",
+    Bottom = "Bottom",
+    Left = "Left",
+    Right = "Right"
 }
 
 export enum ConnectorDirection {
-    SignalIn,
-    SignalOut
+    SignalIn = "SignalIn",
+    SignalOut = "SignalOut"
 }
 
 
-class ConnectorBlueprint {
+class ConnectorModel {
     public name: string;
     public side: ConnectorSide;
     public direction: ConnectorDirection;
@@ -23,4 +23,4 @@ class ConnectorBlueprint {
     }
 }
 
-export default ConnectorBlueprint;
+export default ConnectorModel;

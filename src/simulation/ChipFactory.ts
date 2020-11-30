@@ -1,6 +1,6 @@
 import { GateType, TriState } from "./simulator.types";
 import Gate from "./gate";
-import Simulator from "./simulator";
+import Simulation from "./simulation";
 
 class ChipFactory {
     private static instance: ChipFactory;
@@ -8,8 +8,11 @@ class ChipFactory {
     private nextANDId: number = 0;
     private nextNOTId: number = 0;
 
+    private simulation: Simulation;
+
     private constructor() {
         ChipFactory.instance = this;
+        this.simulation = Simulation.getInstance();
     }
 
     public static getInstance() {
@@ -23,7 +26,7 @@ class ChipFactory {
         let id = `AND_${this.nextANDId++}`;
         let and = new Gate(id, GateType.AND, TriState.False, [in1, in2]);
 
-        Simulator.getInstance().gates.push(and);
+        this.simulation.addGates([and]);
 
         return [id];
     }
@@ -32,7 +35,7 @@ class ChipFactory {
         let id = `NOT_${this.nextNOTId++}`;
         let not = new Gate(id, GateType.NOT, TriState.False, [in1]);
 
-        Simulator.getInstance().gates.push(not);
+        this.simulation.addGates([not]);
 
         return [id];
     }

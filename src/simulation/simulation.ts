@@ -1,17 +1,18 @@
 import ChipFactory from "./ChipFactory";
 import Gate from "./gate";
-import { WireConnection, GateType, TriState } from "./simulator.types";
+import { GateType, TriState } from "./simulator.types";
+import { Wire } from "./wire";
 
-class Simulator {
-    private static instance: Simulator;
+class Simulation {
+    private static instance: Simulation;
 
-    gates: Gate[] = [];
-    wireConnections: WireConnection[] = []; //this is responsible for wiering external outputs to chip internal outputs
+    private gates: Gate[] = [];
+    private wires: Wire[] = []; //this is responsible for wiering external outputs to chip internal outputs
 
     evalsPerStep: number = 5;
 
     private constructor() {
-        Simulator.instance = this;
+        Simulation.instance = this;
 
         //on board only
         let in1 = new Gate("IN1", GateType.Controlled, TriState.True, []);
@@ -20,16 +21,24 @@ class Simulator {
 
         this.gates.push(in1, in2, out1);
 
-        let or = ChipFactory.getInstance().buildORChip(in1.id, in2.id);
+        let or = ChipFactory.getInstance().buildANDChip(in1.id, in2.id);
 
-        this.wireConnections.push({ outputId: "OUT1", input: or[0] });
+        this.wires.push({ inputId: or[0], outputId: "OUT1" });
     }
 
     public static getInstance() {
-        if (!Simulator.instance)
-            new Simulator();
+        if (!Simulation.instance)
+            new Simulation();
 
-        return Simulator.instance;
+        return Simulation.instance;
+    }
+
+    public addGates(gates: Gate[]) {
+        this.gates.push(...gates);
+    }
+
+    public addWires(connections: Wire[]) {
+        this.wires.push(...connections);
     }
 
     getGateById(id: string): Gate {
@@ -77,8 +86,8 @@ class Simulator {
     public simulate() {
         console.log(`Starting simulaton with ${this.gates.length} Gates`);
 
-        this.wireConnections.forEach(config => {
-            this.getGateById(config.outputId).inputs = [config.input];
+        this.wires.forEach(wire => {
+            this.getGateById(wire.outputId).inputs = [wire.inputId];
         });
 
         for (let i = 0; i < this.evalsPerStep; i++)
@@ -88,4 +97,4 @@ class Simulator {
     }
 }
 
-export default Simulator;
+export default Simulation;

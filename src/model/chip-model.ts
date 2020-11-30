@@ -1,15 +1,20 @@
-import ConnectorBlueprint, { ConnectorSide } from "./connector-blueprint";
+import Gate from "../simulation/gate";
+import { Wire } from "../simulation/wire";
+import ConnectorModel, { ConnectorSide } from "./connector-model";
 
-class ChipBlueprint {
+class ChipModel {
     name: string;
     color: string;
 
-    public connectorsTop: ConnectorBlueprint[];
-    public connectorsBottom: ConnectorBlueprint[];
-    public connectorsLeft: ConnectorBlueprint[];
-    public connectorsRight: ConnectorBlueprint[];
+    public connectorsTop: ConnectorModel[];
+    public connectorsBottom: ConnectorModel[];
+    public connectorsLeft: ConnectorModel[];
+    public connectorsRight: ConnectorModel[];
 
-    constructor(name: string, color: string, connectors: ConnectorBlueprint[]) {
+    public gates: Gate[] = [];
+    public wires: Wire[] = [];
+
+    constructor(name: string, color: string, connectors: ConnectorModel[], gates: Gate[] = [], wires: Wire[] = []) {
         this.name = name;
         this.color = color;
 
@@ -19,8 +24,8 @@ class ChipBlueprint {
         this.connectorsRight = connectors.filter(connector => connector.side === ConnectorSide.Right)
     }
 
-    public getConnectorArrays(): ConnectorBlueprint[][] {
-        let result: ConnectorBlueprint[][] = [];
+    public getConnectorArrays(): ConnectorModel[][] {
+        let result: ConnectorModel[][] = [];
 
         if (this.connectorsTop.length > 0)
             result.push(this.connectorsTop);
@@ -35,4 +40,4 @@ class ChipBlueprint {
     }
 }
 
-export default ChipBlueprint;
+export default ChipModel;
