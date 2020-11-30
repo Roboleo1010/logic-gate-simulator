@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import ChipModel from "../../model/chip-model";
+import { ChipBlueprint } from "../../model/circuit-builder.types";
 import "./chip.scss";
 
 interface ChipToolboxProps {
-    chip: ChipModel;
-    onChipClicked: (chip: ChipModel) => void;
+    chip: ChipBlueprint;
+    onChipClicked: (chip: ChipBlueprint) => void;
 }
 
 class ChipToolbox extends Component<ChipToolboxProps> {

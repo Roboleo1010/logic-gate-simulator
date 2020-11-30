@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ChipModel from '../../model/chip-model';
-import ConnectorModel, { ConnectorDirection } from '../../model/connector-model';
+import { ChipBlueprint, ConnectorDirection, ConnectorModel } from '../../model/circuit-builder.types';
 import Simulation from '../../simulation/simulation';
 import { Wire } from '../../simulation/wire';
 import Board from '../board/board';
@@ -27,9 +27,9 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         Simulation.getInstance().simulate();
     }
 
-    addChipToBoard(chip: ChipModel) {
+    addChipToBoard(chip: ChipBlueprint) {
         let newChips = this.state.chips;
-        newChips.push(chip);
+        newChips.push(new ChipModel(chip));
 
         this.setState({ chips: newChips })
     }
@@ -37,19 +37,34 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     onConnectorClicked(connector: ConnectorModel) {
         //First click
         if (!this.state.lastClickedConnector) {
-            this.setState({ lastClickedConnector: connector });
-            return;
+            if (connector.direction === ConnectorDirection.SignalOut) {
+                this.setState({ lastClickedConnector: connector });
+                return;
+            }
+            else {
+                console.warn("Can't start Wire on Input.")
+                this.setState({ lastClickedConnector: undefined });
+                return;
+            }
         }
 
-        //Checking for mistakes
-        if (connector.name === this.state.lastClickedConnector.name) {
+        //Same Connector
+        if (connector.id === this.state.lastClickedConnector.id) {
             console.warn("Can't Connect Wire to same connector.")
             this.setState({ lastClickedConnector: undefined });
             return;
         }
 
-        if (connector.direction === this.state.lastClickedConnector.direction) {
-            console.warn(`Can't Connect ${connector.direction} to ${connector.direction}`);
+        //Input & input or out & out
+        if (connector.direction === ConnectorDirection.SignalOut) {
+            console.warn("Can't end Wire on output.")
+            this.setState({ lastClickedConnector: undefined });
+            return;
+        }
+
+        //Two wires to same connector
+        if ((this.state.wires.filter(wire => wire.outputId === connector.id)).length > 0) {
+            console.warn("Can't Connect two Wires to same Input.")
             this.setState({ lastClickedConnector: undefined });
             return;
         }
@@ -58,11 +73,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         console.log("Creatng Wire:", this.state.lastClickedConnector, connector);
 
         let newWires = this.state.wires;
-
-        if (connector.direction === ConnectorDirection.SignalOut)
-            newWires.push({ inputId: connector.name, outputId: this.state.lastClickedConnector.name });
-        else
-            newWires.push({ inputId: this.state.lastClickedConnector.name, outputId: connector.name });
+        newWires.push({ inputId: this.state.lastClickedConnector.id, outputId: connector.id });
 
         this.setState({ wires: newWires, lastClickedConnector: undefined })
 

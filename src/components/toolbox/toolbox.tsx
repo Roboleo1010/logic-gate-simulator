@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import ChipModel from "../../model/chip-model";
-import ConnectorModel, { ConnectorDirection, ConnectorSide } from "../../model/connector-model";
-import ChipFactory from "../../simulation/ChipFactory";
+import ChipManager from "../../manager/chip-manager";
+import { ChipBlueprint } from "../../model/circuit-builder.types";
 import ChipToolbox from "../chip/chip-toolbox";
 import { TabData } from "../tabs/tab.types";
 import Tab from "../tabs/tab/tab";
@@ -11,37 +10,26 @@ import "./toolbox.scss"
 
 interface ToolboxState {
     selectedTab: string;
-    chipsLogic: ChipModel[];
-    chipsInOut: ChipModel[];
-    chipsCustom: ChipModel[];
+    chipsLogic: ChipBlueprint[];
+    chipsInOut: ChipBlueprint[];
+    chipsCustom: ChipBlueprint[];
 }
 
 interface ToolboxProps {
-    onChipClicked: (chip: ChipModel) => void;
+    onChipClicked: (chip: ChipBlueprint) => void;
 }
 
 class Toolbox extends Component<ToolboxProps, ToolboxState> {
-    private chipFactory: ChipFactory;
-
-
     constructor(props: ToolboxProps) {
         super(props);
-        this.chipFactory = ChipFactory.getInstance();
+
+        let chipManager = ChipManager.getInstance();
 
         this.state = {
             selectedTab: 'chips-logic',
-            chipsLogic: [
-                // new ChipBlueprint("AND", "#729B79", [new ConnectorBlueprint("in1", ConnectorSide.Left, ConnectorDirection.SignalIn), new ConnectorBlueprint("in2", ConnectorSide.Left, ConnectorDirection.SignalIn), new ConnectorBlueprint("out1", ConnectorSide.Right, ConnectorDirection.SignalOut)]),
-                new ChipModel("NOT", "#D05353", [new ConnectorModel("not_in1", ConnectorSide.Left, ConnectorDirection.SignalIn), new ConnectorModel("not_out1", ConnectorSide.Right, ConnectorDirection.SignalOut)])
-            ],
-            chipsInOut: [
-                // new ChipBlueprint("Input", "#386FA4", [new ConnectorBlueprint("in1", ConnectorSide.Left, ConnectorDirection.SignalIn)]),
-                new ChipModel("Output", "#386FA4", [new ConnectorModel("out_in1", ConnectorSide.Left, ConnectorDirection.SignalIn)]),
-                new ChipModel("Constant On", "#6DA34D", [new ConnectorModel("on_out1", ConnectorSide.Right, ConnectorDirection.SignalOut)]),
-                new ChipModel("Constant Off", "#D10000", [new ConnectorModel("off_out1", ConnectorSide.Right, ConnectorDirection.SignalOut)]),
-                // new ChipBlueprint("Oscilloscope", "#000000", [new ConnectorBlueprint("in1", ConnectorSide.Left, ConnectorDirection.SignalIn)])
-            ],
-            chipsCustom: []
+            chipsLogic: chipManager.getByCategory('logic'),
+            chipsInOut: chipManager.getByCategory('io'),
+            chipsCustom: chipManager.getByCategory('')
         };
     }
 

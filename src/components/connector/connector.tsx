@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import ConnectorModel, { ConnectorDirection, ConnectorSide } from "../../model/connector-model";
+import { ConnectorDirection, ConnectorModel, ConnectorSide } from "../../model/circuit-builder.types";
 import "./connector.scss";
 
 interface ConnectorProps {
@@ -43,7 +43,7 @@ class Connector extends Component<ConnectorProps>{
                 break;
         }
 
-        return (<div data-connectorid={this.props.connectorBlueprint.name} className={className} style={style} onClick={() => this.props.onClick(this.props.connectorBlueprint)}></div >);
+        return (<div data-connectorid={this.props.connectorBlueprint.id} className={className} style={style} onClick={() => this.props.onClick(this.props.connectorBlueprint)}></div >);
     }
 }
 

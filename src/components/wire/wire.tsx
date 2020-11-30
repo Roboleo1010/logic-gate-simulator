@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { WireModel } from "../../model/wire-model";
+import { WireModel } from "../../model/circuit-builder.types";
 
 import "./wire.scss";
 

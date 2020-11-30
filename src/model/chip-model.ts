@@ -1,42 +1,27 @@
-import Gate from "../simulation/gate";
-import { Wire } from "../simulation/wire";
-import ConnectorModel, { ConnectorSide } from "./connector-model";
+import ChipManager from "../manager/chip-manager";
+import { ChipBlueprint, ConnectorModel, ConnectorSide } from "./circuit-builder.types";
 
 class ChipModel {
-    name: string;
-    color: string;
+    public blueprint: ChipBlueprint;
+    public id: string;
 
-    public connectorsTop: ConnectorModel[];
-    public connectorsBottom: ConnectorModel[];
-    public connectorsLeft: ConnectorModel[];
-    public connectorsRight: ConnectorModel[];
+    public connectors: ConnectorModel[][] = [];
 
-    public gates: Gate[] = [];
-    public wires: Wire[] = [];
+    constructor(blueprint: ChipBlueprint) {
+        let chipManager = ChipManager.getInstance();
 
-    constructor(name: string, color: string, connectors: ConnectorModel[], gates: Gate[] = [], wires: Wire[] = []) {
-        this.name = name;
-        this.color = color;
+        this.blueprint = blueprint;
+        this.id = `${blueprint.name}_${chipManager.getNextId(blueprint.name)}`;
 
-        this.connectorsTop = connectors.filter(connector => connector.side === ConnectorSide.Top)
-        this.connectorsBottom = connectors.filter(connector => connector.side === ConnectorSide.Bottom)
-        this.connectorsLeft = connectors.filter(connector => connector.side === ConnectorSide.Left)
-        this.connectorsRight = connectors.filter(connector => connector.side === ConnectorSide.Right)
+
+        // this.filterConnectors(connectors);
     }
 
-    public getConnectorArrays(): ConnectorModel[][] {
-        let result: ConnectorModel[][] = [];
-
-        if (this.connectorsTop.length > 0)
-            result.push(this.connectorsTop);
-        if (this.connectorsBottom.length > 0)
-            result.push(this.connectorsBottom);
-        if (this.connectorsLeft.length > 0)
-            result.push(this.connectorsLeft);
-        if (this.connectorsRight.length > 0)
-            result.push(this.connectorsRight);
-
-        return result;
+    private filterConnectors(connectors: ConnectorModel[]) {
+        this.connectors.push(connectors.filter(connector => connector.side === ConnectorSide.Top));
+        this.connectors.push(connectors.filter(connector => connector.side === ConnectorSide.Bottom));
+        this.connectors.push(connectors.filter(connector => connector.side === ConnectorSide.Left));
+        this.connectors.push(connectors.filter(connector => connector.side === ConnectorSide.Right));
     }
 }
 
