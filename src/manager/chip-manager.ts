@@ -1,8 +1,12 @@
-import { ChipBlueprint } from "../model/circuit-builder.types";
+import { ChipBlueprint, GateBlueprint } from "../model/circuit-builder.types";
+import { GateType } from "../simulation/simulator.types";
 
 class ChipManager {
     private chips: Map<string, ChipBlueprint> = new Map();
     private chipIds: Map<string, number> = new Map();
+
+    private nextInputId: number = 0;
+    private nextOutputId: number = 0;
 
     private static instance: ChipManager;
 
@@ -13,14 +17,20 @@ class ChipManager {
     }
 
     private loadData() {//TODO: From Firebase
-        this.chips.set("AND", { name: "AND", color: "#729B79", category: "logic" });
-        this.chips.set("NOT", { name: "NOT", color: "#D05353", category: "logic" });
+        let gateAnd: GateBlueprint = { type: GateType.AND, inputCount: 2, outputCount: 1 };
+        let gateNot: GateBlueprint = { type: GateType.NOT, inputCount: 1, outputCount: 1 };
 
-        this.chips.set("Input", { name: "Input", color: "#386FA4", category: "io" });
-        this.chips.set("Output", { name: "Output", color: "#386FA4", category: "io" });
-        this.chips.set("Constant On", { name: "Constant On", color: "#6DA34D", category: "io" });
-        this.chips.set("Constant Off", { name: "Constant Off", color: "#D10000", category: "io" });
-        this.chips.set("Oscilloscope", { name: "Oscilloscope", color: "#000000", category: "io" });
+        let gateControlled: GateBlueprint = { type: GateType.Controlled, inputCount: 0, outputCount: 1 };
+        let gateRelay: GateBlueprint = { type: GateType.Relay, inputCount: 1, outputCount: 1 };
+
+        this.chips.set("AND", { name: "AND", color: "#729B79", category: "logic", gates: [gateAnd] });
+        this.chips.set("NOT", { name: "NOT", color: "#D05353", category: "logic", gates: [gateNot] });
+
+        this.chips.set("Input", { name: "Input", color: "#386FA4", category: "io", gates: [gateControlled] });
+        this.chips.set("Output", { name: "Output", color: "#386FA4", category: "io", gates: [gateRelay] });
+        this.chips.set("Constant On", { name: "Constant On", color: "#6DA34D", category: "io", gates: [gateControlled] });
+        this.chips.set("Constant Off", { name: "Constant Off", color: "#D10000", category: "io", gates: [gateControlled] });
+        this.chips.set("Oscilloscope", { name: "Oscilloscope", color: "#000000", category: "io", gates: [gateRelay] });
     }
 
     public static getInstance() {
@@ -54,7 +64,7 @@ class ChipManager {
         return chips;
     }
 
-    public getNextId(name: string): number {
+    public getNextChipId(name: string): number {
         if (!this.chipIds.has(name)) {
             this.chipIds.set(name, 0);
             return 0;
@@ -70,6 +80,14 @@ class ChipManager {
 
         console.error("Error while getting new ChipId");
         return -1;
+    }
+
+    public getNextInputId(): string {
+        return `IN_${this.nextInputId++}`;
+    }
+
+    public getNextOutputId(): string {
+        return `OUT_${this.nextOutputId++}`;
     }
 }
 

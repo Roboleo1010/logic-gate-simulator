@@ -27,10 +27,13 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         Simulation.getInstance().simulate();
     }
 
-    addChipToBoard(chip: ChipBlueprint) {
-        let newChips = this.state.chips;
-        newChips.push(new ChipModel(chip));
+    addChipToBoard(chipBlueprint: ChipBlueprint) {
+        let chip = new ChipModel(chipBlueprint);
 
+
+
+        let newChips = this.state.chips;
+        newChips.push(chip);
         this.setState({ chips: newChips })
     }
 

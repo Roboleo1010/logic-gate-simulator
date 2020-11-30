@@ -1,5 +1,5 @@
 import ChipManager from "../manager/chip-manager";
-import { ChipBlueprint, ConnectorModel, ConnectorSide } from "./circuit-builder.types";
+import { ChipBlueprint, ConnectorDirection, ConnectorModel, ConnectorSide } from "./circuit-builder.types";
 
 class ChipModel {
     public blueprint: ChipBlueprint;
@@ -11,10 +11,20 @@ class ChipModel {
         let chipManager = ChipManager.getInstance();
 
         this.blueprint = blueprint;
-        this.id = `${blueprint.name}_${chipManager.getNextId(blueprint.name)}`;
+        this.id = `${blueprint.name}_${chipManager.getNextChipId(blueprint.name)}`;
 
+        let connectors: ConnectorModel[] = [];
 
-        // this.filterConnectors(connectors);
+        //Adding Gates
+        blueprint.gates?.forEach(gate => {
+            for (let i = 0; i < gate.inputCount; i++)
+                connectors.push({ direction: ConnectorDirection.SignalIn, side: ConnectorSide.Left, id: chipManager.getNextInputId() })
+
+            for (let o = 0; o < gate.outputCount; o++)
+                connectors.push({ direction: ConnectorDirection.SignalOut, side: ConnectorSide.Right, id: chipManager.getNextOutputId() })
+        });
+
+        this.filterConnectors(connectors);
     }
 
     private filterConnectors(connectors: ConnectorModel[]) {

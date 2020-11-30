@@ -7,8 +7,6 @@ class ChipFactory {
 
     private nextANDId: number = 0;
     private nextNOTId: number = 0;
-    private nextInputId: number = 0;
-    private nextOutputId: number = 0;
 
     private simulation: Simulation;
 
@@ -57,14 +55,6 @@ class ChipFactory {
         let nand1 = this.buildNANDChip(not1[0], not2[0]);
 
         return nand1;
-    }
-
-    public getNextInputId(): string {
-        return `IN_${this.nextInputId++}`;
-    }
-
-    public getNextOutputId(): string {
-        return `OUT_${this.nextOutputId++}`;
     }
 }
 export default ChipFactory;
