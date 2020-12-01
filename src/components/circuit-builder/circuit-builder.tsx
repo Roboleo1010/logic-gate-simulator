@@ -92,7 +92,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     }
 
     switchTool(tool: Tool) {
-        this.setState({ activeTool: tool });
+        this.setState({ activeTool: tool, lastClickedConnector: undefined });
     }
 
     render() {
