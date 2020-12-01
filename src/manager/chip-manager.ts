@@ -1,12 +1,11 @@
-import { ChipBlueprint, GateBlueprint } from "../model/circuit-builder.types";
-import { GateType } from "../simulation/simulator.types";
+import { ChipBlueprint } from "../model/circuit-builder.types";
+import { GateType, TriState } from "../simulation/simulator.types";
 
 class ChipManager {
     private chips: Map<string, ChipBlueprint> = new Map();
     private chipIds: Map<string, number> = new Map();
 
-    private nextInputId: number = 0;
-    private nextOutputId: number = 0;
+    private nextId: number = 0;
 
     private static instance: ChipManager;
 
@@ -17,20 +16,32 @@ class ChipManager {
     }
 
     private loadData() {//TODO: From Firebase
-        let gateAnd: GateBlueprint = { type: GateType.AND, inputCount: 2, outputCount: 1 };
-        let gateNot: GateBlueprint = { type: GateType.NOT, inputCount: 1, outputCount: 1 };
+        this.chips.set("Constant On", {
+            name: "Constant On", color: "#6DA34D", category: "io", gates: [
+                { id: 'ctr', type: GateType.Controlled, state: TriState.True, inputs: [] },
+                { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['ctr'] }]
+        });
 
-        let gateControlled: GateBlueprint = { type: GateType.Controlled, inputCount: 0, outputCount: 1 };
-        let gateRelay: GateBlueprint = { type: GateType.Relay, inputCount: 1, outputCount: 1 };
+        this.chips.set("Constant Off", {
+            name: "Constant Off", color: "#D10000", category: "io", gates: [
+                { id: 'ctr', type: GateType.Controlled, state: TriState.False, inputs: [] },
+                { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['ctr'] }]
+        });
 
-        this.chips.set("AND", { name: "AND", color: "#729B79", category: "logic", gates: [gateAnd] });
-        this.chips.set("NOT", { name: "NOT", color: "#D05353", category: "logic", gates: [gateNot] });
+        this.chips.set("Not", {
+            name: "NOT", color: "#e76f51", category: "logic", gates: [
+                { id: 'rly_in', type: GateType.Relay, state: TriState.False, inputs: [] },
+                { id: 'not', type: GateType.NOT, state: TriState.False, inputs: ['rly_in'] },
+                { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['not'] }]
+        });
 
-        this.chips.set("Input", { name: "Input", color: "#386FA4", category: "io", gates: [gateControlled] });
-        this.chips.set("Output", { name: "Output", color: "#386FA4", category: "io", gates: [gateRelay] });
-        this.chips.set("Constant On", { name: "Constant On", color: "#6DA34D", category: "io", gates: [gateControlled] });
-        this.chips.set("Constant Off", { name: "Constant Off", color: "#D10000", category: "io", gates: [gateControlled] });
-        this.chips.set("Oscilloscope", { name: "Oscilloscope", color: "#000000", category: "io", gates: [gateRelay] });
+        this.chips.set("And", {
+            name: "AND", color: "#2a9d8f", category: "logic", gates: [
+                { id: 'rly_in1', type: GateType.Relay, state: TriState.False, inputs: [] },
+                { id: 'rly_in2', type: GateType.Relay, state: TriState.False, inputs: [] },
+                { id: 'and', type: GateType.AND, state: TriState.False, inputs: ['rly_in1', 'rly_in2'] },
+                { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['and'] }]
+        });
     }
 
     public static getInstance() {
@@ -82,13 +93,10 @@ class ChipManager {
         return -1;
     }
 
-    public getNextInputId(): string {
-        return `IN_${this.nextInputId++}`;
+    public getNextId(): string {
+        return `${this.nextId++}`;
     }
 
-    public getNextOutputId(): string {
-        return `OUT_${this.nextOutputId++}`;
-    }
 }
 
 export default ChipManager;

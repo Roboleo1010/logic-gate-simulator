@@ -10,3 +10,15 @@ export enum GateType {
     AND = "AND",
     NOT = "NOT",
 }
+
+export interface Wire {
+    inputId: string;
+    outputId: string;
+}
+
+export interface Gate {
+    id: string;
+    type: GateType;
+    state: TriState;
+    inputs: string[];
+}

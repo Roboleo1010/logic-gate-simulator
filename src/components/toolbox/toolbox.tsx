@@ -46,21 +46,21 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
                     <Tab isSelected={this.state.selectedTab === tabs[0].id}>
                         <div className="tab-chips">
                             {this.state.chipsLogic.map(chip => {
-                                return <ChipToolbox chip={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
+                                return <ChipToolbox chipBlueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
                             })}
                         </div>
                     </Tab>
                     <Tab isSelected={this.state.selectedTab === tabs[1].id}>
                         <div className="tab-chips">
                             {this.state.chipsInOut.map(chip => {
-                                return <ChipToolbox chip={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
+                                return <ChipToolbox chipBlueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
                             })}
                         </div>
                     </Tab>
                     <Tab isSelected={this.state.selectedTab === tabs[2].id}>
                         <div className="tab-chips">
                             {this.state.chipsCustom.map(chip => {
-                                return <ChipToolbox chip={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
+                                return <ChipToolbox chipBlueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
                             })}
                         </div>
                     </Tab>

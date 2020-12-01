@@ -1,51 +1,43 @@
-import ChipFactory from "./ChipFactory";
-import Gate from "./gate";
-import { GateType, TriState } from "./simulator.types";
-import { Wire } from "./wire";
+import { GateType, TriState, Wire, Gate } from "./simulator.types";
 
 class Simulation {
-    private static instance: Simulation;
-
     private gates: Gate[] = [];
-    private wires: Wire[] = []; //this is responsible for wiering external outputs to chip internal outputs
+    private wires: Wire[] = [];
 
-    evalsPerStep: number = 5;
+    evalsPerTick: number = 10;
 
-    private constructor() {
-        Simulation.instance = this;
-
-        //on board only
-        let in1 = new Gate("IN1", GateType.Controlled, TriState.True, []);
-        let in2 = new Gate("IN2", GateType.Controlled, TriState.True, []);
-        let out1 = new Gate("OUT1", GateType.Relay, TriState.False, []);
-
-        this.gates.push(in1, in2, out1);
-
-        let or = ChipFactory.getInstance().buildANDChip(in1.id, in2.id);
-
-        this.wires.push({ inputId: or[0], outputId: "OUT1" });
+    constructor(gates: Gate[], wires: Wire[]) {
+        this.gates = gates;
+        this.wires = wires;
     }
 
-    public static getInstance() {
-        if (!Simulation.instance)
-            new Simulation();
+    public simulate() {
+        console.log(`Added ${this.gates.length} Gates.`);
+        console.log(this.gates);
 
-        return Simulation.instance;
+        this.wires.forEach(wire => {
+            this.getGateById(wire.outputId).inputs = [wire.inputId];
+        });
+
+        console.log(`Added ${this.wires.length} Wires.`);
+        console.log(this.wires);
+
+        console.log(`%cRunning Simulation with ${this.evalsPerTick} steps per Tick`, 'color: #bada55');
+
+        console.time("simulation");
+
+        for (let i = 0; i < this.evalsPerTick; i++)
+            this.evaluate();
+
+        console.timeEnd("simulation")
+        this.printState();
     }
 
-    public addGates(gates: Gate[]) {
-        this.gates.push(...gates);
-    }
-
-    public addWires(connections: Wire[]) {
-        this.wires.push(...connections);
-    }
-
-    getGateById(id: string): Gate {
+    private getGateById(id: string): Gate {
         return this.gates.filter(chip => chip.id === id)[0];
     }
 
-    evaluate() {
+    private evaluate() {
         this.gates.forEach((gate: Gate) => {
             if (gate.type === GateType.Controlled)
                 return;
@@ -70,7 +62,7 @@ class Simulation {
         });
     }
 
-    printState(gateIds: string[] = []) {
+    private printState(gateIds: string[] = []) {
 
         if (gateIds.length > 0)
             this.gates.forEach(gate => {
@@ -81,19 +73,6 @@ class Simulation {
             this.gates.forEach(gate => {
                 console.log(`${gate.id} ${gate.state}`);
             });
-    }
-
-    public simulate() {
-        console.log(`Starting simulaton with ${this.gates.length} Gates`);
-
-        this.wires.forEach(wire => {
-            this.getGateById(wire.outputId).inputs = [wire.inputId];
-        });
-
-        for (let i = 0; i < this.evalsPerStep; i++)
-            this.evaluate();
-
-        this.printState(["IN1", "IN2", "OUT1"]);
     }
 }
 

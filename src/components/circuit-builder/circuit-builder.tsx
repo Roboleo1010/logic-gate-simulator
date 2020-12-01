@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import ChipModel from '../../model/chip-model';
 import { ChipBlueprint, ConnectorDirection, ConnectorModel } from '../../model/circuit-builder.types';
-import Simulation from '../../simulation/simulation';
-import { Wire } from '../../simulation/wire';
+import { Wire } from '../../simulation/simulator.types';
 import Board from '../board/board';
 import Toolbox from '../toolbox/toolbox';
 
@@ -23,14 +22,10 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             chips: [],
             wires: []
         };
-
-        Simulation.getInstance().simulate();
     }
 
     addChipToBoard(chipBlueprint: ChipBlueprint) {
         let chip = new ChipModel(chipBlueprint);
-
-
 
         let newChips = this.state.chips;
         newChips.push(chip);

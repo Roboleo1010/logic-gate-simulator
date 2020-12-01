@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { WireModel } from "../../model/circuit-builder.types";
+import { Wire as WireSimulation } from "../../simulation/simulator.types";
 
 import "./wire.scss";
 
 interface WireProps {
-    wire: WireModel;
+    wire: WireSimulation;
 }
 
 class Wire extends Component<WireProps> {

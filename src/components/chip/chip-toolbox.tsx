@@ -3,18 +3,18 @@ import { ChipBlueprint } from "../../model/circuit-builder.types";
 import "./chip.scss";
 
 interface ChipToolboxProps {
-    chip: ChipBlueprint;
+    chipBlueprint: ChipBlueprint;
     onChipClicked: (chip: ChipBlueprint) => void;
 }
 
 class ChipToolbox extends Component<ChipToolboxProps> {
     render() {
-        let style = { backgroundColor: this.props.chip.color };
+        let style = { backgroundColor: this.props.chipBlueprint.color };
 
         return (
-            <div className="chip chip-on-toolbox" style={style} onClick={() => this.props.onChipClicked(this.props.chip)}>
+            <div className="chip chip-on-toolbox" style={style} onClick={() => this.props.onChipClicked(this.props.chipBlueprint)}>
                 <span>
-                    {this.props.chip.name}
+                    {this.props.chipBlueprint.name}
                 </span>
             </div>
         );
