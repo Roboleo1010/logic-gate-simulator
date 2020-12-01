@@ -3,16 +3,22 @@ import React, { Component } from "react";
 import "./action-button.scss";
 
 interface ActionButtonProps {
-    icon: string;
     text: string;
-    backgroundColor: string;
+    active: boolean;
     onClick: () => void;
 }
 
-class ActionButton extends Component<ActionButtonProps> {
 
+class ActionButton extends Component<ActionButtonProps> {
     render() {
-        return <div className={"action-button unselectable"} style={{ backgroundColor: this.props.backgroundColor }} onClick={this.props.onClick} title={this.props.text}></div>
+        let className = "action-button unselectable ";
+
+        if (this.props.active)
+            className += "action-button-active";
+        else
+            className += "action-button-inactive";
+
+        return <div className={className} onClick={this.props.onClick} title={this.props.text}></div>
     }
 }
 

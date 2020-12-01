@@ -25,3 +25,9 @@ export interface ConnectorModel {
     side: ConnectorSide;
     direction: ConnectorDirection;
 }
+
+export enum Tool {
+    move = "move",
+    delete = "delete",
+    simulate = "simulate"
+}

@@ -25,5 +25,12 @@
 
 .chip-on-board {
     position: absolute;
-    cursor: grab;
+}
+
+.chip-tool-move {
+    cursor: move;
+}
+
+.chip-tool-delete {
+    cursor: not-allowed;
 }

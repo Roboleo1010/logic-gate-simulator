@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
 import ChipModel from '../../model/chip-model';
-import { ChipBlueprint, ConnectorDirection, ConnectorModel } from '../../model/circuit-builder.types';
+import { ChipBlueprint, ConnectorDirection, ConnectorModel, Tool } from '../../model/circuit-builder.types';
 import { Wire } from '../../simulation/simulator.types';
 import ActionButton from '../action-button/action-button';
 import Board from '../board/board';
 import Toolbox from '../toolbox/toolbox';
 
 import './circuit-builder.scss';
-import './../../styles/fabric-icons.scss'
 
 interface CircuitBuilderState {
     chips: ChipModel[];
     wires: Wire[];
     lastClickedConnector?: ConnectorModel;
+    activeTool: Tool;
 }
 
 class CircuitBuilder extends Component<{}, CircuitBuilderState> {
@@ -22,7 +22,8 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
 
         this.state = {
             chips: [],
-            wires: []
+            wires: [],
+            activeTool: Tool.move
         };
     }
 
@@ -80,15 +81,28 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         return;
     }
 
+    onChipDelete(chipToDelete: ChipModel) {
+        let gateIds = chipToDelete.gates.map(gate => gate.id);
+
+        this.setState({
+            chips: this.state.chips.filter(chip => chip.id !== chipToDelete.id),
+            wires: this.state.wires.filter(wire => !gateIds.includes(wire.inputId) && !gateIds.includes(wire.outputId))
+        });
+    }
+
+    switchTool(tool: Tool) {
+        this.setState({ activeTool: tool });
+    }
+
     render() {
         return (
             <div className="circuit-builder">
-                <Board onConnectorClicked={this.onConnectorClicked.bind(this)} chips={this.state.chips} wires={this.state.wires}></Board>
+                <Board onConnectorClicked={this.onConnectorClicked.bind(this)} chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onChipDelete={this.onChipDelete.bind(this)}></Board>
                 <Toolbox onChipClicked={this.addChipToBoard.bind(this)}></Toolbox>
                 <div className="action-bar">
-                    <ActionButton key={"tool-drag"} text={"Drag"} backgroundColor={"#ffffff"} icon={""} onClick={() => console.log("drag clicked")}></ActionButton>
-                    <ActionButton key={"tool-delete"} text={"Delete"} backgroundColor={"#ffffff"} icon={""} onClick={() => console.log("delete clicked")}></ActionButton>
-                    <ActionButton key={"tool-simulate"} text={"Simulate"} backgroundColor={"#ffffff"} icon={""} onClick={() => console.log("simulate clicked")}></ActionButton>
+                    <ActionButton key={"tool-drag"} text={"Move"} onClick={() => this.switchTool(Tool.move)} active={this.state.activeTool === Tool.move}></ActionButton>
+                    <ActionButton key={"tool-delete"} text={"Delete"} onClick={() => this.switchTool(Tool.delete)} active={this.state.activeTool === Tool.delete}></ActionButton>
+                    <ActionButton key={"tool-simulate"} text={"Simulate"} onClick={() => this.switchTool(Tool.simulate)} active={this.state.activeTool === Tool.simulate}></ActionButton>
                 </div>
             </div>
         );
