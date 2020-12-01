@@ -1,3 +1,9 @@
 .circuit-builder {
     height: 100%;
+
+    .action-bar {
+        position: absolute;
+        right: 0;
+        bottom: 92px;
+    }
 }

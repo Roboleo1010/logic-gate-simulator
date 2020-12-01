@@ -23,19 +23,6 @@ class Board extends Component<BoardProps>{
         console.log("Preparing Simulation");
 
         let gates: Gate[] = [];
-        let wires: WireSimulation[] = [];
-
-        //   Demo SImulation
-        // let factory = new ChipFactory();
-
-        // let in1: Gate = { id: "IN1", type: GateType.Controlled, state: TriState.True, inputs: [] };
-        // let out1: Gate = { id: "OUT1", type: GateType.Relay, state: TriState.False, inputs: [] };
-        // let not = factory.buildNOTChip(in1.id);
-
-        // gates.push(in1, out1);
-        // gates.push(...factory.gates);
-        // wires.push({ outputId: "OUT1", inputId: not[0] });
-
 
         this.props.chips.forEach(chip => {
             chip.gates.forEach(gate => {
@@ -43,9 +30,7 @@ class Board extends Component<BoardProps>{
             });
         });
 
-        wires = this.props.wires;
-
-        new Simulation(gates, wires).simulate();
+        new Simulation(gates, this.props.wires).simulate();
     }
 
     render() {
@@ -57,7 +42,6 @@ class Board extends Component<BoardProps>{
                 {this.props.wires.map(wire => {
                     return <Wire key={`${wire.inputId}_${wire.outputId}`} wire={wire}></Wire>
                 })}
-                <div style={{ right: 0, bottom: 95, position: 'absolute', backgroundColor: 'red', color: 'white', cursor: 'pointer' }} className="unselectable" onClick={this.simulate.bind(this)}>Simulate</div>
             </div>);
     }
 }

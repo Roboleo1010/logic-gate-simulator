@@ -18,7 +18,7 @@ class Wire extends Component<WireProps> {
 
         return (
             <svg className="wire-canvas">
-                <line className="wire wire-on" x1={startElement?.left + startElement?.width / 2} y1={startElement?.top + startElement.height / 2} x2={endElement?.left + startElement?.width / 2} y2={endElement?.top + endElement.height / 2} />
+                <line className="wire" x1={startElement?.left + startElement?.width / 2} y1={startElement?.top + startElement.height / 2} x2={endElement?.left + startElement?.width / 2} y2={endElement?.top + endElement.height / 2} />
             </svg>
         );
     }

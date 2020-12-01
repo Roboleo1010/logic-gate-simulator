@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 import ChipModel from '../../model/chip-model';
 import { ChipBlueprint, ConnectorDirection, ConnectorModel } from '../../model/circuit-builder.types';
 import { Wire } from '../../simulation/simulator.types';
+import ActionButton from '../action-button/action-button';
 import Board from '../board/board';
 import Toolbox from '../toolbox/toolbox';
 
 import './circuit-builder.scss';
+import './../../styles/fabric-icons.scss'
 
 interface CircuitBuilderState {
     chips: ChipModel[];
@@ -83,6 +85,11 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             <div className="circuit-builder">
                 <Board onConnectorClicked={this.onConnectorClicked.bind(this)} chips={this.state.chips} wires={this.state.wires}></Board>
                 <Toolbox onChipClicked={this.addChipToBoard.bind(this)}></Toolbox>
+                <div className="action-bar">
+                    <ActionButton key={"tool-drag"} text={"Drag"} backgroundColor={"#ffffff"} icon={""} onClick={() => console.log("drag clicked")}></ActionButton>
+                    <ActionButton key={"tool-delete"} text={"Delete"} backgroundColor={"#ffffff"} icon={""} onClick={() => console.log("delete clicked")}></ActionButton>
+                    <ActionButton key={"tool-simulate"} text={"Simulate"} backgroundColor={"#ffffff"} icon={""} onClick={() => console.log("simulate clicked")}></ActionButton>
+                </div>
             </div>
         );
     }

@@ -10,16 +10,5 @@
     .wire {
         stroke: #ffffff;
         stroke-width: 3px;
-        pointer-events: painted;
-
-        cursor: pointer;
-    }
-
-    .wire-on {
-        stroke: green;
-    }
-
-    .wire-off {
-        stroke: red;
     }
 }
