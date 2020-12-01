@@ -27,8 +27,6 @@ class ChipModel {
             if (gate.type !== GateType.Relay)
                 return;
 
-            console.log("Missing connector " + gate.id);
-
             if (gate.inputs.length > 0)
                 connectors.push({ direction: ConnectorDirection.SignalOut, side: ConnectorSide.Right, id: gate.id });
             else

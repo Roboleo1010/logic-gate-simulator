@@ -70,9 +70,6 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             return;
         }
 
-        //Creating new Wire
-        console.log("Creatng Wire:", this.state.lastClickedConnector, connector);
-
         let newWires = this.state.wires;
         newWires.push({ inputId: this.state.lastClickedConnector.id, outputId: connector.id });
 
@@ -90,6 +87,10 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         });
     }
 
+    onWireDelete(wireToDelete: Wire) {
+        this.setState({ wires: this.state.wires.filter(wire => wire.inputId !== wireToDelete.inputId || wire.outputId !== wireToDelete.outputId) });
+    }
+
     switchTool(tool: Tool) {
         this.setState({ activeTool: tool });
     }
@@ -97,7 +98,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     render() {
         return (
             <div className="circuit-builder">
-                <Board onConnectorClicked={this.onConnectorClicked.bind(this)} chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onChipDelete={this.onChipDelete.bind(this)}></Board>
+                <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.onChipDelete.bind(this)} onWireDelete={this.onWireDelete.bind(this)}></Board>
                 <Toolbox onChipClicked={this.addChipToBoard.bind(this)}></Toolbox>
                 <div className="action-bar">
                     <ActionButton key={"tool-drag"} text={"Move"} onClick={() => this.switchTool(Tool.move)} active={this.state.activeTool === Tool.move}></ActionButton>

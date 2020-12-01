@@ -14,6 +14,7 @@ interface BoardProps {
     activeTool: Tool;
     onConnectorClicked: (connector: ConnectorModel) => void;
     onChipDelete: (id: ChipModel) => void;
+    onWireDelete: (id: WireSimulation) => void;
 }
 
 class Board extends Component<BoardProps>{
@@ -39,12 +40,12 @@ class Board extends Component<BoardProps>{
         return (
             <div className="board">
                 {this.props.chips.map(chip => {
-                    return <Chip key={chip.id} chip={chip} onConnectorClick={this.props.onConnectorClicked} redraw={this.redraw.bind(this)} activeTool={this.props.activeTool} onChipDelete={this.props.onChipDelete} ></Chip>
+                    return <Chip key={chip.id} chip={chip} activeTool={this.props.activeTool} onConnectorClick={this.props.onConnectorClicked} redraw={this.redraw.bind(this)} onChipDelete={this.props.onChipDelete} ></Chip>
                 })
                 }
                 {
                     this.props.wires.map(wire => {
-                        return <Wire key={`${wire.inputId}_${wire.outputId}`} wire={wire}></Wire>
+                        return <Wire key={`${wire.inputId}_${wire.outputId}`} wire={wire} activeTool={this.props.activeTool} onWireDelete={this.props.onWireDelete}></Wire>
                     })
                 }
             </div >);

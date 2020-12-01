@@ -11,4 +11,9 @@
         stroke: #ffffff;
         stroke-width: 3px;
     }
+
+    .wire-tool-delete {
+        pointer-events: painted;
+        cursor: not-allowed;
+    }
 }
