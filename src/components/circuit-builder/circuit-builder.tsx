@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
+import ReactNotification from 'react-notifications-component'
 import Icons from '../../assets/icons/icons';
 import ChipModel from '../../model/chip-model';
 import { ChipBlueprint, ConnectorDirection, ConnectorModel, Tool } from '../../model/circuit-builder.types';
 import { Gate, SimulationResult, SimulationState, TriState, Wire } from '../../simulation/simulator.types';
+import NotificationManager, { NotificationType } from '../../manager/notification-manager';
 import ActionButton from '../action-button/action-button';
 import Board from '../board/board';
 import Toolbox from '../toolbox/toolbox';
 import Worker from '../../worker'
 
+import 'react-notifications-component/dist/theme.css'
 import './circuit-builder.scss';
 
 interface CircuitBuilderState {
@@ -122,9 +125,14 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
 
             if (result.error) {
                 console.error(result);
-                this.setChipError(result.missingConnections);
+
+                if (result.missingConnections.length > 0)
+                    this.setChipError(result.missingConnections);
+                else
+                    NotificationManager.addNotification("Simulation Error", `An unknown error occured during the simulation. Please try again.`, NotificationType.Error);
             }
             else {
+                NotificationManager.addNotification("Finished Simulation", ' ', NotificationType.Success);
                 this.setConnectorState(result.states);
                 this.setWireState(result.states);
             }
@@ -156,8 +164,10 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.state.chips.forEach(chip => {
             chip.connectors.forEach(connectorSide => {
                 connectorSide.forEach(connector => {
-                    if (errors.find(error => error === connector.id))
+                    if (errors.find(error => error === connector.id)) {
                         connector.error = true;
+                        NotificationManager.addNotification("Connection missing", `Missing connection at ${connector.id}.`, NotificationType.Warning);
+                    }
                 });
             });
         });
@@ -193,6 +203,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     render() {
         return (
             <div className="circuit-builder" >
+                <ReactNotification />
                 <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.onChipDelete.bind(this)} onWireDelete={this.onWireDelete.bind(this)} redraw={this.redraw.bind(this)}></Board>
                 <Toolbox onChipClicked={this.addChipToBoard.bind(this)}></Toolbox>
                 <div className="action-bar">
