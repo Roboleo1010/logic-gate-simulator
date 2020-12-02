@@ -1,5 +1,5 @@
 import { ChipBlueprint } from "../model/circuit-builder.types";
-import { GateType, TriState } from "../simulation/simulator.types";
+import { GateFunction, GateType, TriState } from "../simulation/simulator.types";
 
 class ChipManager {
     private chips: Map<string, ChipBlueprint> = new Map();
@@ -44,18 +44,18 @@ class ChipManager {
         });
         this.chips.set("Switch", {
             name: "Switch", color: "#FE5F00", category: "io", description: "Can be clicked to toggle state while Simulation is running", gates: [
-                { id: 'ctr', type: GateType.Switch, state: TriState.False, inputs: [] },
+                { id: 'ctr', type: GateType.Controlled, function: GateFunction.Switch, state: TriState.False, inputs: [] },
                 { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['ctr'] }]
         });
 
         this.chips.set("Clock", {
             name: "Clock", color: "#FBB02D", category: "io", description: "Switches state every simulation Tick", gates: [
-                { id: 'ctr', type: GateType.Clock, state: TriState.False, inputs: [] },
+                { id: 'ctr', type: GateType.Controlled, function: GateFunction.Clock, state: TriState.False, inputs: [] },
                 { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['ctr'] }]
         });
         this.chips.set("Output", {
             name: "Output", color: "#912F56", category: "io", description: "Displays a connected State", gates: [
-                { id: 'rly_in', type: GateType.Output, state: TriState.False, inputs: [] }]
+                { id: 'rly_in', type: GateType.Relay, function: GateFunction.Output, state: TriState.False, inputs: [] }]
         });
     }
 

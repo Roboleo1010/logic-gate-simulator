@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import ChipModel from "../../model/chip-model";
 import { ConnectorModel, Tool } from "../../model/circuit-builder.types";
-import { Wire as WireSimulation } from "../../simulation/simulator.types";
+import { Gate, Wire as WireSimulation } from "../../simulation/simulator.types";
 import Chip from "../chip/chip";
 import Wire from "../wire/wire";
 
@@ -14,7 +14,7 @@ interface BoardProps {
     onConnectorClicked: (connector: ConnectorModel) => void;
     onChipDelete: (id: ChipModel) => void;
     onWireDelete: (id: WireSimulation) => void;
-    onSwitchSwitched: (chip: ChipModel) => void;
+    onSwitchSwitched: (gate: Gate) => void;
     redraw: () => void;
 }
 

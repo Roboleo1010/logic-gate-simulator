@@ -23,9 +23,6 @@ class Simulation {
     public simulate(): SimulationResult {
         const timerStart = performance.now();
 
-        //Switch clocks
-        this.gates.filter(gate => gate.type === GateType.Clock).forEach(clock => clock.state === TriState.True ? clock.state = TriState.False : clock.state = TriState.True);
-
         for (let i = 0; i < this.evalsPerTick; i++)
             this.evaluate();
 
@@ -51,9 +48,9 @@ class Simulation {
 
     private evaluate() {
         this.gates.forEach((gate: Gate) => {
-            if (gate.type === GateType.Controlled || gate.type === GateType.Clock || gate.type === GateType.Switch)
+            if (gate.type === GateType.Controlled)
                 return;
-            if (gate.type === GateType.Relay || gate.type === GateType.Output) {
+            if (gate.type === GateType.Relay) {
                 const inputA: Gate = this.getGateById(gate.inputs[0]);
 
                 if (!inputA) {

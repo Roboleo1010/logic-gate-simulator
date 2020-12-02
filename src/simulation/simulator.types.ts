@@ -6,12 +6,16 @@ export enum TriState {
 
 export enum GateType {
     Controlled = "Controlled",
-    Output = "Output",
     Relay = "Relay",
-    Clock = "Clock",
-    Switch = "Switch",
     AND = "AND",
     NOT = "NOT",
+}
+
+export enum GateFunction {
+    Controlled = "Controlled",
+    Output = "Output",
+    Clock = "Clock",
+    Switch = "Switch",
 }
 
 export interface Wire {
@@ -23,6 +27,7 @@ export interface Wire {
 export interface Gate {
     id: string;
     type: GateType;
+    function?: GateFunction;
     state: TriState;
     inputs: string[];
 }

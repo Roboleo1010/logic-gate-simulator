@@ -3,7 +3,7 @@ import ReactNotification from 'react-notifications-component'
 import Icons from '../../assets/icons/icons';
 import ChipModel from '../../model/chip-model';
 import { ChipBlueprint, ConnectorDirection, ConnectorModel, Tool } from '../../model/circuit-builder.types';
-import { Gate, GateType, SimulationState, TriState, Wire } from '../../simulation/simulator.types';
+import { Gate, GateFunction, SimulationState, TriState, Wire } from '../../simulation/simulator.types';
 import NotificationManager, { NotificationType } from '../../manager/notification-manager';
 import ToolbarButton from '../toolbar-button/toolbar-button';
 import Board from '../board/board';
@@ -20,6 +20,7 @@ interface CircuitBuilderState {
     activeTool: Tool;
     isSimulationRunning: boolean;
     simulationHandle?: any;
+    clockChips: Gate[];
 }
 
 class CircuitBuilder extends Component<{}, CircuitBuilderState> {
@@ -31,8 +32,9 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.state = {
             chips: [],
             wires: [],
+            clockChips: [],
             activeTool: Tool.Move,
-            isSimulationRunning: false
+            isSimulationRunning: false,
         };
     }
 
@@ -116,12 +118,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             this.stopSimulation();
     }
 
-    onSwitchSwitched(chip: ChipModel) {
-        let gate = chip.gates.find(gate => gate.type === GateType.Switch);
-
-        if (!gate)
-            return;
-
+    onSwitchSwitched(gate: Gate) {
         this.simulation?.changeGateState(gate.id, gate.state === TriState.True ? gate.state = TriState.False : gate.state = TriState.True)
     }
     //#endregion
@@ -133,10 +130,14 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.resetWireState();
 
         let gates: Gate[] = [];
+        let clocks: Gate[] = [];
 
         this.state.chips.forEach(chip => {
             chip.gates.forEach(gate => {
                 gates.push(gate);
+
+                if (gate.function === GateFunction.Clock)
+                    clocks.push(gate);
             });
         });
 
@@ -144,12 +145,14 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
 
         const handle = setInterval(() => { this.simulate() }, 1000)
 
-        this.setState({ simulationHandle: handle, isSimulationRunning: true });
+        this.setState({ simulationHandle: handle, isSimulationRunning: true, clockChips: clocks });
         NotificationManager.addNotification("Starting Simulation", ' ', NotificationType.Info);
     }
 
     simulate() {
         console.log("Simulation Tick");
+
+        this.state.clockChips.filter(gate => gate.function === GateFunction.Clock).forEach(clock => this.simulation?.changeGateState(clock.id, clock.state === TriState.True ? clock.state = TriState.False : clock.state = TriState.True));
 
         const result = this.simulation?.simulate()!;
 

@@ -17,14 +17,14 @@ class ChipModel {
 
         //Add Gates
         blueprint.gates?.forEach(gate => {
-            this.gates.push({ id: `${this.id}_${gate.id}`, state: gate.state, type: gate.type, inputs: gate.inputs.map(id => `${this.id}_${id}`) });
+            this.gates.push({ id: `${this.id}_${gate.id}`, state: gate.state, type: gate.type, function: gate.function, inputs: gate.inputs.map(id => `${this.id}_${id}`) });
         });
 
         let connectors: ConnectorModel[] = [];
 
         //Add Connectors to Chip
         this.gates.forEach(gate => {
-            if (!(gate.type === GateType.Relay || gate.type === GateType.Output))
+            if (gate.type !== GateType.Relay)
                 return;
 
             if (gate.inputs.length > 0)

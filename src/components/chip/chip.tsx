@@ -5,27 +5,32 @@ import Connector from "../connector/connector";
 
 import "./chip.scss";
 import ChipModel from "../../model/chip-model";
-import { GateType, TriState } from "../../simulation/simulator.types";
+import { Gate, GateFunction, TriState } from "../../simulation/simulator.types";
 
 interface ChipProps {
     chip: ChipModel;
     activeTool: Tool;
     onConnectorClick: (connector: ConnectorModel) => void;
     onChipDelete: (chip: ChipModel) => void;
-    onSwitchSwitched: (chip: ChipModel) => void;
+    onSwitchSwitched: (gate: Gate) => void;
     redraw: () => void;
 }
 
 interface ChipState {
-    isSwitch: boolean;
-    isOutput: boolean;
+    switch?: Gate;
+    output?: Gate;
+    clock?: Gate;
 }
 
 class Chip extends Component<ChipProps, ChipState> {
     constructor(props: ChipProps) {
         super(props);
 
-        this.state = { isSwitch: this.props.chip.gates.filter(gate => gate.type === GateType.Switch).length > 0, isOutput: this.props.chip.gates.filter(gate => gate.type === GateType.Output).length > 0 }
+        this.state = {
+            switch: this.props.chip.gates.find(gate => gate.function === GateFunction.Switch),
+            output: this.props.chip.gates.find(gate => gate.function === GateFunction.Output),
+            clock: this.props.chip.gates.find(gate => gate.function === GateFunction.Clock)
+        };
     }
 
     render() {
@@ -46,11 +51,28 @@ class Chip extends Component<ChipProps, ChipState> {
         else if (this.props.activeTool === Tool.Delete)
             className += "chip-tool-delete ";
         else if (this.props.activeTool === Tool.Simulate) {
-            if (this.state.isSwitch)
+            if (this.state.switch)
                 className += "chip-type-switch ";
 
-            if (this.state.isOutput) {
-                if (this.props.chip.gates[0].state === TriState.True)
+            //TODO: Decide if neccecary
+            if (this.state.output) {
+                if (this.state.output.state === TriState.True)
+                    className += "chip-true ";
+                else
+                    className += "chip-false ";
+            }
+
+            //TODO: Decide if neccecary
+            if (this.state.switch) {
+                if (this.state.switch.state === TriState.True)
+                    className += "chip-true ";
+                else
+                    className += "chip-false ";
+            }
+
+            //TODO: Decide if neccecary
+            if (this.state.clock) {
+                if (this.state.clock.state === TriState.True)
                     className += "chip-true ";
                 else
                     className += "chip-false ";
@@ -61,8 +83,8 @@ class Chip extends Component<ChipProps, ChipState> {
 
         if (this.props.activeTool === Tool.Delete)
             clickEvent = () => { this.props.onChipDelete(this.props.chip) };
-        else if (this.props.activeTool === Tool.Simulate && this.state.isSwitch)
-            clickEvent = () => { this.props.onSwitchSwitched(this.props.chip) };
+        else if (this.props.activeTool === Tool.Simulate && this.state.switch)
+            clickEvent = () => { this.props.onSwitchSwitched(this.state.switch!) }
 
         return (
             <Draggable grid={[25, 25]} bounds={"parent"} cancel={".connector"} onStop={this.props.redraw} disabled={this.props.activeTool !== Tool.Move}>
