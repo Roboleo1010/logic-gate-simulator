@@ -14,18 +14,15 @@ interface BoardProps {
     onConnectorClicked: (connector: ConnectorModel) => void;
     onChipDelete: (id: ChipModel) => void;
     onWireDelete: (id: WireSimulation) => void;
+    redraw: () => void;
 }
 
 class Board extends Component<BoardProps>{
-    redraw() {
-        this.forceUpdate();
-    }
-
     render() {
         return (
             <div className="board">
                 {this.props.chips.map(chip => {
-                    return <Chip key={chip.id} chip={chip} activeTool={this.props.activeTool} onConnectorClick={this.props.onConnectorClicked} redraw={this.redraw.bind(this)} onChipDelete={this.props.onChipDelete} ></Chip>
+                    return <Chip key={chip.id} chip={chip} activeTool={this.props.activeTool} onConnectorClick={this.props.onConnectorClicked} redraw={this.props.redraw} onChipDelete={this.props.onChipDelete} ></Chip>
                 })
                 }
                 {

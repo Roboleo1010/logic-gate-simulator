@@ -1,4 +1,4 @@
-import { GateType, TriState, Wire, Gate } from "./simulator.types";
+import { GateType, TriState, Wire, Gate, SimulationResult } from "./simulator.types";
 
 class Simulation {
     private gates: Gate[] = [];
@@ -28,9 +28,12 @@ class Simulation {
 
         for (let i = 0; i < this.evalsPerTick; i++)
             this.evaluate();
-
+        1
         console.timeEnd("simulation")
-        this.printState();
+    }
+
+    public getResults(): SimulationResult[] {
+        return this.gates.map(gate => { return { id: gate.id, state: gate.state } });
     }
 
     private getGateById(id: string): Gate {

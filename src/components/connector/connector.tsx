@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { ConnectorDirection, ConnectorModel, ConnectorSide } from "../../model/circuit-builder.types";
+import { TriState } from "../../simulation/simulator.types";
 import "./connector.scss";
 
 interface ConnectorProps {
@@ -40,6 +41,18 @@ class Connector extends Component<ConnectorProps>{
                 break;
             case ConnectorDirection.SignalOut:
                 className += 'connector-direction-out ';
+                break;
+        }
+
+        switch (this.props.connectorBlueprint.state) {
+            case TriState.True:
+                className += 'connector-true';
+                break;
+            case TriState.False:
+                className += 'connector-false';
+                break;
+            case TriState.Floating:
+                className += 'connector-floating';
                 break;
         }
 

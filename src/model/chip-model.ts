@@ -1,5 +1,5 @@
 import ChipManager from "../manager/chip-manager";
-import { Gate, GateType } from "../simulation/simulator.types";
+import { Gate, GateType, TriState } from "../simulation/simulator.types";
 import { ChipBlueprint, ConnectorDirection, ConnectorModel, ConnectorSide } from "./circuit-builder.types";
 
 class ChipModel {
@@ -28,9 +28,9 @@ class ChipModel {
                 return;
 
             if (gate.inputs.length > 0)
-                connectors.push({ direction: ConnectorDirection.SignalOut, side: ConnectorSide.Right, id: gate.id });
+                connectors.push({ direction: ConnectorDirection.SignalOut, side: ConnectorSide.Right, id: gate.id, state: TriState.Floating });
             else
-                connectors.push({ direction: ConnectorDirection.SignalIn, side: ConnectorSide.Left, id: gate.id });
+                connectors.push({ direction: ConnectorDirection.SignalIn, side: ConnectorSide.Left, id: gate.id, state: TriState.Floating });
         });
 
         this.filterConnectors(connectors);

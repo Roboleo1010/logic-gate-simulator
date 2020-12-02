@@ -2,13 +2,15 @@ import React, { Component } from 'react';
 import Icons from '../../assets/icons/icons';
 import ChipModel from '../../model/chip-model';
 import { ChipBlueprint, ConnectorDirection, ConnectorModel, Tool } from '../../model/circuit-builder.types';
-import Simulation from '../../simulation/simulation';
-import { Gate, Wire } from '../../simulation/simulator.types';
+import { Gate, SimulationResult, Wire } from '../../simulation/simulator.types';
 import ActionButton from '../action-button/action-button';
 import Board from '../board/board';
 import Toolbox from '../toolbox/toolbox';
+import Worker from '../../worker'
+
 
 import './circuit-builder.scss';
+import { createThisTypeNode } from 'typescript';
 
 interface CircuitBuilderState {
     chips: ChipModel[];
@@ -27,6 +29,10 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             wires: [],
             activeTool: Tool.move
         };
+    }
+
+    redraw() {
+        this.forceUpdate();
     }
 
     addChipToBoard(chipBlueprint: ChipBlueprint) {
@@ -108,13 +114,33 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             });
         });
 
-        new Simulation(gates, this.state.wires).simulate();
+        const worker = new Worker();
+
+        return new Promise(async resolve => {
+            const result = await worker.simulate(gates, this.state.wires);
+            resolve(result);
+
+            this.setCipState(result);
+        });
+    }
+
+    setCipState(results: SimulationResult[]) {
+        this.state.chips.forEach(chip => {
+            chip.connectors.forEach(connectorSide => {
+                connectorSide.forEach(connector => {
+                    const result = results.find(res => res.id === connector.id);
+                    connector.state = result?.state!;
+                });
+            });
+        });
+
+        this.redraw();
     }
 
     render() {
         return (
-            <div className="circuit-builder">
-                <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.onChipDelete.bind(this)} onWireDelete={this.onWireDelete.bind(this)}></Board>
+            <div className="circuit-builder" >
+                <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.onChipDelete.bind(this)} onWireDelete={this.onWireDelete.bind(this)} redraw={this.redraw.bind(this)}></Board>
                 <Toolbox onChipClicked={this.addChipToBoard.bind(this)}></Toolbox>
                 <div className="action-bar">
                     <ActionButton key={"tool-drag"} text={"Move"} icon={Icons.iconDrag} onClick={() => this.switchTool(Tool.move)} active={this.state.activeTool === Tool.move}></ActionButton>

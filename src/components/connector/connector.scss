@@ -31,12 +31,16 @@ $connectorWidthHalfed: $connectorWidth/2;
     right: -$connectorWidthHalfed;
 }
 
-.connector-on {
+.connector-true {
     background-color: green;
 }
 
-.connector-off {
+.connector-false {
     background-color: red;
+}
+
+.connector-floating {
+    background-color: grey;
 }
 
 .connector-direction-out {

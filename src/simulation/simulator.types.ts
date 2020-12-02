@@ -22,3 +22,8 @@ export interface Gate {
     state: TriState;
     inputs: string[];
 }
+
+export interface SimulationResult {
+    id: string;
+    state: TriState;
+}
