@@ -33,23 +33,23 @@ class ChipManager {
 
         //IO
         this.chips.set("Constant On", {
-            name: "Constant On", color: "#6DA34D", category: "io", gates: [
+            name: "Constant On", color: "#6DA34D", category: "io", description: "Emits a constant ON signal", gates: [
                 { id: 'ctr', type: GateType.Controlled, state: TriState.True, inputs: [] },
                 { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['ctr'] }]
         });
         this.chips.set("Constant Off", {
-            name: "Constant Off", color: "#D10000", category: "io", gates: [
+            name: "Constant Off", color: "#D10000", category: "io", description: "Emits a constant OFF signal", gates: [
                 { id: 'ctr', type: GateType.Controlled, state: TriState.False, inputs: [] },
                 { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['ctr'] }]
         });
         this.chips.set("Switch", {
-            name: "Switch", color: "#FE5F00", category: "io", gates: [
-                { id: 'ctr', type: GateType.Controlled, state: TriState.False, inputs: [] },
+            name: "Switch", color: "#FE5F00", category: "io", description: "Can be clicked to toggle state while Simulation is running", gates: [
+                { id: 'ctr', type: GateType.Switch, state: TriState.False, inputs: [] },
                 { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['ctr'] }]
         });
 
         this.chips.set("Clock", {
-            name: "Clock", color: "#FBB02D", category: "io", gates: [
+            name: "Clock", color: "#FBB02D", category: "io", description: "Switches state every simulation Tick", gates: [
                 { id: 'ctr', type: GateType.Clock, state: TriState.False, inputs: [] },
                 { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['ctr'] }]
         });

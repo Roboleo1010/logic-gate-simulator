@@ -14,6 +14,7 @@ export enum ConnectorDirection {
 
 export interface ChipBlueprint {
     name: string;
+    description?: string;
     color: string;
     category?: string;
     wires?: Wire[];

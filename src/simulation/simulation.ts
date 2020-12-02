@@ -41,13 +41,17 @@ class Simulation {
         return this.result;
     }
 
+    public changeGateState(id: string, state: TriState) {
+        this.getGateById(id).state = state;
+    }
+
     private getGateById(id: string): Gate {
         return this.gates.filter(chip => chip.id === id)[0];
     }
 
     private evaluate() {
         this.gates.forEach((gate: Gate) => {
-            if (gate.type === GateType.Controlled)
+            if (gate.type === GateType.Controlled || gate.type === GateType.Clock || gate.type === GateType.Switch)
                 return;
             if (gate.type === GateType.Relay) {
                 const inputA: Gate = this.getGateById(gate.inputs[0]);

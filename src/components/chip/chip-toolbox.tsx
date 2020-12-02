@@ -12,7 +12,7 @@ class ChipToolbox extends Component<ChipToolboxProps> {
         let style = { backgroundColor: this.props.chipBlueprint.color };
 
         return (
-            <div className="chip chip-on-toolbox" style={style} onClick={() => this.props.onChipClicked(this.props.chipBlueprint)}>
+            <div className="chip chip-on-toolbox" style={style} title={this.props.chipBlueprint.description} onClick={() => this.props.onChipClicked(this.props.chipBlueprint)}>
                 <span>
                     {this.props.chipBlueprint.name}
                 </span>

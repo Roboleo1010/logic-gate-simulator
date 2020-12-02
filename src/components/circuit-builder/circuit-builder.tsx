@@ -3,7 +3,7 @@ import ReactNotification from 'react-notifications-component'
 import Icons from '../../assets/icons/icons';
 import ChipModel from '../../model/chip-model';
 import { ChipBlueprint, ConnectorDirection, ConnectorModel, Tool } from '../../model/circuit-builder.types';
-import { Gate, SimulationState, TriState, Wire } from '../../simulation/simulator.types';
+import { Gate, GateType, SimulationState, TriState, Wire } from '../../simulation/simulator.types';
 import NotificationManager, { NotificationType } from '../../manager/notification-manager';
 import ToolbarButton from '../toolbar-button/toolbar-button';
 import Board from '../board/board';
@@ -36,6 +36,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         };
     }
 
+    //#region events
     redraw() {
         this.forceUpdate();
     }
@@ -113,6 +114,17 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             this.stopSimulation();
     }
 
+    onSwitchSwitched(chip: ChipModel) {
+        let gate = chip.gates.find(gate => gate.type === GateType.Switch);
+
+        if (!gate)
+            return;
+
+        this.simulation?.changeGateState(gate.id, gate.state === TriState.True ? gate.state = TriState.False : gate.state = TriState.True)
+    }
+    //#endregion
+
+    //#region Simulation
     startSimulation() {
         this.resetChipState();
         this.resetChipError();
@@ -168,6 +180,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.resetChipState();
         this.resetWireState();
     }
+    //#endregion
 
     //#region Setting Connector/ Wire State/ Error
     setConnectorState(results: SimulationState[]) {
@@ -230,7 +243,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         return (
             <div className="circuit-builder" >
                 <ReactNotification />
-                <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.onChipDelete.bind(this)} onWireDelete={this.onWireDelete.bind(this)} redraw={this.redraw.bind(this)}></Board>
+                <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.onChipDelete.bind(this)} onWireDelete={this.onWireDelete.bind(this)} redraw={this.redraw.bind(this)} onSwitchSwitched={this.onSwitchSwitched.bind(this)}></Board>
                 <Toolbox onChipClicked={this.addChipToBoard.bind(this)}></Toolbox>
                 <div className="action-bar">
                     <ToolbarButton key={"tool-drag"} text={"Move"} icon={Icons.iconDrag} onClick={() => this.switchTool(Tool.Move)} active={this.state.activeTool === Tool.Move}></ToolbarButton>

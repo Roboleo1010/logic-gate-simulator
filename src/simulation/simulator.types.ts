@@ -8,6 +8,7 @@ export enum GateType {
     Controlled = "Controlled",
     Relay = "Relay",
     Clock = "Clock",
+    Switch = "Switch",
     AND = "AND",
     NOT = "NOT",
 }
