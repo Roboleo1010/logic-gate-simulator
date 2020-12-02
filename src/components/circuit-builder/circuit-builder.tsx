@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
 import ReactNotification from 'react-notifications-component'
-import Icons from '../../assets/icons/icons';
 import ChipModel from '../../model/chip-model';
 import { ChipBlueprint, ConnectorDirection, ConnectorModel, Tool } from '../../model/circuit-builder.types';
 import { Gate, GateFunction, SimulationState, TriState, Wire } from '../../simulation/simulator.types';
 import NotificationManager, { NotificationType } from '../../manager/notification-manager';
-import ToolbarButton from '../toolbar-button/toolbar-button';
 import Board from '../board/board';
 import Toolbox from '../toolbox/toolbox';
 
 import 'react-notifications-component/dist/theme.css'
 import './circuit-builder.scss';
 import Simulation from '../../simulation/simulation';
+import Toolbar from '../toolbar/toolbar';
+import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
+import ToolbarButtonMulti from '../toolbar/toolbar-button-multi/toolbar-button-multi';
+import ToolbarButtonToggle from '../toolbar/toolbar-button-toggle/toolbar-button-toggle';
+import Icons from '../../assets/icons/icons';
+import ToolbarButton from '../toolbar/toolbar-button/toolbar-button';
 
 interface CircuitBuilderState {
     chips: ChipModel[];
@@ -44,7 +48,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     }
 
     addChipToBoard(chipBlueprint: ChipBlueprint) {
-        this.switchTool(Tool.Move);
+        this.stopSimulation();
 
         let chip = new ChipModel(chipBlueprint);
 
@@ -54,6 +58,8 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     }
 
     onConnectorClicked(connector: ConnectorModel) {
+        this.stopSimulation();
+
         //First click
         if (!this.state.lastClickedConnector) {
             if (connector.direction === ConnectorDirection.SignalOut) {
@@ -111,15 +117,22 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
 
     switchTool(tool: Tool) {
         this.setState({ activeTool: tool, lastClickedConnector: undefined });
-
-        if (!this.state.isSimulationRunning && tool === Tool.Simulate)
-            this.startSimulation();
-        else if (this.state.isSimulationRunning && tool !== Tool.Simulate)
-            this.stopSimulation();
     }
 
     onSwitchSwitched(gate: Gate) {
         this.simulation?.changeGateState(gate.id, gate.state === TriState.True ? gate.state = TriState.False : gate.state = TriState.True)
+    }
+
+    onPackageChip() {
+        console.log("Package Chip");
+    }
+
+    onToggleSimulation(state: boolean) {
+        if (state)
+            this.startSimulation();
+        else
+            this.stopSimulation();
+
     }
     //#endregion
 
@@ -166,7 +179,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             else
                 NotificationManager.addNotification("Simulation Error", `An unknown error occured during the simulation. Please try again.`, NotificationType.Error);
 
-            this.switchTool(Tool.Move);
+            this.stopSimulation();
         }
         else {
             this.setConnectorState(result.states);
@@ -177,6 +190,9 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     }
 
     stopSimulation() {
+        if (!this.state.isSimulationRunning)
+            return;
+
         NotificationManager.addNotification("Stopping Simulation", ' ', NotificationType.Info);
         clearInterval(this.state.simulationHandle);
         this.setState({ simulationHandle: undefined, isSimulationRunning: false });
@@ -248,12 +264,21 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         return (
             <div className="circuit-builder" >
                 <ReactNotification />
-                <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.onChipDelete.bind(this)} onWireDelete={this.onWireDelete.bind(this)} redraw={this.redraw.bind(this)} onSwitchSwitched={this.onSwitchSwitched.bind(this)}></Board>
+                <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} isSimulationRunning={this.state.isSimulationRunning} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.onChipDelete.bind(this)} onWireDelete={this.onWireDelete.bind(this)} redraw={this.redraw.bind(this)} onSwitchSwitched={this.onSwitchSwitched.bind(this)}></Board>
                 <Toolbox onChipClicked={this.addChipToBoard.bind(this)}></Toolbox>
-                <div className="action-bar">
-                    <ToolbarButton key={"tool-drag"} text={"Move"} icon={Icons.iconDrag} onClick={() => this.switchTool(Tool.Move)} active={this.state.activeTool === Tool.Move}></ToolbarButton>
-                    <ToolbarButton key={"tool-delete"} text={"Delete"} icon={Icons.iconDelete} onClick={() => this.switchTool(Tool.Delete)} active={this.state.activeTool === Tool.Delete}></ToolbarButton>
-                    <ToolbarButton key={"tool-simulate"} text={"Simulate"} icon={Icons.iconPlay} onClick={() => this.switchTool(Tool.Simulate)} active={this.state.activeTool === Tool.Simulate}></ToolbarButton>
+                <div className="toolbar-container">
+                    <Toolbar>
+                        <ToolbarGroup>
+                            <ToolbarButtonMulti icon={Icons.iconMove} text="Move" onClick={() => this.switchTool(Tool.Move)} isActive={this.state.activeTool === Tool.Move}></ToolbarButtonMulti>
+                            <ToolbarButtonMulti icon={Icons.iconDelete} text="Delete" onClick={() => this.switchTool(Tool.Delete)} isActive={this.state.activeTool === Tool.Delete}></ToolbarButtonMulti>
+                        </ToolbarGroup>
+                        <ToolbarGroup>
+                            <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.state.isSimulationRunning} onClick={this.onToggleSimulation.bind(this)}></ToolbarButtonToggle>
+                        </ToolbarGroup>
+                        <ToolbarGroup>
+                            <ToolbarButton icon={Icons.iconChip} text="Package Chip" onClick={this.onPackageChip.bind(this)}></ToolbarButton>
+                        </ToolbarGroup>
+                    </Toolbar>
                 </div>
             </div>
         );

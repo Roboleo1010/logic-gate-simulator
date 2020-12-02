@@ -1,0 +1,8 @@
+@import "../toolbar-button.scss";
+
+.toolbar-group {
+    display: inline-block;
+    margin: 0 5px;
+    border: 1px solid white;
+    height: $toolbar-height;
+}

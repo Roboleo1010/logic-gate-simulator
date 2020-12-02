@@ -10,6 +10,7 @@ import { Gate, GateFunction, TriState } from "../../simulation/simulator.types";
 interface ChipProps {
     chip: ChipModel;
     activeTool: Tool;
+    isSimulationRunning: boolean;
     onConnectorClick: (connector: ConnectorModel) => void;
     onChipDelete: (chip: ChipModel) => void;
     onSwitchSwitched: (gate: Gate) => void;
@@ -46,11 +47,7 @@ class Chip extends Component<ChipProps, ChipState> {
 
         let className = "chip chip-on-board ";
 
-        if (this.props.activeTool === Tool.Move)
-            className += "chip-tool-move ";
-        else if (this.props.activeTool === Tool.Delete)
-            className += "chip-tool-delete ";
-        else if (this.props.activeTool === Tool.Simulate) {
+        if (this.props.isSimulationRunning) {
             if (this.state.switch)
                 className += "chip-type-switch ";
 
@@ -78,12 +75,18 @@ class Chip extends Component<ChipProps, ChipState> {
                     className += "chip-false ";
             }
         }
+        else {
+            if (this.props.activeTool === Tool.Move)
+                className += "chip-tool-move ";
+            else if (this.props.activeTool === Tool.Delete)
+                className += "chip-tool-delete ";
+        }
 
         let clickEvent = () => { };
 
-        if (this.props.activeTool === Tool.Delete)
+        if (!this.props.isSimulationRunning && this.props.activeTool === Tool.Delete)
             clickEvent = () => { this.props.onChipDelete(this.props.chip) };
-        else if (this.props.activeTool === Tool.Simulate && this.state.switch)
+        else if (this.props.isSimulationRunning && this.state.switch)
             clickEvent = () => { this.props.onSwitchSwitched(this.state.switch!) }
 
         return (

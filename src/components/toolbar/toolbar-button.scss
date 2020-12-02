@@ -1,10 +1,9 @@
-$size: 31px;
+$toolbar-height: 31px;
 
 .toolbar-button {
-    width: $size;
-    height: $size;
+    width: $toolbar-height;
+    height: $toolbar-height;
     display: inline-block;
-    margin: 0 3px;
     background-repeat: no-repeat;
     background-position: center center;
 
@@ -12,9 +11,9 @@ $size: 31px;
 }
 
 .toolbar-button-active {
-    background-color: green;
+    background-color: white;
 }
 
 .toolbar-button-inactive {
-    background-color: white;
+    background-color: transparent;
 }
