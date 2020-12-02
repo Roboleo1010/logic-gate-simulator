@@ -1,3 +1,5 @@
+@import "../../styles/design.scss";
+
 $connectorWidth: 16px;
 $connectorWidthHalfed: $connectorWidth/2;
 
@@ -32,15 +34,15 @@ $connectorWidthHalfed: $connectorWidth/2;
 }
 
 .connector-true {
-    background-color: green;
+    background-color: $color-true;
 }
 
 .connector-false {
-    background-color: red;
+    background-color: $color-false;
 }
 
 .connector-floating {
-    background-color: grey;
+    background-color: $color-floating;
 }
 
 .connector-direction-out {

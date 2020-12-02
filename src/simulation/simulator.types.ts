@@ -14,6 +14,7 @@ export enum GateType {
 export interface Wire {
     inputId: string;
     outputId: string;
+    state?: TriState;
 }
 
 export interface Gate {

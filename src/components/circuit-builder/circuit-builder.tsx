@@ -121,6 +121,9 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             resolve(result);
 
             this.setCipState(result);
+            this.setWireState(result);
+
+            this.redraw();
         });
     }
 
@@ -133,8 +136,13 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
                 });
             });
         });
+    }
 
-        this.redraw();
+    setWireState(results: SimulationResult[]) {
+        this.state.wires.forEach(wire => {
+            const result = results.find(res => res.id === wire.inputId);
+            wire.state = result?.state
+        })
     }
 
     render() {

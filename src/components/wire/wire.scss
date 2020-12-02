@@ -1,3 +1,5 @@
+@import "../../styles/design.scss";
+
 .wire-canvas {
     position: absolute;
     left: 0;
@@ -8,8 +10,17 @@
     pointer-events: none;
 
     .wire {
-        stroke: #ffffff;
         stroke-width: 3px;
+    }
+
+    .wire-true {
+        stroke: $color-true;
+    }
+    .wire-false {
+        stroke: $color-false;
+    }
+    .wire-floating {
+        stroke: $color-floating;
     }
 
     .wire-tool-delete {

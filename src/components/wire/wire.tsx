@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Tool } from "../../model/circuit-builder.types";
-import { Wire as WireSimulation } from "../../simulation/simulator.types";
+import { TriState, Wire as WireSimulation } from "../../simulation/simulator.types";
 
 import "./wire.scss";
 
@@ -22,6 +22,19 @@ class Wire extends Component<WireProps> {
 
         if (this.props.activeTool === Tool.delete)
             className += "wire-tool-delete";
+
+        switch (this.props.wire.state) {
+            case TriState.True:
+                className += 'wire-true';
+                break;
+            case TriState.False:
+                className += 'wire-false';
+                break;
+            default:
+            case TriState.Floating:
+                className += 'wire-floating';
+                break;
+        }
 
         let clickEvent = () => { };
 
