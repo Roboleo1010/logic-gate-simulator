@@ -53,6 +53,10 @@ class ChipManager {
                 { id: 'ctr', type: GateType.Clock, state: TriState.False, inputs: [] },
                 { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['ctr'] }]
         });
+        this.chips.set("Output", {
+            name: "Output", color: "#912F56", category: "io", description: "Displays a connected State", gates: [
+                { id: 'rly_in', type: GateType.Output, state: TriState.False, inputs: [] }]
+        });
     }
 
     public static getInstance() {

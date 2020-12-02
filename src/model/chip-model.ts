@@ -24,7 +24,7 @@ class ChipModel {
 
         //Add Connectors to Chip
         this.gates.forEach(gate => {
-            if (gate.type !== GateType.Relay)
+            if (!(gate.type === GateType.Relay || gate.type === GateType.Output))
                 return;
 
             if (gate.inputs.length > 0)

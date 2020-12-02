@@ -5,7 +5,7 @@ import Connector from "../connector/connector";
 
 import "./chip.scss";
 import ChipModel from "../../model/chip-model";
-import { GateType } from "../../simulation/simulator.types";
+import { GateType, TriState } from "../../simulation/simulator.types";
 
 interface ChipProps {
     chip: ChipModel;
@@ -18,13 +18,14 @@ interface ChipProps {
 
 interface ChipState {
     isSwitch: boolean;
+    isOutput: boolean;
 }
 
 class Chip extends Component<ChipProps, ChipState> {
     constructor(props: ChipProps) {
         super(props);
 
-        this.state = { isSwitch: this.props.chip.gates.filter(gate => gate.type === GateType.Switch).length > 0 }
+        this.state = { isSwitch: this.props.chip.gates.filter(gate => gate.type === GateType.Switch).length > 0, isOutput: this.props.chip.gates.filter(gate => gate.type === GateType.Output).length > 0 }
     }
 
     render() {
@@ -44,8 +45,17 @@ class Chip extends Component<ChipProps, ChipState> {
             className += "chip-tool-move ";
         else if (this.props.activeTool === Tool.Delete)
             className += "chip-tool-delete ";
-        else if (this.props.activeTool === Tool.Simulate && this.state.isSwitch)
-            className += "chip-type-switch ";
+        else if (this.props.activeTool === Tool.Simulate) {
+            if (this.state.isSwitch)
+                className += "chip-type-switch ";
+
+            if (this.state.isOutput) {
+                if (this.props.chip.gates[0].state === TriState.True)
+                    className += "chip-true ";
+                else
+                    className += "chip-false ";
+            }
+        }
 
         let clickEvent = () => { };
 
@@ -53,7 +63,6 @@ class Chip extends Component<ChipProps, ChipState> {
             clickEvent = () => { this.props.onChipDelete(this.props.chip) };
         else if (this.props.activeTool === Tool.Simulate && this.state.isSwitch)
             clickEvent = () => { this.props.onSwitchSwitched(this.props.chip) };
-
 
         return (
             <Draggable grid={[25, 25]} bounds={"parent"} cancel={".connector"} onStop={this.props.redraw} disabled={this.props.activeTool !== Tool.Move}>

@@ -6,6 +6,7 @@ export enum TriState {
 
 export enum GateType {
     Controlled = "Controlled",
+    Output = "Output",
     Relay = "Relay",
     Clock = "Clock",
     Switch = "Switch",

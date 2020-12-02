@@ -53,7 +53,7 @@ class Simulation {
         this.gates.forEach((gate: Gate) => {
             if (gate.type === GateType.Controlled || gate.type === GateType.Clock || gate.type === GateType.Switch)
                 return;
-            if (gate.type === GateType.Relay) {
+            if (gate.type === GateType.Relay || gate.type === GateType.Output) {
                 const inputA: Gate = this.getGateById(gate.inputs[0]);
 
                 if (!inputA) {

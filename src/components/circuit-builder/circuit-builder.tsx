@@ -42,6 +42,8 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     }
 
     addChipToBoard(chipBlueprint: ChipBlueprint) {
+        this.switchTool(Tool.Move);
+
         let chip = new ChipModel(chipBlueprint);
 
         let newChips = this.state.chips;
