@@ -29,6 +29,7 @@ export interface ConnectorModel {
 }
 
 export enum Tool {
-    move = "move",
-    delete = "delete"
+    Move = "Move",
+    Delete = "Delete",
+    Simulate = "Simulate"
 }

@@ -20,25 +20,25 @@ class Wire extends Component<WireProps> {
 
         let className = "wire ";
 
-        if (this.props.activeTool === Tool.delete)
-            className += "wire-tool-delete";
+        if (this.props.activeTool === Tool.Delete)
+            className += "wire-tool-delete ";
 
         switch (this.props.wire.state) {
             case TriState.True:
-                className += 'wire-true';
+                className += 'wire-true ';
                 break;
             case TriState.False:
-                className += 'wire-false';
+                className += 'wire-false ';
                 break;
             default:
             case TriState.Floating:
-                className += 'wire-floating';
+                className += 'wire-floating ';
                 break;
         }
 
         let clickEvent = () => { };
 
-        if (this.props.activeTool === Tool.delete)
+        if (this.props.activeTool === Tool.Delete)
             clickEvent = () => { this.props.onWireDelete(this.props.wire) };
 
         return (

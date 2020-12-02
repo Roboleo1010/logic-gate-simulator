@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import Icons from "../../assets/icons/icons";
 
-import "./action-button.scss";
+import "./toolbar-button.scss";
 
-interface ActionButtonProps {
+interface ToolbarButtonProps {
     text: string;
     active: boolean;
     icon: string;
@@ -11,14 +11,14 @@ interface ActionButtonProps {
 }
 
 
-class ActionButton extends Component<ActionButtonProps> {
+class ToolbarButton extends Component<ToolbarButtonProps> {
     render() {
-        let className = "action-button unselectable ";
+        let className = "toolbar-button unselectable ";
 
         if (this.props.active)
-            className += "action-button-active";
+            className += "toolbar-button-active";
         else
-            className += "action-button-inactive";
+            className += "toolbar-button-inactive";
 
         let style = { backgroundImage: `url('${Icons.backgroundImage}${this.props.icon}')` };
 
@@ -26,4 +26,4 @@ class ActionButton extends Component<ActionButtonProps> {
     }
 }
 
-export default ActionButton;
+export default ToolbarButton;

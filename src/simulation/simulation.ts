@@ -12,18 +12,19 @@ class Simulation {
         this.gates = gates;
         this.wires = wires;
 
-        this.result = { states: [], time: 0, gates: [], wires: [], error: false, missingConnections: [] };
-    }
-
-    public simulate(): SimulationResult {
-        const timerStart = performance.now();
-
         this.wires.forEach(wire => {
             this.getGateById(wire.outputId).inputs = [wire.inputId];
         });
 
-        this.result.gates = this.gates;
-        this.result.wires = this.wires;
+        this.result = { states: [], time: 0, gates: this.gates, wires: this.wires, error: false, missingConnections: [] };
+    }
+
+
+    public simulate(): SimulationResult {
+        const timerStart = performance.now();
+
+        //Switch clocks
+        this.gates.filter(gate => gate.type === GateType.Clock).forEach(clock => clock.state === TriState.True ? clock.state = TriState.False : clock.state = TriState.True);
 
         for (let i = 0; i < this.evalsPerTick; i++)
             this.evaluate();

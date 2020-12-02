@@ -1,19 +1,20 @@
 $size: 31px;
 
-.action-button {
+.toolbar-button {
     width: $size;
     height: $size;
     display: inline-block;
-    cursor: pointer;
     margin: 0 3px;
     background-repeat: no-repeat;
     background-position: center center;
+
+    cursor: pointer;
 }
 
-.action-button-active {
+.toolbar-button-active {
     background-color: green;
 }
 
-.action-button-inactive {
+.toolbar-button-inactive {
     background-color: white;
 }

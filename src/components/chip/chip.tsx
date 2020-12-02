@@ -28,18 +28,18 @@ class Chip extends Component<ChipProps> {
 
         let className = "chip chip-on-board ";
 
-        if (this.props.activeTool === Tool.move)
+        if (this.props.activeTool === Tool.Move)
             className += "chip-tool-move";
-        else if (this.props.activeTool === Tool.delete)
+        else if (this.props.activeTool === Tool.Delete)
             className += "chip-tool-delete";
 
         let clickEvent = () => { };
 
-        if (this.props.activeTool === Tool.delete)
+        if (this.props.activeTool === Tool.Delete)
             clickEvent = () => { this.props.onChipDelete(this.props.chip) };
 
         return (
-            <Draggable grid={[25, 25]} bounds={"parent"} cancel={".connector"} onStop={this.props.redraw} disabled={this.props.activeTool !== Tool.move}>
+            <Draggable grid={[25, 25]} bounds={"parent"} cancel={".connector"} onStop={this.props.redraw} disabled={this.props.activeTool !== Tool.Move}>
                 <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
                     <span>{this.props.chip.blueprint.name}</span>
                     {connectors}

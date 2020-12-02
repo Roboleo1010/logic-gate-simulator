@@ -7,6 +7,7 @@ export enum TriState {
 export enum GateType {
     Controlled = "Controlled",
     Relay = "Relay",
+    Clock = "Clock",
     AND = "AND",
     NOT = "NOT",
 }
