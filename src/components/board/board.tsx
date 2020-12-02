@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import ChipModel from "../../model/chip-model";
 import { ConnectorModel, Tool } from "../../model/circuit-builder.types";
-import Simulation from "../../simulation/simulation";
-import { Gate, Wire as WireSimulation } from "../../simulation/simulator.types";
+import { Wire as WireSimulation } from "../../simulation/simulator.types";
 import Chip from "../chip/chip";
 import Wire from "../wire/wire";
 
@@ -20,20 +19,6 @@ interface BoardProps {
 class Board extends Component<BoardProps>{
     redraw() {
         this.forceUpdate();
-    }
-
-    simulate() {
-        console.log("Preparing Simulation");
-
-        let gates: Gate[] = [];
-
-        this.props.chips.forEach(chip => {
-            chip.gates.forEach(gate => {
-                gates.push(gate);
-            });
-        });
-
-        new Simulation(gates, this.props.wires).simulate();
     }
 
     render() {

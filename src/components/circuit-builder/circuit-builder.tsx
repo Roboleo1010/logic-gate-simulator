@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import ChipModel from '../../model/chip-model';
 import { ChipBlueprint, ConnectorDirection, ConnectorModel, Tool } from '../../model/circuit-builder.types';
-import { Wire } from '../../simulation/simulator.types';
+import Simulation from '../../simulation/simulation';
+import { Gate, Wire } from '../../simulation/simulator.types';
 import ActionButton from '../action-button/action-button';
 import Board from '../board/board';
 import Toolbox from '../toolbox/toolbox';
@@ -95,6 +96,20 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.setState({ activeTool: tool, lastClickedConnector: undefined });
     }
 
+    simulate() {
+        console.log("Preparing Simulation");
+
+        let gates: Gate[] = [];
+
+        this.state.chips.forEach(chip => {
+            chip.gates.forEach(gate => {
+                gates.push(gate);
+            });
+        });
+
+        new Simulation(gates, this.state.wires).simulate();
+    }
+
     render() {
         return (
             <div className="circuit-builder">
@@ -103,7 +118,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
                 <div className="action-bar">
                     <ActionButton key={"tool-drag"} text={"Move"} onClick={() => this.switchTool(Tool.move)} active={this.state.activeTool === Tool.move}></ActionButton>
                     <ActionButton key={"tool-delete"} text={"Delete"} onClick={() => this.switchTool(Tool.delete)} active={this.state.activeTool === Tool.delete}></ActionButton>
-                    <ActionButton key={"tool-simulate"} text={"Simulate"} onClick={() => this.switchTool(Tool.simulate)} active={this.state.activeTool === Tool.simulate}></ActionButton>
+                    <ActionButton key={"tool-simulate"} text={"Simulate"} onClick={this.simulate.bind(this)} active={false}></ActionButton>
                 </div>
             </div>
         );
