@@ -25,6 +25,7 @@ export interface ConnectorModel {
     side: ConnectorSide;
     direction: ConnectorDirection;
     state: TriState;
+    error: boolean;
 }
 
 export enum Tool {

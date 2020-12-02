@@ -45,8 +45,6 @@ $connectorWidthHalfed: $connectorWidth/2;
     background-color: $color-floating;
 }
 
-.connector-direction-out {
-}
-
-.connector-direction-in {
+.connector-error {
+    border: 3px solid red;
 }

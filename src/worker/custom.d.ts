@@ -4,7 +4,7 @@ declare module 'comlink-loader!*' {
 
         // Add any custom functions to this class.
         // Make note that the return type needs to be wrapped in a promise.
-        simulate(gates: Gate[], wires: Wire[]): Promise<SimulationResult[]>;
+        simulate(gates: Gate[], wires: Wire[]): Promise<SimulationResult>;
     }
 
     export = WebpackWorker;

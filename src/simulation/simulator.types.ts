@@ -25,6 +25,16 @@ export interface Gate {
 }
 
 export interface SimulationResult {
+    states: SimulationState[];
+    time: number;
+    gates: Gate[];
+    wires: Wire[];
+    error: boolean;
+    missingConnections: string[];
+    errorMessage?: string;
+}
+
+export interface SimulationState {
     id: string;
     state: TriState;
 }

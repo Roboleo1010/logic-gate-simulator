@@ -2,15 +2,13 @@ import React, { Component } from 'react';
 import Icons from '../../assets/icons/icons';
 import ChipModel from '../../model/chip-model';
 import { ChipBlueprint, ConnectorDirection, ConnectorModel, Tool } from '../../model/circuit-builder.types';
-import { Gate, SimulationResult, Wire } from '../../simulation/simulator.types';
+import { Gate, SimulationResult, SimulationState, TriState, Wire } from '../../simulation/simulator.types';
 import ActionButton from '../action-button/action-button';
 import Board from '../board/board';
 import Toolbox from '../toolbox/toolbox';
 import Worker from '../../worker'
 
-
 import './circuit-builder.scss';
-import { createThisTypeNode } from 'typescript';
 
 interface CircuitBuilderState {
     chips: ChipModel[];
@@ -103,9 +101,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.setState({ activeTool: tool, lastClickedConnector: undefined });
     }
 
-    simulate() {
-        console.log("Preparing Simulation");
-
+    onSimulate() {
         let gates: Gate[] = [];
 
         this.state.chips.forEach(chip => {
@@ -117,17 +113,28 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         const worker = new Worker();
 
         return new Promise(async resolve => {
-            const result = await worker.simulate(gates, this.state.wires);
+            const result: SimulationResult = await worker.simulate(gates, this.state.wires);
             resolve(result);
 
-            this.setCipState(result);
-            this.setWireState(result);
+            this.resetChipState();
+            this.resetChipError();
+            this.resetWireState();
+
+            if (result.error) {
+                console.error(result);
+                this.setChipError(result.missingConnections);
+            }
+            else {
+                this.setConnectorState(result.states);
+                this.setWireState(result.states);
+            }
 
             this.redraw();
         });
     }
 
-    setCipState(results: SimulationResult[]) {
+    //#region Setting Connector/ Wire State/ Error
+    setConnectorState(results: SimulationState[]) {
         this.state.chips.forEach(chip => {
             chip.connectors.forEach(connectorSide => {
                 connectorSide.forEach(connector => {
@@ -138,12 +145,50 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         });
     }
 
-    setWireState(results: SimulationResult[]) {
+    setWireState(results: SimulationState[]) {
         this.state.wires.forEach(wire => {
             const result = results.find(res => res.id === wire.inputId);
-            wire.state = result?.state
+            wire.state = result?.state;
         })
     }
+
+    setChipError(errors: string[]) {
+        this.state.chips.forEach(chip => {
+            chip.connectors.forEach(connectorSide => {
+                connectorSide.forEach(connector => {
+                    if (errors.find(error => error === connector.id))
+                        connector.error = true;
+                });
+            });
+        });
+    }
+
+    resetChipState() {
+        this.state.chips.forEach(chip => {
+            chip.connectors.forEach(connectorSide => {
+                connectorSide.forEach(connector => {
+                    connector.state = TriState.Floating;
+                });
+            });
+        });
+    }
+
+    resetChipError() {
+        this.state.chips.forEach(chip => {
+            chip.connectors.forEach(connectorSide => {
+                connectorSide.forEach(connector => {
+                    connector.error = false;
+                });
+            });
+        });
+    }
+
+    resetWireState() {
+        this.state.wires.forEach(wire => {
+            wire.state = TriState.Floating;
+        })
+    }
+    //#endregion
 
     render() {
         return (
@@ -153,7 +198,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
                 <div className="action-bar">
                     <ActionButton key={"tool-drag"} text={"Move"} icon={Icons.iconDrag} onClick={() => this.switchTool(Tool.move)} active={this.state.activeTool === Tool.move}></ActionButton>
                     <ActionButton key={"tool-delete"} text={"Delete"} icon={Icons.iconDelete} onClick={() => this.switchTool(Tool.delete)} active={this.state.activeTool === Tool.delete}></ActionButton>
-                    <ActionButton key={"tool-simulate"} text={"Simulate"} icon={Icons.iconPlay} onClick={this.simulate.bind(this)} active={false}></ActionButton>
+                    <ActionButton key={"tool-simulate"} text={"Simulate"} icon={Icons.iconPlay} onClick={this.onSimulate.bind(this)} active={false}></ActionButton>
                 </div>
             </div>
         );

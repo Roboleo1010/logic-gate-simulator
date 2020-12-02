@@ -28,9 +28,9 @@ class ChipModel {
                 return;
 
             if (gate.inputs.length > 0)
-                connectors.push({ direction: ConnectorDirection.SignalOut, side: ConnectorSide.Right, id: gate.id, state: TriState.Floating });
+                connectors.push({ direction: ConnectorDirection.SignalOut, side: ConnectorSide.Right, id: gate.id, state: TriState.Floating, error: false });
             else
-                connectors.push({ direction: ConnectorDirection.SignalIn, side: ConnectorSide.Left, id: gate.id, state: TriState.Floating });
+                connectors.push({ direction: ConnectorDirection.SignalIn, side: ConnectorSide.Left, id: gate.id, state: TriState.Floating, error: false });
         });
 
         this.filterConnectors(connectors);

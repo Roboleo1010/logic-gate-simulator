@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { ConnectorDirection, ConnectorModel, ConnectorSide } from "../../model/circuit-builder.types";
+import { ConnectorModel, ConnectorSide } from "../../model/circuit-builder.types";
 import { TriState } from "../../simulation/simulator.types";
 import "./connector.scss";
 
@@ -35,26 +35,21 @@ class Connector extends Component<ConnectorProps>{
                 style = { top: `calc(${(100 / (this.props.connectorsForSideCount + 1)) * (this.props.connectorForSideIndex + 1)}% - 8px)` }
                 break;
         }
-        switch (this.props.connectorBlueprint.direction) {
-            case ConnectorDirection.SignalIn:
-                className += 'connector-direction-in ';
-                break;
-            case ConnectorDirection.SignalOut:
-                className += 'connector-direction-out ';
-                break;
-        }
 
         switch (this.props.connectorBlueprint.state) {
             case TriState.True:
-                className += 'connector-true';
+                className += 'connector-true ';
                 break;
             case TriState.False:
-                className += 'connector-false';
+                className += 'connector-false ';
                 break;
             case TriState.Floating:
-                className += 'connector-floating';
+                className += 'connector-floating ';
                 break;
         }
+
+        if (this.props.connectorBlueprint.error)
+            className += 'connector-error ';
 
         return (<div data-connectorid={this.props.connectorBlueprint.id} className={className} style={style} onClick={() => this.props.onClick(this.props.connectorBlueprint)}></div >);
     }
