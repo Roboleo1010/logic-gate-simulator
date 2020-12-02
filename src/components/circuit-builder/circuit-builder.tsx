@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Icons from '../../assets/icons/icons';
 import ChipModel from '../../model/chip-model';
 import { ChipBlueprint, ConnectorDirection, ConnectorModel, Tool } from '../../model/circuit-builder.types';
 import Simulation from '../../simulation/simulation';
@@ -116,9 +117,9 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
                 <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.onChipDelete.bind(this)} onWireDelete={this.onWireDelete.bind(this)}></Board>
                 <Toolbox onChipClicked={this.addChipToBoard.bind(this)}></Toolbox>
                 <div className="action-bar">
-                    <ActionButton key={"tool-drag"} text={"Move"} onClick={() => this.switchTool(Tool.move)} active={this.state.activeTool === Tool.move}></ActionButton>
-                    <ActionButton key={"tool-delete"} text={"Delete"} onClick={() => this.switchTool(Tool.delete)} active={this.state.activeTool === Tool.delete}></ActionButton>
-                    <ActionButton key={"tool-simulate"} text={"Simulate"} onClick={this.simulate.bind(this)} active={false}></ActionButton>
+                    <ActionButton key={"tool-drag"} text={"Move"} icon={Icons.iconDrag} onClick={() => this.switchTool(Tool.move)} active={this.state.activeTool === Tool.move}></ActionButton>
+                    <ActionButton key={"tool-delete"} text={"Delete"} icon={Icons.iconDelete} onClick={() => this.switchTool(Tool.delete)} active={this.state.activeTool === Tool.delete}></ActionButton>
+                    <ActionButton key={"tool-simulate"} text={"Simulate"} icon={Icons.iconPlay} onClick={this.simulate.bind(this)} active={false}></ActionButton>
                 </div>
             </div>
         );
