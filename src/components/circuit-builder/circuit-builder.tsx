@@ -6,9 +6,6 @@ import { Gate, GateFunction, SimulationState, TriState, Wire } from '../../simul
 import NotificationManager, { NotificationType } from '../../manager/notification-manager';
 import Board from '../board/board';
 import Toolbox from '../toolbox/toolbox';
-
-import 'react-notifications-component/dist/theme.css'
-import './circuit-builder.scss';
 import Simulation from '../../simulation/simulation';
 import Toolbar from '../toolbar/toolbar';
 import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
@@ -16,6 +13,9 @@ import ToolbarButtonMulti from '../toolbar/toolbar-button-multi/toolbar-button-m
 import ToolbarButtonToggle from '../toolbar/toolbar-button-toggle/toolbar-button-toggle';
 import Icons from '../../assets/icons/icons';
 import ToolbarButton from '../toolbar/toolbar-button/toolbar-button';
+
+import 'react-notifications-component/dist/theme.css'
+import './circuit-builder.scss';
 
 interface CircuitBuilderState {
     chips: ChipModel[];
