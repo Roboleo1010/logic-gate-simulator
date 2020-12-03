@@ -19,33 +19,33 @@ class ChipManager {
         // Logic
         this.chips.set("Not", {
             name: "NOT", color: "#e76f51", category: "logic", gates: [
-                { id: 'rly_in', type: GateType.Relay, state: TriState.False, inputs: [] },
+                { id: 'rly_in', type: GateType.Relay, state: TriState.False, name: "Input", inputs: [] },
                 { id: 'not', type: GateType.NOT, state: TriState.False, inputs: ['rly_in'] },
-                { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['not'] }]
+                { id: 'rly_out', type: GateType.Relay, state: TriState.False, name: "Output", inputs: ['not'] }]
         });
         this.chips.set("And", {
             name: "AND", color: "#2a9d8f", category: "logic", gates: [
-                { id: 'rly_in1', type: GateType.Relay, state: TriState.False, inputs: [] },
-                { id: 'rly_in2', type: GateType.Relay, state: TriState.False, inputs: [] },
+                { id: 'rly_in1', type: GateType.Relay, state: TriState.False, name: "Input 1", inputs: [] },
+                { id: 'rly_in2', type: GateType.Relay, state: TriState.False, name: "Input 2", inputs: [] },
                 { id: 'and', type: GateType.AND, state: TriState.False, inputs: ['rly_in1', 'rly_in2'] },
-                { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['and'] }]
+                { id: 'rly_out', type: GateType.Relay, state: TriState.False, name: "Output", inputs: ['and'] }]
         });
 
         //IO
         this.chips.set("Constant On", {
             name: "Constant On", color: "#6DA34D", category: "io", description: "Emits a constant ON signal", gates: [
                 { id: 'ctr', type: GateType.Controlled, state: TriState.True, inputs: [] },
-                { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['ctr'] }]
+                { id: 'rly_out', type: GateType.Relay, state: TriState.False, name: "Output", inputs: ['ctr'] }]
         });
         this.chips.set("Constant Off", {
             name: "Constant Off", color: "#D10000", category: "io", description: "Emits a constant OFF signal", gates: [
                 { id: 'ctr', type: GateType.Controlled, state: TriState.False, inputs: [] },
-                { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['ctr'] }]
+                { id: 'rly_out', type: GateType.Relay, state: TriState.False, name: "Output", inputs: ['ctr'] }]
         });
         this.chips.set("Switch", {
             name: "Switch", color: "#FE5F00", category: "io", description: "Can be clicked to toggle state while Simulation is running", gates: [
                 { id: 'ctr', type: GateType.Controlled, function: GateFunction.Switch, state: TriState.False, inputs: [] },
-                { id: 'rly_out', type: GateType.Relay, state: TriState.False, inputs: ['ctr'] }]
+                { id: 'rly_out', type: GateType.Relay, state: TriState.False, name: "Output", inputs: ['ctr'] }]
         });
 
         this.chips.set("Clock", {

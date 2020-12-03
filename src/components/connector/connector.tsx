@@ -4,10 +4,11 @@ import { TriState } from "../../simulation/simulator.types";
 import "./connector.scss";
 
 interface ConnectorProps {
-    connectorBlueprint: ConnectorModel;
+    connector: ConnectorModel;
     connectorsForSideCount: number;
     connectorForSideIndex: number;
     onClick: (connector: ConnectorModel) => void;
+    isSimulationRunning: boolean;
 }
 
 class Connector extends Component<ConnectorProps>{
@@ -17,7 +18,7 @@ class Connector extends Component<ConnectorProps>{
         let className = "connector ";
         let style;
 
-        switch (this.props.connectorBlueprint.side) {
+        switch (this.props.connector.side) {
             case ConnectorSide.Top:
                 className += 'connector-side-top ';
                 style = { left: `calc(${(100 / (this.props.connectorsForSideCount + 1)) * (this.props.connectorForSideIndex + 1)}% - 8px)` }
@@ -36,22 +37,23 @@ class Connector extends Component<ConnectorProps>{
                 break;
         }
 
-        switch (this.props.connectorBlueprint.state) {
-            case TriState.True:
-                className += 'connector-true ';
-                break;
-            case TriState.False:
-                className += 'connector-false ';
-                break;
-            case TriState.Floating:
-                className += 'connector-floating ';
-                break;
-        }
+        if (this.props.isSimulationRunning)
+            switch (this.props.connector.gate.state) {
+                case TriState.True:
+                    className += 'connector-true ';
+                    break;
+                case TriState.False:
+                    className += 'connector-false ';
+                    break;
+                case TriState.Floating:
+                    className += 'connector-floating ';
+                    break;
+            }
 
-        if (this.props.connectorBlueprint.error)
+        if (this.props.connector.error)
             className += 'connector-error ';
 
-        return (<div data-connectorid={this.props.connectorBlueprint.id} className={className} style={style} onClick={() => this.props.onClick(this.props.connectorBlueprint)}></div >);
+        return (<div data-connectorid={this.props.connector.id} className={className} style={style} title={this.props.connector.gate.name} onClick={() => this.props.onClick(this.props.connector)}></div >);
     }
 }
 

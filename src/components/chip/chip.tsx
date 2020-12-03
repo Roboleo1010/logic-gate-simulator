@@ -41,7 +41,7 @@ class Chip extends Component<ChipProps, ChipState> {
 
         this.props.chip.connectors.forEach((connectorArray: ConnectorModel[]) => {
             connectorArray.forEach((connector: ConnectorModel, index) => {
-                connectors.push(<Connector key={connector.id} connectorBlueprint={connector} connectorsForSideCount={connectorArray.length} connectorForSideIndex={index} onClick={this.props.onConnectorClick}></Connector>);
+                connectors.push(<Connector key={connector.id} connector={connector} connectorsForSideCount={connectorArray.length} connectorForSideIndex={index} isSimulationRunning={this.props.isSimulationRunning} onClick={this.props.onConnectorClick}></Connector>);
             });
         });
 

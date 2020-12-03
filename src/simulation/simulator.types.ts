@@ -26,6 +26,7 @@ export interface Wire {
 
 export interface Gate {
     id: string;
+    name?: string;
     type: GateType;
     function?: GateFunction;
     state: TriState;

@@ -209,7 +209,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             chip.connectors.forEach(connectorSide => {
                 connectorSide.forEach(connector => {
                     const result = results.find(res => res.id === connector.id);
-                    connector.state = result?.state!;
+                    connector.gate.state = result?.state!;
                 });
             });
         });
@@ -237,7 +237,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.state.chips.forEach(chip => {
             chip.connectors.forEach(connectorSide => {
                 connectorSide.forEach(connector => {
-                    connector.state = TriState.Floating;
+                    connector.gate.state = TriState.Floating;
                 });
             });
         });

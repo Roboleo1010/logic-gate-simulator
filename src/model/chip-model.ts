@@ -1,5 +1,5 @@
 import ChipManager from "../manager/chip-manager";
-import { Gate, GateType, TriState } from "../simulation/simulator.types";
+import { Gate, GateType } from "../simulation/simulator.types";
 import { ChipBlueprint, ConnectorDirection, ConnectorModel, ConnectorSide } from "./circuit-builder.types";
 
 class ChipModel {
@@ -17,7 +17,7 @@ class ChipModel {
 
         //Add Gates
         blueprint.gates?.forEach(gate => {
-            this.gates.push({ id: `${this.id}_${gate.id}`, state: gate.state, type: gate.type, function: gate.function, inputs: gate.inputs.map(id => `${this.id}_${id}`) });
+            this.gates.push({ id: `${this.id}_${gate.id}`, state: gate.state, type: gate.type, function: gate.function, name: gate.name, inputs: gate.inputs.map(id => `${this.id}_${id}`) });
         });
 
         let connectors: ConnectorModel[] = [];
@@ -28,9 +28,9 @@ class ChipModel {
                 return;
 
             if (gate.inputs.length > 0)
-                connectors.push({ direction: ConnectorDirection.SignalOut, side: ConnectorSide.Right, id: gate.id, state: TriState.Floating, error: false });
+                connectors.push({ direction: ConnectorDirection.SignalOut, side: ConnectorSide.Right, id: gate.id, error: false, gate: gate });
             else
-                connectors.push({ direction: ConnectorDirection.SignalIn, side: ConnectorSide.Left, id: gate.id, state: TriState.Floating, error: false });
+                connectors.push({ direction: ConnectorDirection.SignalIn, side: ConnectorSide.Left, id: gate.id, error: false, gate: gate });
         });
 
         this.filterConnectors(connectors);

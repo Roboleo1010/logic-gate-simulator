@@ -1,4 +1,4 @@
-import { Gate, TriState, Wire } from "../simulation/simulator.types";
+import { Gate, Wire } from "../simulation/simulator.types";
 
 export enum ConnectorSide {
     Top = "Top",
@@ -25,7 +25,7 @@ export interface ConnectorModel {
     id: string;
     side: ConnectorSide;
     direction: ConnectorDirection;
-    state: TriState;
+    gate: Gate;
     error: boolean;
 }
 
