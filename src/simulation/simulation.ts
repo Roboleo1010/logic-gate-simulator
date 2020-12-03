@@ -1,22 +1,16 @@
-import { GateType, TriState, Wire, Gate, SimulationResult } from "./simulator.types";
+import { GateType, TriState, Gate, SimulationResult } from "./simulator.types";
 
 class Simulation {
     private gates: Gate[] = [];
-    private wires: Wire[] = [];
 
     private result: SimulationResult;
 
     evalsPerTick: number = 10;
 
-    constructor(gates: Gate[], wires: Wire[]) {
+    constructor(gates: Gate[]) {
         this.gates = gates;
-        this.wires = wires;
 
-        this.wires.forEach(wire => {
-            this.getGateById(wire.outputId).inputs = [wire.inputId];
-        });
-
-        this.result = { states: [], time: 0, gates: this.gates, wires: this.wires, error: false, missingConnections: [] };
+        this.result = { states: [], time: 0, gates: this.gates, error: false, missingConnections: [] };
     }
 
 
@@ -43,7 +37,7 @@ class Simulation {
     }
 
     private getGateById(id: string): Gate {
-        return this.gates.filter(chip => chip.id === id)[0];
+        return this.gates.filter(gate => gate.id === id)[0];
     }
 
     private evaluate() {

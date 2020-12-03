@@ -1,5 +1,5 @@
 import ChipManager from "../manager/chip-manager";
-import { Gate, GateType } from "../simulation/simulator.types";
+import { Gate, GateFunction } from "../simulation/simulator.types";
 import { ChipBlueprint, ConnectorDirection, ConnectorModel, ConnectorSide } from "./circuit-builder.types";
 
 class ChipModel {
@@ -24,7 +24,7 @@ class ChipModel {
 
         //Add Connectors to Chip
         this.gates.forEach(gate => {
-            if (gate.type !== GateType.Relay)
+            if (!(gate.function === GateFunction.Input || gate.function === GateFunction.Output))
                 return;
 
             if (gate.inputs.length > 0)

@@ -22,8 +22,8 @@ interface ToolboxProps {
 class Toolbox extends Component<ToolboxProps, ToolboxState> {
     constructor(props: ToolboxProps) {
         super(props);
-
         let chipManager = ChipManager.getInstance();
+        chipManager.chipAddedCallback = this.chipBlueprintAddedCallback.bind(this);
 
         this.state = {
             selectedTab: 'chips-logic',
@@ -33,8 +33,18 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
         };
     }
 
-    setSelected(tap: TabData) {
-        this.setState({ selectedTab: tap.id });
+    setSelected(tab: TabData) {
+        this.setState({ selectedTab: tab.id });
+    }
+
+    chipBlueprintAddedCallback() {
+        let chipManager = ChipManager.getInstance();
+
+        this.setState({
+            chipsLogic: chipManager.getByCategory('logic'),
+            chipsInOut: chipManager.getByCategory('io'),
+            chipsCustom: chipManager.getByCategory('')
+        });
     }
 
     render() {

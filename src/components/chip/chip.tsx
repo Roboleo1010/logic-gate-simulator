@@ -5,7 +5,7 @@ import Connector from "../connector/connector";
 
 import "./chip.scss";
 import ChipModel from "../../model/chip-model";
-import { Gate, GateFunction, TriState } from "../../simulation/simulator.types";
+import { Gate, GateFunction } from "../../simulation/simulator.types";
 import CircuitBuilderContext from "../context/circuit-builder-context/circuit-builder-context";
 
 interface ChipProps {
@@ -19,8 +19,8 @@ interface ChipProps {
 
 interface ChipState {
     switch?: Gate;
-    output?: Gate;
-    clock?: Gate;
+    // output?: Gate;
+    // clock?: Gate;
 }
 
 class Chip extends Component<ChipProps, ChipState> {
@@ -31,8 +31,8 @@ class Chip extends Component<ChipProps, ChipState> {
 
         this.state = {
             switch: this.props.chip.gates.find(gate => gate.function === GateFunction.Switch),
-            output: this.props.chip.gates.find(gate => gate.function === GateFunction.Output),
-            clock: this.props.chip.gates.find(gate => gate.function === GateFunction.Clock)
+            // output: this.props.chip.gates.find(gate => gate.function === GateFunction.Output), //TODO: fix thgis
+            // clock: this.props.chip.gates.find(gate => gate.function === GateFunction.Clock)
         };
     }
 
@@ -53,29 +53,26 @@ class Chip extends Component<ChipProps, ChipState> {
             if (this.state.switch)
                 className += "chip-type-switch ";
 
-            //TODO: Decide if neccecary
-            if (this.state.output) {
-                if (this.state.output.state === TriState.True)
-                    className += "chip-true ";
-                else
-                    className += "chip-false ";
-            }
+            // if (this.state.output) {
+            //     if (this.state.output.state === TriState.True)
+            //         className += "chip-true ";
+            //     else
+            //         className += "chip-false ";
+            // }
 
-            //TODO: Decide if neccecary
-            if (this.state.switch) {
-                if (this.state.switch.state === TriState.True)
-                    className += "chip-true ";
-                else
-                    className += "chip-false ";
-            }
+            // if (this.state.switch) {
+            //     if (this.state.switch.state === TriState.True)
+            //         className += "chip-true ";
+            //     else
+            //         className += "chip-false ";
+            // }
 
-            //TODO: Decide if neccecary
-            if (this.state.clock) {
-                if (this.state.clock.state === TriState.True)
-                    className += "chip-true ";
-                else
-                    className += "chip-false ";
-            }
+            // if (this.state.clock) {
+            //     if (this.state.clock.state === TriState.True)
+            //         className += "chip-true ";
+            //     else
+            //         className += "chip-false ";
+            // }
         }
         else {
             if (this.props.activeTool === Tool.Move)
@@ -92,7 +89,7 @@ class Chip extends Component<ChipProps, ChipState> {
             clickEvent = () => { this.props.onSwitchSwitched(this.state.switch!) }
 
         return (
-            <Draggable grid={[25, 25]} bounds={"parent"} cancel={".connector"} onStop={this.props.redraw} disabled={this.props.activeTool !== Tool.Move}>
+            <Draggable grid={[25, 25]} bounds={"parent"} cancel={".connector"} onStop={this.props.redraw} disabled={this.props.activeTool !== Tool.Move || this.context.isSimulationRunning}>
                 <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
                     <span>{this.props.chip.blueprint.name}</span>
                     {connectors}

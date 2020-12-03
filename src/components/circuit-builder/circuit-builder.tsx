@@ -17,6 +17,7 @@ import CircuitBuilderContext from '../context/circuit-builder-context/circuit-bu
 
 import 'react-notifications-component/dist/theme.css'
 import './circuit-builder.scss';
+import ChipManager from '../../manager/chip-manager';
 
 interface CircuitBuilderState {
     chips: ChipModel[];
@@ -35,26 +36,15 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     constructor(props: any) {
         super(props);
 
-        this.state = {
-            chips: [],
-            wires: [],
-            clockChips: [],
-            activeTool: Tool.Move,
-        };
+        this.state = { chips: [], wires: [], clockChips: [], activeTool: Tool.Move, };
     }
 
     //#region events
-    redraw() {
-        this.forceUpdate();
-    }
-
-    addChipToBoard(chipBlueprint: ChipBlueprint) {
+    addChip(chipBlueprint: ChipBlueprint) {
         this.stopSimulation();
 
-        let chip = new ChipModel(chipBlueprint);
-
         let newChips = this.state.chips;
-        newChips.push(chip);
+        newChips.push(new ChipModel(chipBlueprint));
         this.setState({ chips: newChips })
     }
 
@@ -103,7 +93,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         return;
     }
 
-    onChipDelete(chipToDelete: ChipModel) {
+    deleteChip(chipToDelete: ChipModel) {
         let gateIds = chipToDelete.gates.map(gate => gate.id);
 
         this.setState({
@@ -112,7 +102,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         });
     }
 
-    onWireDelete(wireToDelete: Wire) {
+    deleteWire(wireToDelete: Wire) {
         this.setState({ wires: this.state.wires.filter(wire => wire.inputId !== wireToDelete.inputId || wire.outputId !== wireToDelete.outputId) });
     }
 
@@ -120,20 +110,32 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.setState({ activeTool: tool, lastClickedConnector: undefined });
     }
 
-    onSwitchSwitched(gate: Gate) {
+    switchedSwitch(gate: Gate) {
         this.simulation?.changeGateState(gate.id, gate.state === TriState.True ? gate.state = TriState.False : gate.state = TriState.True)
     }
 
-    onPackageChip() {
-        console.log("Package Chip");
-    }
+    packageChip() {
+        this.stopSimulation();
 
-    onToggleSimulation(state: boolean) {
-        if (state)
-            this.startSimulation();
-        else
-            this.stopSimulation();
+        let gates = this.getGates();
 
+        //Filter out inner relays set corresponing inputs & outputs
+        gates.forEach(gate => {
+            if (gate.function === GateFunction.Input) {
+                if (gate.inputs.length > 0)
+                    gate.function = GateFunction.Relay
+            }
+            else if (gate.function === GateFunction.Output) {
+                let gatesConnectedToMe: Gate[] = [];
+                gates.forEach(g => g.inputs.forEach(input => { if (gate.id === input) gatesConnectedToMe.push(g) }));
+
+                if (gatesConnectedToMe.length > 0)//has outgoing connections alle inputs wo meine id drin steht
+                    gate.function = GateFunction.Relay;
+            }
+        });
+        ChipManager.getInstance().addChip({ name: `Custom Chip ${ChipManager.getInstance().getNextChipId("custom")}`, color: '#0000ff', gates: gates });
+
+        NotificationManager.addNotification("Packaged Chip", `The new Chip is saved as ${"NAME"} in the category Chips (Custom)`, NotificationType.Success);
     }
     //#endregion
 
@@ -143,30 +145,39 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.resetChipError();
         this.resetWireState();
 
+        const gates: Gate[] = this.getGates();
+        const clocks: Gate[] = gates.filter(gate => gate.function === GateFunction.Clock);
+
+        this.simulation = new Simulation(gates);
+
+        const handle = setInterval(() => { this.simulate() }, 500)
+
+        this.setState({ simulationHandle: handle, clockChips: clocks });
+        this.context.isSimulationRunning = true;
+
+        NotificationManager.addNotification("Starting Simulation", ' ', NotificationType.Info);
+    }
+
+    getGates(): Gate[] {
         let gates: Gate[] = [];
-        let clocks: Gate[] = [];
 
         this.state.chips.forEach(chip => {
             chip.gates.forEach(gate => {
                 gates.push(gate);
-
-                if (gate.function === GateFunction.Clock)
-                    clocks.push(gate);
             });
         });
 
-        this.simulation = new Simulation(gates, this.state.wires);
+        this.state.wires.forEach(wire => {
+            gates.filter(gate => gate.id === wire.outputId)[0].inputs = [wire.inputId]
+        });
 
-        const handle = setInterval(() => { this.simulate() }, 1000)
-
-        this.setState({ simulationHandle: handle, clockChips: clocks });
-        this.context.isSimulationRunning = true;
-        NotificationManager.addNotification("Starting Simulation", ' ', NotificationType.Info);
+        return gates;
     }
 
     simulate() {
         console.log("Simulation Tick");
 
+        //Setting Clock State
         this.state.clockChips.filter(gate => gate.function === GateFunction.Clock).forEach(clock => this.simulation?.changeGateState(clock.id, clock.state === TriState.True ? clock.state = TriState.False : clock.state = TriState.True));
 
         const result = this.simulation?.simulate()!;
@@ -188,7 +199,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             this.setWireState(result.states);
         }
 
-        this.redraw();
+        this.forceUpdate();
     }
 
     stopSimulation() {
@@ -246,6 +257,12 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         });
     }
 
+    resetWireState() {
+        this.state.wires.forEach(wire => {
+            wire.state = TriState.Floating;
+        })
+    }
+
     resetChipError() {
         this.state.chips.forEach(chip => {
             chip.connectors.forEach(connectorSide => {
@@ -255,20 +272,14 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             });
         });
     }
-
-    resetWireState() {
-        this.state.wires.forEach(wire => {
-            wire.state = TriState.Floating;
-        })
-    }
     //#endregion
 
     render() {
         return (
             <div className="circuit-builder" >
                 <ReactNotification />
-                <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.onChipDelete.bind(this)} onWireDelete={this.onWireDelete.bind(this)} redraw={this.redraw.bind(this)} onSwitchSwitched={this.onSwitchSwitched.bind(this)}></Board>
-                <Toolbox onChipClicked={this.addChipToBoard.bind(this)}></Toolbox>
+                <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.deleteChip.bind(this)} onWireDelete={this.deleteWire.bind(this)} redraw={() => this.forceUpdate()} onSwitchSwitched={this.switchedSwitch.bind(this)}></Board>
+                <Toolbox onChipClicked={this.addChip.bind(this)}></Toolbox>
                 <div className="toolbar-container">
                     <Toolbar>
                         <ToolbarGroup>
@@ -276,14 +287,14 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
                             <ToolbarButtonMulti icon={Icons.iconDelete} text="Delete" onClick={() => this.switchTool(Tool.Delete)} isActive={this.state.activeTool === Tool.Delete}></ToolbarButtonMulti>
                         </ToolbarGroup>
                         <ToolbarGroup>
-                            <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.context.isSimulationRunning} onClick={this.onToggleSimulation.bind(this)}></ToolbarButtonToggle>
+                            <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.context.isSimulationRunning} onClick={(newState: boolean) => { newState ? this.startSimulation() : this.stopSimulation() }}></ToolbarButtonToggle>
                         </ToolbarGroup>
                         <ToolbarGroup>
-                            <ToolbarButton icon={Icons.iconChip} text="Package Chip" onClick={this.onPackageChip.bind(this)}></ToolbarButton>
+                            <ToolbarButton icon={Icons.iconChip} text="Package Chip" onClick={this.packageChip.bind(this)}></ToolbarButton>
                         </ToolbarGroup>
                     </Toolbar>
                 </div>
-            </div>
+            </div >
         );
     }
 }

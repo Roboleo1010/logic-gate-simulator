@@ -13,6 +13,8 @@ export enum GateType {
 
 export enum GateFunction {
     Controlled = "Controlled",
+    Relay = "Relay",
+    Input = "Input",
     Output = "Output",
     Clock = "Clock",
     Switch = "Switch",
@@ -37,7 +39,6 @@ export interface SimulationResult {
     states: SimulationState[];
     time: number;
     gates: Gate[];
-    wires: Wire[];
     error: boolean;
     missingConnections: string[];
     errorMessage?: string;
