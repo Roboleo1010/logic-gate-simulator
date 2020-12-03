@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { ConnectorModel, ConnectorSide } from "../../model/circuit-builder.types";
 import { TriState } from "../../simulation/simulator.types";
+import CircuitBuilderContext from "../context/circuit-builder-context/circuit-builder-context";
 import "./connector.scss";
 
 interface ConnectorProps {
@@ -8,11 +9,10 @@ interface ConnectorProps {
     connectorsForSideCount: number;
     connectorForSideIndex: number;
     onClick: (connector: ConnectorModel) => void;
-    isSimulationRunning: boolean;
 }
 
 class Connector extends Component<ConnectorProps>{
-    //When two chips are connected add connectors to simulator.wireConnections
+    static contextType = CircuitBuilderContext;
 
     render() {
         let className = "connector ";
@@ -37,7 +37,7 @@ class Connector extends Component<ConnectorProps>{
                 break;
         }
 
-        if (this.props.isSimulationRunning)
+        if (this.context.isSimulationRunning)
             switch (this.props.connector.gate.state) {
                 case TriState.True:
                     className += 'connector-true ';

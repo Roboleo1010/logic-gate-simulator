@@ -6,11 +6,11 @@ import Connector from "../connector/connector";
 import "./chip.scss";
 import ChipModel from "../../model/chip-model";
 import { Gate, GateFunction, TriState } from "../../simulation/simulator.types";
+import CircuitBuilderContext from "../context/circuit-builder-context/circuit-builder-context";
 
 interface ChipProps {
     chip: ChipModel;
     activeTool: Tool;
-    isSimulationRunning: boolean;
     onConnectorClick: (connector: ConnectorModel) => void;
     onChipDelete: (chip: ChipModel) => void;
     onSwitchSwitched: (gate: Gate) => void;
@@ -24,6 +24,8 @@ interface ChipState {
 }
 
 class Chip extends Component<ChipProps, ChipState> {
+    static contextType = CircuitBuilderContext;
+
     constructor(props: ChipProps) {
         super(props);
 
@@ -41,13 +43,13 @@ class Chip extends Component<ChipProps, ChipState> {
 
         this.props.chip.connectors.forEach((connectorArray: ConnectorModel[]) => {
             connectorArray.forEach((connector: ConnectorModel, index) => {
-                connectors.push(<Connector key={connector.id} connector={connector} connectorsForSideCount={connectorArray.length} connectorForSideIndex={index} isSimulationRunning={this.props.isSimulationRunning} onClick={this.props.onConnectorClick}></Connector>);
+                connectors.push(<Connector key={connector.id} connector={connector} connectorsForSideCount={connectorArray.length} connectorForSideIndex={index} onClick={this.props.onConnectorClick}></Connector>);
             });
         });
 
         let className = "chip chip-on-board ";
 
-        if (this.props.isSimulationRunning) {
+        if (this.context.isSimulationRunning) {
             if (this.state.switch)
                 className += "chip-type-switch ";
 
@@ -84,9 +86,9 @@ class Chip extends Component<ChipProps, ChipState> {
 
         let clickEvent = () => { };
 
-        if (!this.props.isSimulationRunning && this.props.activeTool === Tool.Delete)
+        if (!this.context.isSimulationRunning && this.props.activeTool === Tool.Delete)
             clickEvent = () => { this.props.onChipDelete(this.props.chip) };
-        else if (this.props.isSimulationRunning && this.state.switch)
+        else if (this.context.isSimulationRunning && this.state.switch)
             clickEvent = () => { this.props.onSwitchSwitched(this.state.switch!) }
 
         return (

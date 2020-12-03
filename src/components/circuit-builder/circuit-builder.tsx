@@ -13,6 +13,7 @@ import ToolbarButtonMulti from '../toolbar/toolbar-button-multi/toolbar-button-m
 import ToolbarButtonToggle from '../toolbar/toolbar-button-toggle/toolbar-button-toggle';
 import Icons from '../../assets/icons/icons';
 import ToolbarButton from '../toolbar/toolbar-button/toolbar-button';
+import CircuitBuilderContext from '../context/circuit-builder-context/circuit-builder-context';
 
 import 'react-notifications-component/dist/theme.css'
 import './circuit-builder.scss';
@@ -22,12 +23,13 @@ interface CircuitBuilderState {
     wires: Wire[];
     lastClickedConnector?: ConnectorModel;
     activeTool: Tool;
-    isSimulationRunning: boolean;
     simulationHandle?: any;
     clockChips: Gate[];
 }
 
 class CircuitBuilder extends Component<{}, CircuitBuilderState> {
+    static contextType = CircuitBuilderContext;
+
     private simulation?: Simulation;
 
     constructor(props: any) {
@@ -38,7 +40,6 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             wires: [],
             clockChips: [],
             activeTool: Tool.Move,
-            isSimulationRunning: false,
         };
     }
 
@@ -158,7 +159,8 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
 
         const handle = setInterval(() => { this.simulate() }, 1000)
 
-        this.setState({ simulationHandle: handle, isSimulationRunning: true, clockChips: clocks });
+        this.setState({ simulationHandle: handle, clockChips: clocks });
+        this.context.isSimulationRunning = true;
         NotificationManager.addNotification("Starting Simulation", ' ', NotificationType.Info);
     }
 
@@ -190,12 +192,13 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     }
 
     stopSimulation() {
-        if (!this.state.isSimulationRunning)
+        if (!this.context.isSimulationRunning)
             return;
 
         NotificationManager.addNotification("Stopping Simulation", ' ', NotificationType.Info);
         clearInterval(this.state.simulationHandle);
-        this.setState({ simulationHandle: undefined, isSimulationRunning: false });
+        this.setState({ simulationHandle: undefined });
+        this.context.isSimulationRunning = false;
         this.simulation = undefined;
 
         this.resetChipState();
@@ -264,7 +267,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         return (
             <div className="circuit-builder" >
                 <ReactNotification />
-                <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} isSimulationRunning={this.state.isSimulationRunning} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.onChipDelete.bind(this)} onWireDelete={this.onWireDelete.bind(this)} redraw={this.redraw.bind(this)} onSwitchSwitched={this.onSwitchSwitched.bind(this)}></Board>
+                <Board chips={this.state.chips} wires={this.state.wires} activeTool={this.state.activeTool} onConnectorClicked={this.onConnectorClicked.bind(this)} onChipDelete={this.onChipDelete.bind(this)} onWireDelete={this.onWireDelete.bind(this)} redraw={this.redraw.bind(this)} onSwitchSwitched={this.onSwitchSwitched.bind(this)}></Board>
                 <Toolbox onChipClicked={this.addChipToBoard.bind(this)}></Toolbox>
                 <div className="toolbar-container">
                     <Toolbar>
@@ -273,7 +276,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
                             <ToolbarButtonMulti icon={Icons.iconDelete} text="Delete" onClick={() => this.switchTool(Tool.Delete)} isActive={this.state.activeTool === Tool.Delete}></ToolbarButtonMulti>
                         </ToolbarGroup>
                         <ToolbarGroup>
-                            <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.state.isSimulationRunning} onClick={this.onToggleSimulation.bind(this)}></ToolbarButtonToggle>
+                            <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.context.isSimulationRunning} onClick={this.onToggleSimulation.bind(this)}></ToolbarButtonToggle>
                         </ToolbarGroup>
                         <ToolbarGroup>
                             <ToolbarButton icon={Icons.iconChip} text="Package Chip" onClick={this.onPackageChip.bind(this)}></ToolbarButton>
