@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import ReactNotification from 'react-notifications-component'
 import ChipModel from '../../model/chip-model';
-import { ChipBlueprint, ConnectorDirection, ConnectorModel, Tool } from '../../model/circuit-builder.types';
-import { Gate, GateFunction, SimulationState, TriState, Wire } from '../../simulation/simulator.types';
+import { ChipBlueprint, SignalDirection, ConnectorModel, Tool, Wire, Gate, GateFunction } from '../../model/circuit-builder.types';
+import { SimulationState, TriState, Gate as SimulationGate } from '../../simulation/simulator.types';
 import NotificationManager, { NotificationType } from '../../manager/notification-manager';
 import Board from '../board/board';
 import Toolbox from '../toolbox/toolbox';
@@ -15,9 +15,12 @@ import Icons from '../../assets/icons/icons';
 import ToolbarButton from '../toolbar/toolbar-button/toolbar-button';
 import CircuitBuilderContext from '../context/circuit-builder-context/circuit-builder-context';
 
+
+
 import 'react-notifications-component/dist/theme.css'
 import './circuit-builder.scss';
 import ChipManager from '../../manager/chip-manager';
+
 
 interface CircuitBuilderState {
     chips: ChipModel[];
@@ -53,7 +56,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
 
         //First click
         if (!this.state.lastClickedConnector) {
-            if (connector.direction === ConnectorDirection.SignalOut) {
+            if (connector.direction === SignalDirection.Out) {
                 this.setState({ lastClickedConnector: connector });
                 return;
             }
@@ -72,7 +75,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         }
 
         //Input & input or out & out
-        if (connector.direction === ConnectorDirection.SignalOut) {
+        if (connector.direction === SignalDirection.Out) {
             NotificationManager.addNotification("Wire Error", "Can't end Wire on output.", NotificationType.Warning);
             this.setState({ lastClickedConnector: undefined });
             return;
@@ -97,7 +100,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         let gateIds = chipToDelete.gates.map(gate => gate.id);
 
         this.setState({
-            chips: this.state.chips.filter(chip => chip.id !== chipToDelete.id),
+            chips: this.state.chips.filter(chip => chip.chipId !== chipToDelete.chipId),
             wires: this.state.wires.filter(wire => !gateIds.includes(wire.inputId) && !gateIds.includes(wire.outputId))
         });
     }
@@ -121,11 +124,11 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
 
         //Filter out inner relays set corresponing inputs & outputs
         gates.forEach(gate => {
-            if (gate.function === GateFunction.Input) {
+            if (gate.direction === SignalDirection.In) {
                 if (gate.inputs.length > 0)
                     gate.function = GateFunction.Relay
             }
-            else if (gate.function === GateFunction.Output) {
+            else if (gate.direction === SignalDirection.Out) {
                 let gatesConnectedToMe: Gate[] = [];
                 gates.forEach(g => g.inputs.forEach(input => { if (gate.id === input) gatesConnectedToMe.push(g) }));
 

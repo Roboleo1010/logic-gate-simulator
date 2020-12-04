@@ -1,12 +1,11 @@
 import React, { Component } from "react";
 import Draggable from "react-draggable";
-import { ConnectorModel, Tool } from "../../model/circuit-builder.types";
+import { ConnectorModel, Gate, GateFunction, Tool } from "../../model/circuit-builder.types";
 import Connector from "../connector/connector";
+import ChipModel from "../../model/chip-model";
+import CircuitBuilderContext from "../context/circuit-builder-context/circuit-builder-context";
 
 import "./chip.scss";
-import ChipModel from "../../model/chip-model";
-import { Gate, GateFunction } from "../../simulation/simulator.types";
-import CircuitBuilderContext from "../context/circuit-builder-context/circuit-builder-context";
 
 interface ChipProps {
     chip: ChipModel;
@@ -18,9 +17,7 @@ interface ChipProps {
 }
 
 interface ChipState {
-    switch?: Gate;
-    // output?: Gate;
-    // clock?: Gate;
+    input?: Gate;
 }
 
 class Chip extends Component<ChipProps, ChipState> {
@@ -30,14 +27,12 @@ class Chip extends Component<ChipProps, ChipState> {
         super(props);
 
         this.state = {
-            switch: this.props.chip.gates.find(gate => gate.function === GateFunction.Switch),
-            // output: this.props.chip.gates.find(gate => gate.function === GateFunction.Output), //TODO: fix thgis
-            // clock: this.props.chip.gates.find(gate => gate.function === GateFunction.Clock)
+            input: this.props.chip.gates.find(gate => gate.function === GateFunction.Input),
         };
     }
 
     render() {
-        let style = { backgroundColor: this.props.chip.blueprint.color };
+        let style = { backgroundColor: this.props.chip.chipBlueprint.color };
 
         let connectors: JSX.Element[] = [];
 
@@ -47,51 +42,30 @@ class Chip extends Component<ChipProps, ChipState> {
             });
         });
 
-        let className = "chip chip-on-board ";
+        let className = 'chip chip-on-board ';
 
         if (this.context.isSimulationRunning) {
-            if (this.state.switch)
-                className += "chip-type-switch ";
-
-            // if (this.state.output) {
-            //     if (this.state.output.state === TriState.True)
-            //         className += "chip-true ";
-            //     else
-            //         className += "chip-false ";
-            // }
-
-            // if (this.state.switch) {
-            //     if (this.state.switch.state === TriState.True)
-            //         className += "chip-true ";
-            //     else
-            //         className += "chip-false ";
-            // }
-
-            // if (this.state.clock) {
-            //     if (this.state.clock.state === TriState.True)
-            //         className += "chip-true ";
-            //     else
-            //         className += "chip-false ";
-            // }
+            if (this.state.input)
+                className += 'chip-type-switch ';
         }
         else {
             if (this.props.activeTool === Tool.Move)
-                className += "chip-tool-move ";
+                className += 'chip-tool-move ';
             else if (this.props.activeTool === Tool.Delete)
-                className += "chip-tool-delete ";
+                className += 'chip-tool-delete ';
         }
 
         let clickEvent = () => { };
 
         if (!this.context.isSimulationRunning && this.props.activeTool === Tool.Delete)
             clickEvent = () => { this.props.onChipDelete(this.props.chip) };
-        else if (this.context.isSimulationRunning && this.state.switch)
-            clickEvent = () => { this.props.onSwitchSwitched(this.state.switch!) }
+        else if (this.context.isSimulationRunning && this.state.input)
+            clickEvent = () => { this.props.onSwitchSwitched(this.state.input!) }
 
         return (
             <Draggable grid={[25, 25]} bounds={"parent"} cancel={".connector"} onStop={this.props.redraw} disabled={this.props.activeTool !== Tool.Move || this.context.isSimulationRunning}>
-                <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
-                    <span>{this.props.chip.blueprint.name}</span>
+                <div data-chipid={this.props.chip.chipId} className={className} style={style} onClick={clickEvent}>
+                    <span>{this.props.chip.chipBlueprint.name}</span>
                     {connectors}
                 </div>
             </Draggable >

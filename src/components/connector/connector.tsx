@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { ConnectorModel, ConnectorSide } from "../../model/circuit-builder.types";
 import { TriState } from "../../simulation/simulator.types";
 import CircuitBuilderContext from "../context/circuit-builder-context/circuit-builder-context";
+
 import "./connector.scss";
 
 interface ConnectorProps {

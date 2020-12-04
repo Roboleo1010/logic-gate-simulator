@@ -27,9 +27,9 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
 
         this.state = {
             selectedTab: 'chips-logic',
-            chipsLogic: chipManager.getByCategory('logic'),
-            chipsInOut: chipManager.getByCategory('io'),
-            chipsCustom: chipManager.getByCategory('')
+            chipsLogic: chipManager.getChipsByCategory('logic'),
+            chipsInOut: chipManager.getChipsByCategory('io'),
+            chipsCustom: chipManager.getChipsByCategory('')
         };
     }
 
@@ -41,9 +41,9 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
         let chipManager = ChipManager.getInstance();
 
         this.setState({
-            chipsLogic: chipManager.getByCategory('logic'),
-            chipsInOut: chipManager.getByCategory('io'),
-            chipsCustom: chipManager.getByCategory('')
+            chipsLogic: chipManager.getChipsByCategory('logic'),
+            chipsInOut: chipManager.getChipsByCategory('io'),
+            chipsCustom: chipManager.getChipsByCategory('')
         });
     }
 
@@ -75,7 +75,7 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
                         </div>
                     </Tab>
                     <Tab isSelected={this.state.selectedTab === tabs[3].id}>
-                        TODO
+
                     </Tab>
                 </TabNav>
             </div>

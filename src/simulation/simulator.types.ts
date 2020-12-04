@@ -11,26 +11,9 @@ export enum GateType {
     NOT = "NOT",
 }
 
-export enum GateFunction {
-    Controlled = "Controlled",
-    Relay = "Relay",
-    Input = "Input",
-    Output = "Output",
-    Clock = "Clock",
-    Switch = "Switch",
-}
-
-export interface Wire {
-    inputId: string;
-    outputId: string;
-    state?: TriState;
-}
-
 export interface Gate {
     id: string;
-    name?: string;
     type: GateType;
-    function?: GateFunction;
     state: TriState;
     inputs: string[];
 }

@@ -1,13 +1,13 @@
 import React, { Component } from "react";
-import { Tool } from "../../model/circuit-builder.types";
-import { TriState, Wire as WireSimulation } from "../../simulation/simulator.types";
+import { Tool, Wire as WireModel } from "../../model/circuit-builder.types";
+import { TriState } from "../../simulation/simulator.types";
 
 import "./wire.scss";
 
 interface WireProps {
-    wire: WireSimulation;
+    wire: WireModel;
     activeTool: Tool;
-    onWireDelete: (wire: WireSimulation) => void;
+    onWireDelete: (wire: WireModel) => void;
 }
 
 class Wire extends Component<WireProps> {
@@ -18,10 +18,10 @@ class Wire extends Component<WireProps> {
         if (!startElement || !endElement)
             return;
 
-        let className = "wire ";
+        let className = 'wire ';
 
         if (this.props.activeTool === Tool.Delete)
-            className += "wire-tool-delete ";
+            className += 'wire-tool-delete ';
 
         switch (this.props.wire.state) {
             case TriState.True:

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import ChipModel from "../../model/chip-model";
-import { ConnectorModel, Tool } from "../../model/circuit-builder.types";
-import { Gate, Wire as WireSimulation } from "../../simulation/simulator.types";
+import { ConnectorModel, Gate, Tool, Wire as WireModel } from "../../model/circuit-builder.types";
 import Chip from "../chip/chip";
 import Wire from "../wire/wire";
 
@@ -9,11 +8,12 @@ import "./board.scss";
 
 interface BoardProps {
     chips: ChipModel[];
-    wires: WireSimulation[];
+    wires: WireModel[];
     activeTool: Tool;
+
     onConnectorClicked: (connector: ConnectorModel) => void;
     onChipDelete: (id: ChipModel) => void;
-    onWireDelete: (id: WireSimulation) => void;
+    onWireDelete: (id: WireModel) => void;
     onSwitchSwitched: (gate: Gate) => void;
     redraw: () => void;
 }
@@ -23,7 +23,7 @@ class Board extends Component<BoardProps>{
         return (
             <div className="board">
                 {this.props.chips.map(chip => {
-                    return <Chip key={chip.id} chip={chip} activeTool={this.props.activeTool} onConnectorClick={this.props.onConnectorClicked} redraw={this.props.redraw} onChipDelete={this.props.onChipDelete} onSwitchSwitched={this.props.onSwitchSwitched} ></Chip>
+                    return <Chip key={chip.chipId} chip={chip} activeTool={this.props.activeTool} onConnectorClick={this.props.onConnectorClicked} redraw={this.props.redraw} onChipDelete={this.props.onChipDelete} onSwitchSwitched={this.props.onSwitchSwitched} ></Chip>
                 })
                 }
                 {

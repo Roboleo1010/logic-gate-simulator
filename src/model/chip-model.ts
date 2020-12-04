@@ -1,10 +1,9 @@
 import ChipManager from "../manager/chip-manager";
-import { Gate, GateFunction } from "../simulation/simulator.types";
-import { ChipBlueprint, ConnectorDirection, ConnectorModel, ConnectorSide } from "./circuit-builder.types";
+import { ChipBlueprint, SignalDirection, ConnectorModel, ConnectorSide, Gate } from "./circuit-builder.types";
 
 class ChipModel {
-    public blueprint: ChipBlueprint;
-    public id: string;
+    public chipBlueprint: ChipBlueprint;
+    public chipId: string;
 
     public connectors: ConnectorModel[][] = [];
     public gates: Gate[] = [];
@@ -12,25 +11,25 @@ class ChipModel {
     constructor(blueprint: ChipBlueprint) {
         let chipManager = ChipManager.getInstance();
 
-        this.blueprint = blueprint;
-        this.id = `${blueprint.name}_${chipManager.getNextChipId(blueprint.name)}`;
+        this.chipBlueprint = blueprint;
+        this.chipId = `${blueprint.name}_${chipManager.getNextChipId(blueprint.name)}`;
 
         //Add Gates
         blueprint.gates?.forEach(gate => {
-            this.gates.push({ id: `${this.id}_${gate.id}`, state: gate.state, type: gate.type, function: gate.function, name: gate.name, inputs: gate.inputs.map(id => `${this.id}_${id}`) });
+            let gateCopy = { ...gate };
+
+            gateCopy.id = `${this.chipId}_${gate.id}`;
+            gateCopy.inputs = gate.inputs.map(inputId => `${this.chipId}_${inputId}`);
+
+            this.gates.push(gateCopy);
         });
 
         let connectors: ConnectorModel[] = [];
 
         //Add Connectors to Chip
         this.gates.forEach(gate => {
-            if (!(gate.function === GateFunction.Input || gate.function === GateFunction.Output))
-                return;
-
-            if (gate.inputs.length > 0)
-                connectors.push({ direction: ConnectorDirection.SignalOut, side: ConnectorSide.Right, id: gate.id, error: false, gate: gate });
-            else
-                connectors.push({ direction: ConnectorDirection.SignalIn, side: ConnectorSide.Left, id: gate.id, error: false, gate: gate });
+            if (gate.direction === SignalDirection.In || gate.direction === SignalDirection.Out)
+                connectors.push({ direction: gate.direction, side: gate.direction === SignalDirection.In ? ConnectorSide.Left : ConnectorSide.Right, id: gate.id, error: false, gate: gate });
         });
 
         this.filterConnectors(connectors);

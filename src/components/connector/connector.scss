@@ -1,7 +1,7 @@
 @import "../../styles/design.scss";
 
 $connectorWidth: 16px;
-$connectorWidthHalfed: $connectorWidth/2;
+$connectorWidthHalfed: $connectorWidth / 2;
 
 .connector {
     height: 16px;
@@ -46,5 +46,5 @@ $connectorWidthHalfed: $connectorWidth/2;
 }
 
 .connector-error {
-    border: 3px solid red;
+    border: 3px solid $color-error;
 }
