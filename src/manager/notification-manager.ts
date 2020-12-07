@@ -1,4 +1,4 @@
-import { store } from "react-notifications-component";
+import { store } from 'react-notifications-component';
 
 export enum NotificationType {
     Success = 'success',

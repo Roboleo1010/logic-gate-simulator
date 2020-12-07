@@ -1,7 +1,6 @@
-import React, { Component } from "react";
-import { ChipBlueprint } from "../../model/circuit-builder.types";
-
-import "./chip.scss";
+import ChipBlueprint from '../../model/chip-blueprint';
+import React, { Component } from 'react';
+import './chip.scss';
 
 interface ChipToolboxProps {
     chipBlueprint: ChipBlueprint;

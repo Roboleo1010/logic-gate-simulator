@@ -1,6 +1,5 @@
-import React, { Component } from "react";
-import Icons from "../../../assets/icons/icons";
-
+import Icons from '../../../assets/icons/icons';
+import React, { Component } from 'react';
 import '../toolbar-button.scss';
 
 interface ToolbarButtonToggleProps {
@@ -11,7 +10,6 @@ interface ToolbarButtonToggleProps {
     isActive: boolean;
     onClick: (newState: boolean) => void;
 }
-
 
 class ToolbarButtonToggle extends Component<ToolbarButtonToggleProps> {
     onClick() {

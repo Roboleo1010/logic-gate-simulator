@@ -1,7 +1,6 @@
-import React, { Component } from "react";
-import { TabData } from "../tab.types";
-
-import "./tabnav.scss"
+import React, { Component } from 'react';
+import { TabData } from '../tab.types';
+import './tabnav.scss';
 
 interface TabNavProps {
     selectedId: string;
@@ -22,9 +21,7 @@ class TabNav extends Component<TabNavProps> {
                     return <div key={tap.id} className={classNames} onClick={() => this.props.setSelected(tap)}>{tap.name}</div>
                 })}
             </div>
-
             {this.props.children}
-
         </div>);
     }
 }

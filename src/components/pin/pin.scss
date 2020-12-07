@@ -1,9 +1,9 @@
 @import "../../styles/design.scss";
 
-$connectorWidth: 16px;
-$connectorWidthHalfed: $connectorWidth / 2;
+$pinWidth: 16px;
+$pinWidthHalfed: $pinWidth / 2;
 
-.connector {
+.pin {
     height: 16px;
     width: 16px;
     display: block;
@@ -17,34 +17,26 @@ $connectorWidthHalfed: $connectorWidth / 2;
     cursor: pointer;
 }
 
-.connector-side-top {
-    top: -$connectorWidthHalfed;
+.pin-side-left {
+    left: -$pinWidthHalfed;
 }
 
-.connector-side-bottom {
-    bottom: -$connectorWidthHalfed;
+.pin-side-right {
+    right: -$pinWidthHalfed;
 }
 
-.connector-side-left {
-    left: -$connectorWidthHalfed;
-}
-
-.connector-side-right {
-    right: -$connectorWidthHalfed;
-}
-
-.connector-true {
+.pin-true {
     background-color: $color-true;
 }
 
-.connector-false {
+.pin-false {
     background-color: $color-false;
 }
 
-.connector-floating {
+.pin-floating {
     background-color: $color-floating;
 }
 
-.connector-error {
+.pin-error {
     border: 3px solid $color-error;
 }

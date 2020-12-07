@@ -1,6 +1,5 @@
-import React, { Component } from "react";
-import Icons from "../../../assets/icons/icons";
-
+import Icons from '../../../assets/icons/icons';
+import React, { Component } from 'react';
 import '../toolbar-button.scss';
 
 interface ToolbarButtonMultiProps {
@@ -9,7 +8,6 @@ interface ToolbarButtonMultiProps {
     onClick: () => void;
     isActive: boolean;
 }
-
 
 class ToolbarButtonMulti extends Component<ToolbarButtonMultiProps> {
     render() {

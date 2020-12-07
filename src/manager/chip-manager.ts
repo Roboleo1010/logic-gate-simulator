@@ -1,17 +1,18 @@
-import { ChipBlueprint, GateFunction, SignalDirection } from "../model/circuit-builder.types";
-import { GateType, TriState } from "../simulation/simulator.types";
+import ChipBlueprint from '../model/chip-blueprint';
+import Graph from '../utilities/graph/graph';
+import { Gate, GateRole } from '../model/circuit-builder.types';
+import { GateType, TriState } from '../simulation/simulator.types';
 
 class ChipManager {
     private static instance: ChipManager;
-
-    private chips: Map<string, ChipBlueprint> = new Map();
-    private chipIds: Map<string, number> = new Map();
-    private nextId: number = 0;
-
-    public chipAddedCallback?: () => void;
+    private blueprints: ChipBlueprint[];
+    private chipIds: Map<string, number>;
 
     private constructor() {
         ChipManager.instance = this;
+        this.blueprints = [];
+        this.chipIds = new Map();
+
         this.loadData();
     }
 
@@ -22,91 +23,61 @@ class ChipManager {
         return ChipManager.instance;
     }
 
-    private loadData() {//TODO: From Firebase
-        //Logic
-        this.addChip({
-            name: "NOT", color: "#e76f51", category: "logic", gates: [
-                { id: 'rly_in', type: GateType.Relay, state: TriState.False, direction: SignalDirection.In, name: "Input", inputs: [] },
-                { id: 'not', type: GateType.NOT, state: TriState.False, inputs: ['rly_in'] },
-                { id: 'rly_out', type: GateType.Relay, state: TriState.False, direction: SignalDirection.Out, name: "Output", inputs: ['not'] }]
-        });
-        this.addChip({
-            name: "AND", color: "#2a9d8f", category: "logic", gates: [
-                { id: 'rly_in1', type: GateType.Relay, state: TriState.False, direction: SignalDirection.In, name: "Input 1", inputs: [] },
-                { id: 'rly_in2', type: GateType.Relay, state: TriState.False, direction: SignalDirection.In, name: "Input 2", inputs: [] },
-                { id: 'and', type: GateType.AND, state: TriState.False, inputs: ['rly_in1', 'rly_in2'] },
-                { id: 'rly_out', type: GateType.Relay, state: TriState.False, direction: SignalDirection.Out, name: "Output", inputs: ['and'] }]
-        });
+    private loadData() {//TODO: From Firebase    
+        //NOT-Gate 
+        let graphNOT = new Graph<Gate>();
+        graphNOT.addNodes([
+            { id: "in1", type: GateType.Relay, state: TriState.False, role: GateRole.Input },
+            { id: "not", type: GateType.NOT, state: TriState.False },
+            { id: "out1", type: GateType.Relay, state: TriState.False, role: GateRole.Output }])
 
-        //IO
-        this.addChip({
-            name: "Constant On", color: "#6DA34D", category: "io", description: "Emits a constant ON signal", gates: [
-                { id: 'ctr', type: GateType.Controlled, state: TriState.True, function: GateFunction.Controlled, inputs: [] },
-                { id: 'rly_out', type: GateType.Relay, state: TriState.False, direction: SignalDirection.Out, name: "Output", inputs: ['ctr'] }]
-        });
-        this.addChip({
-            name: "Constant Off", color: "#D10000", category: "io", description: "Emits a constant OFF signal", gates: [
-                { id: 'ctr', type: GateType.Controlled, state: TriState.False, function: GateFunction.Controlled, inputs: [] },
-                { id: 'rly_out', type: GateType.Relay, state: TriState.False, direction: SignalDirection.Out, name: "Output", inputs: ['ctr'] }]
-        });
-        this.addChip({
-            name: "Input (Switch)", color: "#FE5F00", category: "io", description: "Can be clicked to toggle state while Simulation is running", gates: [
-                { id: 'ctr', type: GateType.Controlled, function: GateFunction.Input, state: TriState.False, inputs: [] },
-                { id: 'rly_out', type: GateType.Relay, state: TriState.False, direction: SignalDirection.Out, name: "Output", inputs: ['ctr'] }]
-        });
+        graphNOT.addEdges([{ from: "in1", to: "not" }, { from: "not", to: "out1" }])
 
-        this.addChip({
-            name: "Clock", color: "#FBB02D", category: "io", description: "Switches state every simulation Tick", gates: [
-                { id: 'ctr', type: GateType.Controlled, function: GateFunction.Clock, state: TriState.False, inputs: [] },
-                { id: 'rly_out', type: GateType.Relay, state: TriState.False, direction: SignalDirection.Out, inputs: ['ctr'] }]
-        });
-        this.addChip({
-            name: "Output", color: "#912F56", category: "io", description: "Displays a connected State", gates: [
-                { id: 'rly_in', type: GateType.Relay, direction: SignalDirection.Out, state: TriState.False, inputs: [] }]
-        });
+        this.blueprints.push(new ChipBlueprint("NOT", "#e76f51", "logic", graphNOT));
+
+        //AND-Gate
+        let graphAND = new Graph<Gate>();
+        graphAND.addNodes([
+            { id: "in1", type: GateType.Relay, state: TriState.False, role: GateRole.Input },
+            { id: "in2", type: GateType.Relay, state: TriState.False, role: GateRole.Input },
+            { id: "and", type: GateType.AND, state: TriState.False },
+            { id: "out1", type: GateType.Relay, state: TriState.False, role: GateRole.Output }])
+
+        graphAND.addEdges([{ from: "in1", to: "and" }, { from: "in2", to: "and" }, { from: "and", to: "out1" }])
+
+        this.blueprints.push(new ChipBlueprint("AND", "#2a9d8f", "logic", graphAND));
+
+        //INPUT-Gate
+        let graphInput = new Graph<Gate>();
+        graphInput.addNodes([{
+            id: "in1", type: GateType.Controlled, state: TriState.False, role: GateRole.Output
+        }])
+
+        this.blueprints.push(new ChipBlueprint("Input (Switch)", "#FE5F00", "io", graphInput, "Can be clicked to toggle state while Simulation is running"));
+
+        //OUTPUT-Gate
+        let graphOutput = new Graph<Gate>();
+        graphOutput.addNodes([{ id: "out1", type: GateType.Relay, state: TriState.False, role: GateRole.Input }])
+
+        this.blueprints.push(new ChipBlueprint("Output", "#912F56", "io", graphOutput, "Displays a connected State"));
     }
 
-    public addChip(chip: ChipBlueprint) {
-        this.chips.set(chip.name, chip);
-
-        if (this.chipAddedCallback)
-            this.chipAddedCallback();
+    public static getBlueprints(): ChipBlueprint[] {
+        return ChipManager.getInstance().blueprints;
     }
 
-
-    ///Empty category returns chips without caegory
-    public getChipsByCategory(category: string): ChipBlueprint[] {
-        let chips: ChipBlueprint[] = [];
-
-        if (category)
-            this.chips.forEach(chip => {
-                if (chip.category === category)
-                    chips.push(chip);
-            });
-        else
-            this.chips.forEach(chip => {
-                if (chip.category === undefined)
-                    chips.push(chip);
-            });
-
-        return chips;
-    }
-
-    public getNextChipId(name: string): number {
-        if (!this.chipIds.has(name)) {
-            this.chipIds.set(name, 0);
+    public static getChipId(name: string): number {
+        let instance = ChipManager.getInstance();
+        if (!instance.chipIds.has(name)) {
+            instance.chipIds.set(name, 0);
             return 0;
         }
 
-        let id = this.chipIds.get(name)!;
+        let id = instance.chipIds.get(name)!;
 
         id++;
-        this.chipIds.set(name, id);
+        instance.chipIds.set(name, id);
         return id;
-    }
-
-    public getNextId(): string {
-        return `${this.nextId++}`;
     }
 }
 

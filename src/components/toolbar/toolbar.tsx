@@ -1,7 +1,5 @@
-import React, { Component } from "react";
-
+import React, { Component } from 'react';
 import './toolbar.scss';
-
 
 class Toolbar extends Component {
     render() {

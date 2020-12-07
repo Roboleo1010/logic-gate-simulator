@@ -1,72 +1,56 @@
-import React, { Component } from "react";
-import Draggable from "react-draggable";
-import { ConnectorModel, Gate, GateFunction, Tool } from "../../model/circuit-builder.types";
-import Connector from "../connector/connector";
-import ChipModel from "../../model/chip-model";
-import CircuitBuilderContext from "../context/circuit-builder-context/circuit-builder-context";
-
-import "./chip.scss";
+import ChipInstance from '../../model/chip-instance';
+import CircuitBuilderContext from '../context/circuit-builder-context/circuit-builder-context';
+import Draggable from 'react-draggable';
+import Pin from '../pin/pin';
+import React, { Component } from 'react';
+import { Gate, GateRole, Tool } from '../../model/circuit-builder.types';
+import './chip.scss';
 
 interface ChipProps {
-    chip: ChipModel;
-    activeTool: Tool;
-    onConnectorClick: (connector: ConnectorModel) => void;
-    onChipDelete: (chip: ChipModel) => void;
-    onSwitchSwitched: (gate: Gate) => void;
+    chip: ChipInstance;
+    onChipDelete: (chip: ChipInstance) => void;
     redraw: () => void;
+    onPinClicked: (gate: Gate) => void;
 }
 
-interface ChipState {
-    input?: Gate;
-}
-
-class Chip extends Component<ChipProps, ChipState> {
+class Chip extends Component<ChipProps> {
     static contextType = CircuitBuilderContext;
 
-    constructor(props: ChipProps) {
-        super(props);
-
-        this.state = {
-            input: this.props.chip.gates.find(gate => gate.function === GateFunction.Input),
-        };
-    }
-
     render() {
-        let style = { backgroundColor: this.props.chip.chipBlueprint.color };
+        let style = { backgroundColor: this.props.chip.blueprint.color };
 
-        let connectors: JSX.Element[] = [];
+        let pins: JSX.Element[] = [];
 
-        this.props.chip.connectors.forEach((connectorArray: ConnectorModel[]) => {
-            connectorArray.forEach((connector: ConnectorModel, index) => {
-                connectors.push(<Connector key={connector.id} connector={connector} connectorsForSideCount={connectorArray.length} connectorForSideIndex={index} onClick={this.props.onConnectorClick}></Connector>);
-            });
+        let gatesIn = this.props.chip.graph.nodes.filter(gate => gate.role === GateRole.Input);
+        let gatesOut = this.props.chip.graph.nodes.filter(gate => gate.role === GateRole.Output);
+
+        gatesIn.forEach((gate, index) => {
+            pins.push(<Pin key={gate.id} gate={gate} pinsForSideCount={gatesIn.length} pinForSideIndex={index} onClick={this.props.onPinClicked}></Pin>);
+        });
+
+        gatesOut.forEach((gate, index) => {
+            pins.push(<Pin key={gate.id} gate={gate} pinsForSideCount={gatesOut.length} pinForSideIndex={index} onClick={this.props.onPinClicked}></Pin>);
         });
 
         let className = 'chip chip-on-board ';
 
-        if (this.context.isSimulationRunning) {
-            if (this.state.input)
-                className += 'chip-type-switch ';
-        }
-        else {
-            if (this.props.activeTool === Tool.Move)
+        if (!this.context.isSimulationRunning) {
+            if (this.context.activeTool === Tool.Move)
                 className += 'chip-tool-move ';
-            else if (this.props.activeTool === Tool.Delete)
+            else if (this.context.activeTool === Tool.Delete)
                 className += 'chip-tool-delete ';
         }
 
         let clickEvent = () => { };
 
-        if (!this.context.isSimulationRunning && this.props.activeTool === Tool.Delete)
+        if (!this.context.isSimulationRunning && this.context.activeTool === Tool.Delete)
             clickEvent = () => { this.props.onChipDelete(this.props.chip) };
-        else if (this.context.isSimulationRunning && this.state.input)
-            clickEvent = () => { this.props.onSwitchSwitched(this.state.input!) }
 
         return (
-            <Draggable grid={[25, 25]} bounds={"parent"} cancel={".connector"} onStop={this.props.redraw} disabled={this.props.activeTool !== Tool.Move || this.context.isSimulationRunning}>
-                <div data-chipid={this.props.chip.chipId} className={className} style={style} onClick={clickEvent}>
-                    <span>{this.props.chip.chipBlueprint.name}</span>
-                    {connectors}
+            <Draggable grid={[25, 25]} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.context.activeTool !== Tool.Move || this.context.isSimulationRunning}>
+                <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
+                    <span>{this.props.chip.blueprint.name}</span>
+                    {pins}
                 </div>
             </Draggable >
         );

@@ -1,13 +1,7 @@
 # Logic-Gate-Simulator
 
 The Goal of this Project ist to provide a fun Sandbox whre you can build and Simulate Integrated Circuits.
-
 You can follow a Intro into Logic gates or even browse other Users creations.
-
-## Terminology
-
-**Chip:**  A Chip consists of one or many Chips. 
-**Gate:** Smallest component has chip wrapper so they can be used more easily.
 
 ## Scripts
 

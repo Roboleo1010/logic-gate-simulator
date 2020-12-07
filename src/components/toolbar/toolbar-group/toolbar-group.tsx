@@ -1,7 +1,5 @@
-import React, { Component } from "react";
-
+import React, { Component } from 'react';
 import './toolbar-group.scss';
-
 
 class ToolbarGroup extends Component {
     render() {

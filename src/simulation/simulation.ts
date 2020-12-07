@@ -1,4 +1,4 @@
-import { GateType, TriState, Gate, SimulationResult } from "./simulator.types";
+import { Gate, GateType, SimulationResult, TriState } from './simulator.types';
 
 class Simulation {
     private gates: Gate[] = [];

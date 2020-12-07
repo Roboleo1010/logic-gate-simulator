@@ -1,6 +1,5 @@
-import React, { Component } from "react";
-import Icons from "../../../assets/icons/icons";
-
+import Icons from '../../../assets/icons/icons';
+import React, { Component } from 'react';
 import '../toolbar-button.scss';
 
 interface ToolbarButtonProps {
@@ -8,7 +7,6 @@ interface ToolbarButtonProps {
     icon: string;
     onClick: () => void;
 }
-
 
 class ToolbarButton extends Component<ToolbarButtonProps> {
     render() {

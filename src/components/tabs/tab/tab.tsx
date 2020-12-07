@@ -1,6 +1,5 @@
-import React, { Component } from "react";
-
-import "./tab.scss"
+import React, { Component } from 'react';
+import './tab.scss';
 
 interface TabProps {
     isSelected: boolean;
