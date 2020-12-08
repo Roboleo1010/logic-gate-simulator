@@ -18,7 +18,7 @@ class Wire extends Component<WireProps> {
         if (!startElement || !endElement)
             return;
 
-        let className = 'wire wire-floating';
+        let className = 'wire wire-floating ';
 
         if (this.context.activeTool === Tool.Delete)
             className += 'wire-tool-delete ';

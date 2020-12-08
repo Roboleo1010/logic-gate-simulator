@@ -1,6 +1,6 @@
 import ChipBlueprint from '../model/chip-blueprint';
 import Graph from '../utilities/graph/graph';
-import { Gate, GateRole } from '../model/circuit-builder.types';
+import { Gate, GateRole, SignalDirection } from '../model/circuit-builder.types';
 import { GateType, TriState } from '../simulation/simulator.types';
 
 class ChipManager {
@@ -27,39 +27,35 @@ class ChipManager {
         //NOT-Gate 
         let graphNOT = new Graph<Gate>();
         graphNOT.addNodes([
-            { id: "in1", type: GateType.Relay, state: TriState.False, role: GateRole.Input },
+            { id: "in", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In },
             { id: "not", type: GateType.NOT, state: TriState.False },
-            { id: "out1", type: GateType.Relay, state: TriState.False, role: GateRole.Output }])
+            { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out }]);
 
-        graphNOT.addEdges([{ from: "in1", to: "not" }, { from: "not", to: "out1" }])
+        graphNOT.addEdges([{ from: "in", to: "not" }, { from: "not", to: "out" }])
 
         this.blueprints.push(new ChipBlueprint("NOT", "#e76f51", "logic", graphNOT));
 
         //AND-Gate
         let graphAND = new Graph<Gate>();
         graphAND.addNodes([
-            { id: "in1", type: GateType.Relay, state: TriState.False, role: GateRole.Input },
-            { id: "in2", type: GateType.Relay, state: TriState.False, role: GateRole.Input },
+            { id: "in1", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In },
+            { id: "in2", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In },
             { id: "and", type: GateType.AND, state: TriState.False },
-            { id: "out1", type: GateType.Relay, state: TriState.False, role: GateRole.Output }])
+            { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out }])
 
-        graphAND.addEdges([{ from: "in1", to: "and" }, { from: "in2", to: "and" }, { from: "and", to: "out1" }])
+        graphAND.addEdges([{ from: "in1", to: "and" }, { from: "in2", to: "and" }, { from: "and", to: "out" }]);
 
         this.blueprints.push(new ChipBlueprint("AND", "#2a9d8f", "logic", graphAND));
 
         //INPUT-Gate
         let graphInput = new Graph<Gate>();
-        graphInput.addNodes([{
-            id: "in1", type: GateType.Controlled, state: TriState.False, role: GateRole.Output
-        }])
+        graphInput.addNodes([
+            { id: "in", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.InputActive },
+            { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out }]);
 
-        this.blueprints.push(new ChipBlueprint("Input (Switch)", "#FE5F00", "io", graphInput, "Can be clicked to toggle state while Simulation is running"));
+        graphInput.addEdges([{ from: "in", to: "out" }]);
 
-        //OUTPUT-Gate
-        let graphOutput = new Graph<Gate>();
-        graphOutput.addNodes([{ id: "out1", type: GateType.Relay, state: TriState.False, role: GateRole.Input }])
-
-        this.blueprints.push(new ChipBlueprint("Output", "#912F56", "io", graphOutput, "Displays a connected State"));
+        this.blueprints.push(new ChipBlueprint("Input", "#FE5F00", "io", graphInput));
     }
 
     public static getBlueprints(): ChipBlueprint[] {

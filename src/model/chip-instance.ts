@@ -9,7 +9,7 @@ class ChipInstance {
     public startPosition?: { x: number, y: number };
     public graph: Graph<Gate>;
 
-    constructor(blueprint: ChipBlueprint, startPosition: { x: number, y: number }) {
+    constructor(blueprint: ChipBlueprint, startPosition: { x: number, y: number } | undefined) {
         this.blueprint = blueprint;
         this.startPosition = startPosition;
         this.id = `${blueprint.name}_${ChipManager.getChipId(blueprint.name)}`;

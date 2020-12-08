@@ -5,9 +5,14 @@ export enum Tool {
     Delete = "Delete"
 }
 
+export enum SignalDirection {
+    In = "In",
+    Out = "Out"
+}
+
 export enum GateRole {
-    Input = "Input",
-    Output = "Output"
+    InputActive = "InputActive",
+    InputInactive = "InputInactive"
 }
 
 export interface WireModel {
@@ -19,5 +24,6 @@ export interface Gate {
     id: string;
     state: TriState;
     type: GateType;
+    signalDirection?: SignalDirection;
     role?: GateRole;
 }

@@ -9,7 +9,6 @@ class Simulation {
 
     constructor(gates: Gate[]) {
         this.gates = gates;
-        debugger;
         this.result = { states: [], time: 0, gates: this.gates, error: false, missingConnections: [] };
     }
 

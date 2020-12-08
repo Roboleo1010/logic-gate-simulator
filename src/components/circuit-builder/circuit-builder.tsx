@@ -3,17 +3,20 @@ import ChipBlueprint from '../../model/chip-blueprint';
 import ChipInstance from '../../model/chip-instance';
 import ChipManager from '../../manager/chip-manager';
 import CircuitBuilderContext from '../context/circuit-builder-context/circuit-builder-context';
+import Graph from '../../utilities/graph/graph';
 import Icons from '../../assets/icons/icons';
 import NotificationManager, { NotificationType } from '../../manager/notification-manager';
 import React, { Component } from 'react';
 import ReactNotification from 'react-notifications-component';
+import Simulation from '../../simulation/simulation';
 import Toolbar from '../toolbar/toolbar';
 import ToolbarButton from '../toolbar/toolbar-button/toolbar-button';
 import ToolbarButtonMulti from '../toolbar/toolbar-button-multi/toolbar-button-multi';
 import ToolbarButtonToggle from '../toolbar/toolbar-button-toggle/toolbar-button-toggle';
 import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
 import Toolbox from '../toolbox/toolbox';
-import { Gate, GateRole, Tool, WireModel } from '../../model/circuit-builder.types';
+import { Gate, GateRole, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
+import { Gate as SimulationGate } from '../../simulation/simulator.types';
 import './circuit-builder.scss';
 import 'react-notifications-component/dist/theme.css';
 
@@ -32,8 +35,8 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.state = { chips: [], wires: [], chipBlueprints: ChipManager.getBlueprints() };
     }
 
-    //#region Add & Remove from Board
-    addChipToBoard(blueprint: ChipBlueprint, position: { x: number, y: number }) {
+    //#region Chip & Wire Events
+    addChipToBoard(blueprint: ChipBlueprint, position: { x: number, y: number } | undefined = undefined) {
         let newChips = this.state.chips;
         newChips.push(new ChipInstance(blueprint, position));
         this.setState({ chips: newChips })
@@ -64,8 +67,8 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         }
 
         //input -> input || output -> output
-        if (this.state.lastClickedPin.role === gate.role) {
-            NotificationManager.addNotification("Wire Error", `Can't connect to same the pintype. Both selected pins are ${gate.role?.toLowerCase()}s`, NotificationType.Warning);
+        if (this.state.lastClickedPin.signalDirection === gate.signalDirection) {
+            NotificationManager.addNotification("Wire Error", `Can't connect to same the pintype. Both selected pins are ${gate.signalDirection?.toLowerCase()}s`, NotificationType.Warning);
             this.setState({ lastClickedPin: undefined });
             return;
         }
@@ -79,7 +82,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
 
         let newWires = this.state.wires;
 
-        if (gate.role === GateRole.Input)
+        if (gate.signalDirection === SignalDirection.In)
             newWires.push({ fromId: this.state.lastClickedPin.id, toId: gate.id });
         else
             newWires.push({ fromId: gate.id, toId: this.state.lastClickedPin.id });
@@ -90,12 +93,62 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     removeWireFromBoard(wireToDelete: WireModel) {
         this.setState({ wires: this.state.wires.filter(wire => wire.fromId !== wireToDelete.fromId || wire.toId !== wireToDelete.toId) });
     }
+
+    packageChip() {
+        let graph: Graph<Gate> = new Graph<Gate>();
+
+        //Build Graph
+        this.state.chips.forEach(chip => {
+            chip.graph.nodes.forEach(gate => {
+                if (gate.role === GateRole.InputActive) {
+                    let copy: Gate = { ...gate };
+                    copy.role = GateRole.InputInactive;
+                    graph.addNode(copy);
+                }
+                else
+                    graph.addNode(gate);
+
+            });
+            graph.addEdges(chip.graph.edges);
+        });
+
+        this.state.wires.forEach(wire => {
+            graph.addEdge({ from: wire.fromId, to: wire.toId });
+        })
+
+        let blueprint = new ChipBlueprint(`Custom ${ChipManager.getChipId("Custom")}`, "#aaff33", "custom", graph)
+
+        let newBlueprints = this.state.chipBlueprints;
+        newBlueprints.push(blueprint);
+        this.setState({ chipBlueprints: newBlueprints });
+    }
     //#endregion
 
     setTool(tool: Tool) {
         this.context.activeTool = tool;
         this.setState({ lastClickedPin: undefined });
         this.forceUpdate();
+    }
+
+    simulate() {
+        let gates: SimulationGate[] = []
+        let wires = this.state.wires;
+
+        //get wires and gates
+        this.state.chips.forEach(chip => {
+            chip.graph.nodes.forEach(gate => {
+                gates.push({ id: gate.id, state: gate.state, type: gate.type, inputs: [] });
+            });
+            chip.graph.edges.forEach(wire => {
+                wires.push({ fromId: wire.from, toId: wire.to });
+            });
+        });
+
+        gates.forEach(gate => {
+            gate.inputs = wires.filter(wire => gate.id === wire.toId).map(wire => wire.fromId);
+        });
+
+        console.log(new Simulation(gates).simulate());
     }
 
     //TODO: Reintegrate Simulation
@@ -247,10 +300,10 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
                             <ToolbarButtonMulti icon={Icons.iconDelete} text="Delete" onClick={() => this.setTool(Tool.Delete)} isActive={this.context.activeTool === Tool.Delete}></ToolbarButtonMulti>
                         </ToolbarGroup>
                         <ToolbarGroup>
-                            <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.context.isSimulationRunning} onClick={() => { }}></ToolbarButtonToggle>
+                            <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.context.isSimulationRunning} onClick={this.simulate.bind(this)}></ToolbarButtonToggle>
                         </ToolbarGroup>
                         <ToolbarGroup>
-                            <ToolbarButton icon={Icons.iconChip} text="Package Chip" onClick={() => { }}></ToolbarButton>
+                            <ToolbarButton icon={Icons.iconChip} text="Package Chip" onClick={this.packageChip.bind(this)}></ToolbarButton>
                         </ToolbarGroup>
                     </Toolbar>
                 </div>
