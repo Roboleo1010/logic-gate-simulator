@@ -41,13 +41,17 @@ class Chip extends Component<ChipProps> {
                 className += 'chip-tool-delete ';
         }
 
+        let startPos = this.props.chip.startPosition;
+        if (startPos)
+            this.props.chip.startPosition = undefined;
+
         let clickEvent = () => { };
 
         if (!this.context.isSimulationRunning && this.context.activeTool === Tool.Delete)
             clickEvent = () => { this.props.onChipDelete(this.props.chip) };
 
         return (
-            <Draggable grid={[25, 25]} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.context.activeTool !== Tool.Move || this.context.isSimulationRunning}>
+            <Draggable grid={[25, 25]} position={startPos} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.context.activeTool !== Tool.Move || this.context.isSimulationRunning}>
                 <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
                     <span>{this.props.chip.blueprint.name}</span>
                     {pins}

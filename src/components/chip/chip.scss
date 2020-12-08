@@ -1,9 +1,11 @@
 @import "../../styles/design.scss";
 
+$chip-height: 50px;
+
 .chip {
     padding: 15px 0;
     text-align: center;
-    height: 50px;
+    height: $chip-height;
     width: 125px;
     box-sizing: border-box;
     border-radius: 2px;
@@ -20,9 +22,20 @@
     }
 }
 
-.chip-on-toolbox {
-    cursor: pointer;
-    margin-left: 10px;
+.chip-on-toolbox-wrapper {
+    height: $chip-height;
+
+    .chip-on-toolbox {
+        cursor: pointer;
+        position: relative;
+        margin-left: 10px;
+    }
+
+    .chip-on-toolbox-fake {
+        top: -$chip-height;
+        pointer-events: none;
+        touch-action: none;
+    }
 }
 
 .chip-on-board {

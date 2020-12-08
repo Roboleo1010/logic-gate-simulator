@@ -33,9 +33,9 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     }
 
     //#region Add & Remove from Board
-    addChipToBoard(blueprint: ChipBlueprint) {
+    addChipToBoard(blueprint: ChipBlueprint, position: { x: number, y: number }) {
         let newChips = this.state.chips;
-        newChips.push(new ChipInstance(blueprint));
+        newChips.push(new ChipInstance(blueprint, position));
         this.setState({ chips: newChips })
     }
 

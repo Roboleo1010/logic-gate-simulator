@@ -11,7 +11,7 @@ interface ToolboxState {
 }
 
 interface ToolboxProps {
-    onChipClicked: (chip: ChipBlueprint) => void;
+    onChipClicked: (chip: ChipBlueprint, position: { x: number, y: number }) => void;
     blueprints: ChipBlueprint[]
 }
 
@@ -35,21 +35,21 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
                     <Tab isSelected={this.state.selectedTab === tabs[0].id}>
                         <div className="tab-chips">
                             {this.props.blueprints.filter(blueprint => blueprint.category === 'logic').map(chip => {
-                                return <ChipToolbox chipBlueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
+                                return <ChipToolbox blueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
                             })}
                         </div>
                     </Tab>
                     <Tab isSelected={this.state.selectedTab === tabs[1].id}>
                         <div className="tab-chips">
                             {this.props.blueprints.filter(blueprint => blueprint.category === 'io').map(chip => {
-                                return <ChipToolbox chipBlueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
+                                return <ChipToolbox blueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
                             })}
                         </div>
                     </Tab>
                     <Tab isSelected={this.state.selectedTab === tabs[2].id}>
                         <div className="tab-chips">
                             {this.props.blueprints.filter(blueprint => blueprint.category === 'custom').map(chip => {
-                                return <ChipToolbox chipBlueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
+                                return <ChipToolbox blueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
                             })}
                         </div>
                     </Tab>
