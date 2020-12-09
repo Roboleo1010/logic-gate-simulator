@@ -24,7 +24,7 @@ class ChipManager {
     }
 
     private loadData() {//TODO: From Firebase    
-        //NOT-Gate 
+        //NOT-Chip 
         let graphNOT = new Graph<Gate>();
         graphNOT.addNodes([
             { id: "in", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In },
@@ -35,7 +35,7 @@ class ChipManager {
 
         this.blueprints.push(new ChipBlueprint("NOT", "#e76f51", "logic", graphNOT));
 
-        //AND-Gate
+        //AND-Chip
         let graphAND = new Graph<Gate>();
         graphAND.addNodes([
             { id: "in1", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In },
@@ -47,15 +47,25 @@ class ChipManager {
 
         this.blueprints.push(new ChipBlueprint("AND", "#2a9d8f", "logic", graphAND));
 
-        //INPUT-Gate
+        //INPUT-Chip
         let graphInput = new Graph<Gate>();
         graphInput.addNodes([
-            { id: "switch", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Switch },
+            { id: "switch", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Switch, hidden: true },
             { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out }]);
 
         graphInput.addEdges([{ from: "switch", to: "out" }]);
 
         this.blueprints.push(new ChipBlueprint("Input", "#FE5F00", "io", graphInput));
+
+        //OUTPUT-Chip
+        let graphOutput = new Graph<Gate>();
+        graphOutput.addNodes([
+            { id: "in", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, },
+            { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out, role: GateRole.Output, hidden: true }]);
+
+        graphOutput.addEdges([{ from: "in", to: "out" }]);
+
+        this.blueprints.push(new ChipBlueprint("Output", "#FE5F00", "io", graphOutput));
     }
 
     public static getBlueprints(): ChipBlueprint[] {

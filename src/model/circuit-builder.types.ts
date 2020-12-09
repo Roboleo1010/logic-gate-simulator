@@ -11,7 +11,8 @@ export enum SignalDirection {
 }
 
 export enum GateRole {
-    Switch = "Switch"
+    Switch = "Switch",
+    Output = "Output" //LED
 }
 
 export interface WireModel {
@@ -27,6 +28,7 @@ export interface Gate {
     signalDirection?: SignalDirection;
     role?: GateRole;
     error?: boolean;
+    hidden?: boolean;
 }
 
 export interface CircuitBuilderContext {

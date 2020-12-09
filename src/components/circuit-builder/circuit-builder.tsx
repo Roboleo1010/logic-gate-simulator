@@ -5,7 +5,7 @@ import ChipManager from '../../manager/chip-manager';
 import Graph from '../../utilities/graph/graph';
 import Icons from '../../assets/icons/icons';
 import NotificationManager, { NotificationType } from '../../manager/notification-manager';
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import ReactNotification from 'react-notifications-component';
 import Simulation from '../../simulation/simulation';
 import Toolbar from '../toolbar/toolbar';
@@ -103,37 +103,46 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             NotificationManager.addNotification("Package Error", "A Chip should include at least one Input", NotificationType.Error);
             return;
         }
-        if (this.getGatesByRole(GateRole.Switch).length === 0) {
+        if (this.getGatesByRole(GateRole.Output).length === 0) {
             NotificationManager.addNotification("Package Error", "A Chip should include at least one Output", NotificationType.Error);
             return;
         }
 
+        //Build Graph
+        let allGates: Gate[] = [];
+        let allWires: WireModel[] = [...this.state.wires];
 
+        this.state.chips.forEach(chip => {
+            chip.graph.nodes.forEach(gate => {
+                allGates.push({ ...gate });
+            });
+
+            chip.graph.edges.forEach(edge => {
+                allWires.push({ fromId: edge.from, toId: edge.to, state: TriState.Floating });
+            });
+        });
 
         let graph: Graph<Gate> = new Graph<Gate>();
-        //add input for: Clock, Switch
-        //add Output for: Output
 
-        // //Build Graph
-        // this.state.chips.forEach(chip => {
-        //     chip.graph.nodes.forEach(gate => {
-        //         if (gate.role === GateRole.InputActive) { //TODO: Use switch
-        //             let copy: Gate = { ...gate };
-        //             copy.role = GateRole.InputInactive;
-        //             graph.addNode(copy);
-        //         }
-        //         else
-        //             graph.addNode(gate);
+        allGates.forEach(gate => {
+            //Show switch inputs
+            if (gate.role === GateRole.Switch && gate.type === GateType.Controlled) {
+                gate.type = GateType.Relay;
+                gate.hidden = undefined;
+            }
+            //Show output outputs
+            else if (gate.role === GateRole.Output)
+                gate.hidden = undefined;
+            //hide all unused outputs
+            else if (allWires.filter(wire => wire.fromId === gate.id).length === 0)
+                gate.hidden = true;
+        });
 
-        //     });
-        //     graph.addEdges(chip.graph.edges);
-        // });
+        graph.addNodes(allGates);
 
-        // this.state.wires.forEach(wire => {
-        //     graph.addEdge({ from: wire.fromId, to: wire.toId });
-        // })
-
-
+        allWires.forEach(wire => {
+            graph.addEdge({ from: wire.fromId, to: wire.toId });
+        })
 
         //Build Blueprint
         let name = window.prompt("Please enter a name for your chip:");
@@ -142,6 +151,8 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             name = `Custom-${ChipManager.getChipId("Custom")}`;
 
         const blueprint = new ChipBlueprint(name, "#aaff33", "custom", graph)
+
+        console.log(blueprint);
 
         //Add to Manager
         let newBlueprints = this.state.chipBlueprints;
@@ -187,7 +198,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.setPinState(result.states);
         this.setWireState(result.states);
 
-        console.log(result);
+        // console.log(result);
 
         this.forceUpdate();     //FIXME: Update State correctly
     }
