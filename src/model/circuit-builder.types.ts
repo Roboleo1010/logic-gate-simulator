@@ -12,7 +12,8 @@ export enum SignalDirection {
 
 export enum GateRole {
     InputActive = "InputActive",
-    InputInactive = "InputInactive"
+    InputInactive = "InputInactive",
+    Switch = "Switch"
 }
 
 export interface WireModel {

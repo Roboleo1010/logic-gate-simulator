@@ -50,10 +50,10 @@ class ChipManager {
         //INPUT-Gate
         let graphInput = new Graph<Gate>();
         graphInput.addNodes([
-            { id: "in", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.InputActive },
+            { id: "switch", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Switch },
             { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out }]);
 
-        graphInput.addEdges([{ from: "in", to: "out" }]);
+        graphInput.addEdges([{ from: "switch", to: "out" }]);
 
         this.blueprints.push(new ChipBlueprint("Input", "#FE5F00", "io", graphInput));
     }

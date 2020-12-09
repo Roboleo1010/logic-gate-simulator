@@ -3,6 +3,8 @@ import Draggable from 'react-draggable';
 import Pin from '../pin/pin';
 import React, { Component } from 'react';
 import { CircuitBuilderContext, Gate, GateRole, SignalDirection, Tool } from '../../model/circuit-builder.types';
+import { createLogicalAnd } from 'typescript';
+import { TriState } from '../../simulation/simulator.types';
 import './chip.scss';
 
 interface ChipProps {
@@ -13,13 +15,25 @@ interface ChipProps {
     onPinClicked: (gate: Gate) => void;
 }
 
-class Chip extends Component<ChipProps> {
+interface ChipState {
+    switch?: Gate;
+}
+
+class Chip extends Component<ChipProps, ChipState> {
+    constructor(props: ChipProps) {
+        super(props);
+
+        this.state = {
+            switch: this.props.chip.graph.nodes.find(gate => gate.role === GateRole.Switch)
+        }
+    }
+
     render() {
         let style = { backgroundColor: this.props.chip.blueprint.color };
 
         let pins: JSX.Element[] = [];
 
-        let gatesIn = this.props.chip.graph.nodes.filter(gate => gate.signalDirection === SignalDirection.In && gate.role !== GateRole.InputActive && this.props.chip.graph.edges.filter(wire => gate.id === wire.to).length === 0);
+        let gatesIn = this.props.chip.graph.nodes.filter(gate => gate.signalDirection === SignalDirection.In && gate.role !== GateRole.Switch && this.props.chip.graph.edges.filter(wire => gate.id === wire.to).length === 0);
         let gatesOut = this.props.chip.graph.nodes.filter(gate => gate.signalDirection === SignalDirection.Out && this.props.chip.graph.edges.filter(wire => gate.id === wire.from).length === 0);
 
         gatesIn.forEach((gate, index) => {
@@ -45,8 +59,16 @@ class Chip extends Component<ChipProps> {
 
         let clickEvent = () => { };
 
-        if (!this.props.context.isSimulationRunning && this.props.context.activeTool === Tool.Delete)
-            clickEvent = () => { this.props.onChipDelete(this.props.chip) };
+        if (this.props.context.isSimulationRunning) {
+            if (this.state.switch !== undefined) {
+                className += "chip-role-switch";
+                clickEvent = () => { this.state.switch!.state = this.state.switch!.state === TriState.True ? TriState.False : TriState.True };
+            }
+        }
+        else {
+            if (this.props.context.activeTool === Tool.Delete)
+                clickEvent = () => { this.props.onChipDelete(this.props.chip) };
+        }
 
         return (
             <Draggable grid={[25, 25]} position={startPos} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.props.context.activeTool !== Tool.Move || this.props.context.isSimulationRunning}>

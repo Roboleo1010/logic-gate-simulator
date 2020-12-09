@@ -99,7 +99,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         //Build Graph
         this.state.chips.forEach(chip => {
             chip.graph.nodes.forEach(gate => {
-                if (gate.role === GateRole.InputActive) {
+                if (gate.role === GateRole.InputActive) { //TODO: Use switch
                     let copy: Gate = { ...gate };
                     copy.role = GateRole.InputInactive;
                     graph.addNode(copy);
