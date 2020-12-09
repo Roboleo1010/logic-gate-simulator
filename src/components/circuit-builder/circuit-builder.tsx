@@ -5,7 +5,7 @@ import ChipManager from '../../manager/chip-manager';
 import Graph from '../../utilities/graph/graph';
 import Icons from '../../assets/icons/icons';
 import NotificationManager, { NotificationType } from '../../manager/notification-manager';
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import ReactNotification from 'react-notifications-component';
 import Simulation from '../../simulation/simulation';
 import Toolbar from '../toolbar/toolbar';
@@ -72,9 +72,16 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             return;
         }
 
-        //2 wires on Pin
+        //2 wires on input Pin
         if ((this.state.wires.filter(wire => wire.toId === gate.id)).length > 0) {
             NotificationManager.addNotification("Wire Error", "Can't connect two wires to same input pin.", NotificationType.Warning);
+            this.setState({ lastClickedPin: undefined });
+            return;
+        }
+
+        //2 wires on output pin
+        if ((this.state.wires.filter(wire => wire.fromId === gate.id)).length > 0) {
+            NotificationManager.addNotification("Wire Error", "Can't connect two wires to same output pin.", NotificationType.Warning);
             this.setState({ lastClickedPin: undefined });
             return;
         }
