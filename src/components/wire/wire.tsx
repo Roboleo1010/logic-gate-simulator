@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { CircuitBuilderContext, Tool, WireModel } from '../../model/circuit-builder.types';
+import { TriState } from '../../simulation/simulator.types';
 import './wire.scss';
 
 interface WireProps {
@@ -16,15 +17,30 @@ class Wire extends Component<WireProps> {
         if (!startElement || !endElement)
             return;
 
-        let className = 'wire wire-floating ';
-
-        if (this.props.context.activeTool === Tool.Delete)
-            className += 'wire-tool-delete ';
+        let className = 'wire ';
 
         let clickEvent = () => { };
+        if (this.props.context.isSimulationRunning) {
+            switch (this.props.wire.state) {
+                case TriState.True:
+                    className += 'wire-true ';
+                    break;
+                case TriState.False:
+                    className += 'wire-false ';
+                    break;
+                case TriState.Floating:
+                    className += 'wire-floating ';
+                    break;
+            }
+        }
+        else {
+            className += "wire-floating ";
 
-        if (this.props.context.activeTool === Tool.Delete)
-            clickEvent = () => { this.props.onWireDelete(this.props.wire) };
+            if (this.props.context.activeTool === Tool.Delete) {
+                className += 'wire-tool-delete ';
+                clickEvent = () => { this.props.onWireDelete(this.props.wire) };
+            }
+        }
 
         return (
             <svg className="wire-canvas">

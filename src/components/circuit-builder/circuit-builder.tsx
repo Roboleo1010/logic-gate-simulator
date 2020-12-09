@@ -15,7 +15,7 @@ import ToolbarButtonToggle from '../toolbar/toolbar-button-toggle/toolbar-button
 import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
 import Toolbox from '../toolbox/toolbox';
 import { CircuitBuilderContext, Gate, GateRole, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
-import { Gate as SimulationGate } from '../../simulation/simulator.types';
+import { Gate as SimulationGate, SimulationState, TriState } from '../../simulation/simulator.types';
 import './circuit-builder.scss';
 import 'react-notifications-component/dist/theme.css';
 
@@ -24,6 +24,7 @@ interface CircuitBuilderState {
     chips: ChipInstance[];
     wires: WireModel[];
     lastClickedPin?: Gate;
+    simulationHandle?: any;
     context: CircuitBuilderContext;
 }
 
@@ -81,9 +82,9 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         let newWires = this.state.wires;
 
         if (gate.signalDirection === SignalDirection.In)
-            newWires.push({ fromId: this.state.lastClickedPin.id, toId: gate.id });
+            newWires.push({ fromId: this.state.lastClickedPin.id, toId: gate.id, state: TriState.Floating });
         else
-            newWires.push({ fromId: gate.id, toId: this.state.lastClickedPin.id });
+            newWires.push({ fromId: gate.id, toId: this.state.lastClickedPin.id, state: TriState.Floating });
 
         this.setState({ wires: newWires, lastClickedPin: undefined })
     }
@@ -114,11 +115,15 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             graph.addEdge({ from: wire.fromId, to: wire.toId });
         })
 
-        let blueprint = new ChipBlueprint(`Custom ${ChipManager.getChipId("Custom")}`, "#aaff33", "custom", graph)
+        let chipName = `Custom ${ChipManager.getChipId("Custom")}`;
+
+        let blueprint = new ChipBlueprint(chipName, "#aaff33", "custom", graph)
 
         let newBlueprints = this.state.chipBlueprints;
         newBlueprints.push(blueprint);
         this.setState({ chipBlueprints: newBlueprints });
+
+        NotificationManager.addNotification("Chip Packaged", `Chip ${chipName} added to category Chips (Custom).`, NotificationType.Success);
     }
     //#endregion
 
@@ -130,9 +135,49 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.forceUpdate();
     }
 
+    //#region Simulation
+    startSimulation() {
+        console.log('%cStarting Simulation', 'background-color:green');
+
+        let context = this.state.context;
+        context.isSimulationRunning = true;
+
+        const handle = setInterval(() => { this.simulate() }, 500)
+
+        this.setState({ context: context, simulationHandle: handle, lastClickedPin: undefined });
+
+        NotificationManager.addNotification("Starting Simulation", ' ', NotificationType.Info);
+    }
+
     simulate() {
+        const result = new Simulation(this.getGates()).simulate();
+
+        this.setPinState(result.states);
+        this.setWireState(result.states);
+
+        console.log(result);
+
+        this.forceUpdate();
+    }
+
+    stopSimulation() {
+        console.log('%cEnding Simulation', 'background-color:red');
+
+        let context = this.state.context;
+        context.isSimulationRunning = false;
+
+        clearInterval(this.state.simulationHandle);
+
+        this.setState({ context: context, simulationHandle: undefined, lastClickedPin: undefined });
+
+        NotificationManager.addNotification("Stopping Simulation", ' ', NotificationType.Info);
+    }
+
+    //#region Simulation helpers
+
+    getGates(): SimulationGate[] {
         let gates: SimulationGate[] = []
-        let wires = this.state.wires;
+        let wires = [...this.state.wires];
 
         //get wires and gates
         this.state.chips.forEach(chip => {
@@ -140,7 +185,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
                 gates.push({ id: gate.id, state: gate.state, type: gate.type, inputs: [] });
             });
             chip.graph.edges.forEach(wire => {
-                wires.push({ fromId: wire.from, toId: wire.to });
+                wires.push({ fromId: wire.from, toId: wire.to, state: TriState.Floating });
             });
         });
 
@@ -148,143 +193,26 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             gate.inputs = wires.filter(wire => gate.id === wire.toId).map(wire => wire.fromId);
         });
 
-        console.log(new Simulation(gates).simulate());
+        return gates;
     }
 
-    //TODO: Reintegrate Simulation
-    //#region Simulation
-    // startSimulation() {
-    //     this.resetChipState();
-    //     this.resetChipError();
-    //     this.resetWireState();
+    setPinState(results: SimulationState[]) {
+        this.state.chips.forEach(chip => {
+            chip.graph.nodes.forEach(gate => {
+                const result = results.find(res => res.id === gate.id);
+                gate.state = result?.state!;
+            });
+        });
+    }
 
-    //     const gates: Gate[] = this.getGates();
-    //     const clocks: Gate[] = gates.filter(gate => gate.function === GateFunction.Clock);
+    setWireState(results: SimulationState[]) {
+        this.state.wires.forEach(wire => {
+            const result = results.find(res => res.id === wire.fromId);
+            wire.state = result?.state!;
+        })
+    }
 
-    //     this.simulation = new Simulation(gates);
-
-    //     const handle = setInterval(() => { this.simulate() }, 500)
-
-    //     this.setState({ simulationHandle: handle, clockChips: clocks });
-    //     this.context.isSimulationRunning = true;
-
-    //     NotificationManager.addNotification("Starting Simulation", ' ', NotificationType.Info);
-    // }
-
-    // getGates(): Gate[] {
-    //     let gates: Gate[] = [];
-
-    //     this.state.chips.forEach(chip => {
-    //         chip.gates.forEach(gate => {
-    //             gates.push(gate);
-    //         });
-    //     });
-
-    //     this.state.wires.forEach(wire => {
-    //         gates.filter(gate => gate.id === wire.outputId)[0].inputs = [wire.inputId]
-    //     });
-
-    //     return gates;
-    // }
-
-    // simulate() {
-    //     console.log("Simulation Tick");
-
-    //     //Setting Clock State
-    //     this.state.clockChips.filter(gate => gate.function === GateFunction.Clock).forEach(clock => this.simulation?.changeGateState(clock.id, clock.state === TriState.True ? clock.state = TriState.False : clock.state = TriState.True));
-
-    //     const result = this.simulation?.simulate()!;
-
-    //     if (result.error) {
-    //         console.error(result);
-
-    //         if (result.missingConnections.length > 0) {
-    //             this.setChipError(result.missingConnections);
-    //             NotificationManager.addNotification("Connections missing", 'Wire all marked pins.', NotificationType.Warning);
-    //         }
-    //         else
-    //             NotificationManager.addNotification("Simulation Error", `An unknown error occured during the simulation. Please try again.`, NotificationType.Error);
-
-    //         this.stopSimulation();
-    //     }
-    //     else {
-    //         this.setpinState(result.states);
-    //         this.setWireState(result.states);
-    //     }
-
-    //     this.forceUpdate();
-    // }
-
-    // stopSimulation() {
-    //     if (!this.context.isSimulationRunning)
-    //         return;
-
-    //     NotificationManager.addNotification("Stopping Simulation", ' ', NotificationType.Info);
-    //     clearInterval(this.state.simulationHandle);
-    //     this.setState({ simulationHandle: undefined });
-    //     this.context.isSimulationRunning = false;
-    //     this.simulation = undefined;
-
-    //     this.resetChipState();
-    //     this.resetWireState();
-    // }
-    // //#endregion
-
-    // //#region Setting pin/ Wire State/ Error
-    // setpinState(results: SimulationState[]) {
-    //     this.state.chips.forEach(chip => {
-    //         chip.pins.forEach(pinSide => {
-    //             pinSide.forEach(pin => {
-    //                 const result = results.find(res => res.id === pin.id);
-    //                 pin.gate.state = result?.state!;
-    //             });
-    //         });
-    //     });
-    // }
-
-    // setWireState(results: SimulationState[]) {
-    //     this.state.wires.forEach(wire => {
-    //         const result = results.find(res => res.id === wire.inputId);
-    //         wire.state = result?.state;
-    //     })
-    // }
-
-    // setChipError(errors: string[]) {
-    //     this.state.chips.forEach(chip => {
-    //         chip.pins.forEach(pinSide => {
-    //             pinSide.forEach(pin => {
-    //                 if (errors.find(error => error === pin.id))
-    //                     pin.error = true;
-    //             });
-    //         });
-    //     });
-    // }
-
-    // resetChipState() {
-    //     this.state.chips.forEach(chip => {
-    //         chip.pins.forEach(pinSide => {
-    //             pinSide.forEach(pin => {
-    //                 pin.gate.state = TriState.Floating;
-    //             });
-    //         });
-    //     });
-    // }
-
-    // resetWireState() {
-    //     this.state.wires.forEach(wire => {
-    //         wire.state = TriState.Floating;
-    //     })
-    // }
-
-    // resetChipError() {
-    //     this.state.chips.forEach(chip => {
-    //         chip.pins.forEach(pinSide => {
-    //             pinSide.forEach(pin => {
-    //                 pin.error = false;
-    //             });
-    //         });
-    //     });
-    // }
+    //#endregion
     //#endregion
 
     render() {
@@ -300,7 +228,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
                             <ToolbarButtonMulti icon={Icons.iconDelete} text="Delete" onClick={() => this.setTool(Tool.Delete)} isActive={this.state.context.activeTool === Tool.Delete}></ToolbarButtonMulti>
                         </ToolbarGroup>
                         <ToolbarGroup>
-                            <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.state.context.isSimulationRunning} onClick={this.simulate.bind(this)}></ToolbarButtonToggle>
+                            <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.state.context.isSimulationRunning} onClick={this.state.context.isSimulationRunning ? this.stopSimulation.bind(this) : this.startSimulation.bind(this)}></ToolbarButtonToggle>
                         </ToolbarGroup>
                         <ToolbarGroup>
                             <ToolbarButton icon={Icons.iconChip} text="Package Chip" onClick={this.packageChip.bind(this)}></ToolbarButton>

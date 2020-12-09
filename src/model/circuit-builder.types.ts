@@ -18,6 +18,7 @@ export enum GateRole {
 export interface WireModel {
     fromId: string;
     toId: string;
+    state: TriState;
 }
 
 export interface Gate {
