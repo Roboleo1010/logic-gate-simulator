@@ -26,6 +26,9 @@ class Pin extends Component<PinProps>{
             style = { top: `calc(${(100 / (this.props.pinsForSideCount + 1)) * (this.props.pinForSideIndex + 1)}% - 8px)` }
         }
 
+        if (this.props.gate.error === true)
+            className += "pin-error ";
+
         if (this.props.context.isSimulationRunning) {
             switch (this.props.gate.state) {
                 case TriState.True:
@@ -38,7 +41,6 @@ class Pin extends Component<PinProps>{
                     className += 'pin-floating ';
                     break;
             }
-
         }
 
 

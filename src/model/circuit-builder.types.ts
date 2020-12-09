@@ -11,8 +11,6 @@ export enum SignalDirection {
 }
 
 export enum GateRole {
-    InputActive = "InputActive",
-    InputInactive = "InputInactive",
     Switch = "Switch"
 }
 
@@ -28,6 +26,7 @@ export interface Gate {
     type: GateType;
     signalDirection?: SignalDirection;
     role?: GateRole;
+    error?: boolean;
 }
 
 export interface CircuitBuilderContext {

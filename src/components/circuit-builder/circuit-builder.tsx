@@ -15,7 +15,7 @@ import ToolbarButtonToggle from '../toolbar/toolbar-button-toggle/toolbar-button
 import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
 import Toolbox from '../toolbox/toolbox';
 import { CircuitBuilderContext, Gate, GateRole, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
-import { Gate as SimulationGate, SimulationState, TriState } from '../../simulation/simulator.types';
+import { Gate as SimulationGate, GateType, SimulationState, TriState } from '../../simulation/simulator.types';
 import './circuit-builder.scss';
 import 'react-notifications-component/dist/theme.css';
 
@@ -94,36 +94,61 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     }
 
     packageChip() {
+        //Check for validity
+        if (this.checkValidity().length > 0) {
+            NotificationManager.addNotification("Pin Error", "Please connect all unconnected inputs.", NotificationType.Error);
+            return;
+        }
+        if (this.getGatesByRole(GateRole.Switch).length === 0) {
+            NotificationManager.addNotification("Package Error", "A Chip should include at least one Input", NotificationType.Error);
+            return;
+        }
+        if (this.getGatesByRole(GateRole.Switch).length === 0) {
+            NotificationManager.addNotification("Package Error", "A Chip should include at least one Output", NotificationType.Error);
+            return;
+        }
+
+
+
         let graph: Graph<Gate> = new Graph<Gate>();
+        //add input for: Clock, Switch
+        //add Output for: Output
 
-        //Build Graph
-        this.state.chips.forEach(chip => {
-            chip.graph.nodes.forEach(gate => {
-                if (gate.role === GateRole.InputActive) { //TODO: Use switch
-                    let copy: Gate = { ...gate };
-                    copy.role = GateRole.InputInactive;
-                    graph.addNode(copy);
-                }
-                else
-                    graph.addNode(gate);
+        // //Build Graph
+        // this.state.chips.forEach(chip => {
+        //     chip.graph.nodes.forEach(gate => {
+        //         if (gate.role === GateRole.InputActive) { //TODO: Use switch
+        //             let copy: Gate = { ...gate };
+        //             copy.role = GateRole.InputInactive;
+        //             graph.addNode(copy);
+        //         }
+        //         else
+        //             graph.addNode(gate);
 
-            });
-            graph.addEdges(chip.graph.edges);
-        });
+        //     });
+        //     graph.addEdges(chip.graph.edges);
+        // });
 
-        this.state.wires.forEach(wire => {
-            graph.addEdge({ from: wire.fromId, to: wire.toId });
-        })
+        // this.state.wires.forEach(wire => {
+        //     graph.addEdge({ from: wire.fromId, to: wire.toId });
+        // })
 
-        let chipName = `Custom ${ChipManager.getChipId("Custom")}`;
 
-        let blueprint = new ChipBlueprint(chipName, "#aaff33", "custom", graph)
 
+        //Build Blueprint
+        let name = window.prompt("Please enter a name for your chip:");
+
+        if (!name)
+            name = `Custom-${ChipManager.getChipId("Custom")}`;
+
+        const blueprint = new ChipBlueprint(name, "#aaff33", "custom", graph)
+
+        //Add to Manager
         let newBlueprints = this.state.chipBlueprints;
         newBlueprints.push(blueprint);
         this.setState({ chipBlueprints: newBlueprints });
 
-        NotificationManager.addNotification("Chip Packaged", `Chip ${chipName} added to category Chips (Custom).`, NotificationType.Success);
+        NotificationManager.addNotification("Chip Packaged", `Chip ${name} added to category Chips (Custom).`, NotificationType.Success);
     }
     //#endregion
 
@@ -138,6 +163,13 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     //#region Simulation
     startSimulation() {
         console.log('%cStarting Simulation', 'background-color:green');
+
+        let missingInputs = this.checkValidity();
+
+        if (missingInputs.length > 0) {
+            NotificationManager.addNotification("Pin Error", "Please connect all unconnected inputs.", NotificationType.Error);
+            return;
+        }
 
         let context = this.state.context;
         context.isSimulationRunning = true;
@@ -157,7 +189,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
 
         console.log(result);
 
-        this.forceUpdate();
+        this.forceUpdate();     //FIXME: Update State correctly
     }
 
     stopSimulation() {
@@ -196,6 +228,33 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         return gates;
     }
 
+    checkValidity(highlight: boolean = true): Gate[] {
+        let allGates: Gate[] = [];
+        let allWires: WireModel[] = [...this.state.wires];
+        let missingInputs: Gate[] = [];
+
+        this.state.chips.forEach(chip => {
+            allGates.push(...chip.graph.nodes);
+            chip.graph.edges.forEach(edge => {
+                allWires.push({ fromId: edge.from, toId: edge.to, state: TriState.Floating });
+            });
+        });
+
+        allGates.forEach(gate => {
+            if (gate.type !== GateType.Controlled && allWires.filter(wire => wire.toId === gate.id).length === 0)
+                missingInputs.push(gate);
+        })
+
+        if (highlight && missingInputs.length > 0) {
+            this.resetPinError();
+            this.setPinError(missingInputs);
+            this.forceUpdate(); //FIXME: Update State correctly
+        }
+
+        return missingInputs;
+    }
+
+    //FIXME: Update State correctly
     setPinState(results: SimulationState[]) {
         this.state.chips.forEach(chip => {
             chip.graph.nodes.forEach(gate => {
@@ -205,6 +264,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         });
     }
 
+    //FIXME: Update State correctly
     setWireState(results: SimulationState[]) {
         this.state.wires.forEach(wire => {
             const result = results.find(res => res.id === wire.fromId);
@@ -212,7 +272,60 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         })
     }
 
+    //FIXME: Update State correctly
+    resetPinError() {
+        this.state.chips.forEach(chip => {
+            chip.graph.nodes.forEach(gate => {
+                gate.error = undefined;
+            });
+        });
+    }
+
+    //FIXME: Update State correctly
+    setPinError(missingConnections: Gate[]) {
+        missingConnections.forEach(gate => {
+            this.getGateById(gate.id)!.error = true;
+        });
+    }
+
     //#endregion
+    //#endregion
+
+    //#region Helpers
+
+    getGateById(id: string): Gate | undefined {
+        let result = undefined;
+
+        this.state.chips.forEach(chip => {
+            let gate = chip.graph.nodes.find(gate => gate.id === id);
+
+            if (gate)
+                result = gate;
+        });
+
+        return result;
+    }
+
+    getGatesByType(type: GateType): Gate[] {
+        let result: Gate[] = [];
+
+        this.state.chips.forEach(chip => {
+            result.push(...chip.graph.nodes.filter(gate => gate.type === type));
+        });
+
+        return result;
+    }
+
+    getGatesByRole(role: GateRole): Gate[] {
+        let result: Gate[] = [];
+
+        this.state.chips.forEach(chip => {
+            result.push(...chip.graph.nodes.filter(gate => gate.role === role));
+        });
+
+        return result;
+    }
+
     //#endregion
 
     render() {

@@ -3,7 +3,6 @@ import Draggable from 'react-draggable';
 import Pin from '../pin/pin';
 import React, { Component } from 'react';
 import { CircuitBuilderContext, Gate, GateRole, SignalDirection, Tool } from '../../model/circuit-builder.types';
-import { createLogicalAnd } from 'typescript';
 import { TriState } from '../../simulation/simulator.types';
 import './chip.scss';
 
