@@ -1,21 +1,19 @@
 import ChipInstance from '../../model/chip-instance';
-import CircuitBuilderContext from '../context/circuit-builder-context/circuit-builder-context';
 import Draggable from 'react-draggable';
 import Pin from '../pin/pin';
 import React, { Component } from 'react';
-import { Gate, GateRole, SignalDirection, Tool } from '../../model/circuit-builder.types';
+import { CircuitBuilderContext, Gate, GateRole, SignalDirection, Tool } from '../../model/circuit-builder.types';
 import './chip.scss';
 
 interface ChipProps {
     chip: ChipInstance;
+    context: CircuitBuilderContext;
     onChipDelete: (chip: ChipInstance) => void;
     redraw: () => void;
     onPinClicked: (gate: Gate) => void;
 }
 
 class Chip extends Component<ChipProps> {
-    static contextType = CircuitBuilderContext;
-
     render() {
         let style = { backgroundColor: this.props.chip.blueprint.color };
 
@@ -34,10 +32,10 @@ class Chip extends Component<ChipProps> {
 
         let className = 'chip chip-on-board ';
 
-        if (!this.context.isSimulationRunning) {
-            if (this.context.activeTool === Tool.Move)
+        if (!this.props.context.isSimulationRunning) {
+            if (this.props.context.activeTool === Tool.Move)
                 className += 'chip-tool-move ';
-            else if (this.context.activeTool === Tool.Delete)
+            else if (this.props.context.activeTool === Tool.Delete)
                 className += 'chip-tool-delete ';
         }
 
@@ -47,11 +45,11 @@ class Chip extends Component<ChipProps> {
 
         let clickEvent = () => { };
 
-        if (!this.context.isSimulationRunning && this.context.activeTool === Tool.Delete)
+        if (!this.props.context.isSimulationRunning && this.props.context.activeTool === Tool.Delete)
             clickEvent = () => { this.props.onChipDelete(this.props.chip) };
 
         return (
-            <Draggable grid={[25, 25]} position={startPos} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.context.activeTool !== Tool.Move || this.context.isSimulationRunning}>
+            <Draggable grid={[25, 25]} position={startPos} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.props.context.activeTool !== Tool.Move || this.props.context.isSimulationRunning}>
                 <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
                     <span>{this.props.chip.blueprint.name}</span>
                     {pins}

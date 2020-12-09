@@ -1,4 +1,3 @@
-import CircuitBuilderContext from '../context/circuit-builder-context/circuit-builder-context';
 import React, { Component } from 'react';
 import { Gate, SignalDirection } from '../../model/circuit-builder.types';
 import './pin.scss';
@@ -11,7 +10,6 @@ interface PinProps {
 }
 
 class Pin extends Component<PinProps>{
-    static contextType = CircuitBuilderContext;
 
     render() {
         let className = "pin ";

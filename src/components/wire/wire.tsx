@@ -1,16 +1,14 @@
-import CircuitBuilderContext from '../context/circuit-builder-context/circuit-builder-context';
 import React, { Component } from 'react';
-import { Tool, WireModel } from '../../model/circuit-builder.types';
+import { CircuitBuilderContext, Tool, WireModel } from '../../model/circuit-builder.types';
 import './wire.scss';
 
 interface WireProps {
     wire: WireModel;
+    context: CircuitBuilderContext;
     onWireDelete: (wire: WireModel) => void;
 }
 
 class Wire extends Component<WireProps> {
-    static contextType = CircuitBuilderContext;
-
     render() {
         let startElement = document.querySelector(`[data-gateid='${this.props.wire.fromId}']`)?.getBoundingClientRect();
         let endElement = document.querySelector(`[data-gateid='${this.props.wire.toId}']`)?.getBoundingClientRect();
@@ -20,12 +18,12 @@ class Wire extends Component<WireProps> {
 
         let className = 'wire wire-floating ';
 
-        if (this.context.activeTool === Tool.Delete)
+        if (this.props.context.activeTool === Tool.Delete)
             className += 'wire-tool-delete ';
 
         let clickEvent = () => { };
 
-        if (this.context.activeTool === Tool.Delete)
+        if (this.props.context.activeTool === Tool.Delete)
             clickEvent = () => { this.props.onWireDelete(this.props.wire) };
 
         return (

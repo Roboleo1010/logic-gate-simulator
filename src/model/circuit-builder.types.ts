@@ -27,3 +27,8 @@ export interface Gate {
     signalDirection?: SignalDirection;
     role?: GateRole;
 }
+
+export interface CircuitBuilderContext {
+    isSimulationRunning: boolean;
+    activeTool: Tool;
+}
