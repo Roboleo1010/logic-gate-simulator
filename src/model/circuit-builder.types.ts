@@ -2,7 +2,8 @@ import { GateType, TriState } from '../simulation/simulator.types';
 
 export enum Tool {
     Move = "Move",
-    Delete = "Delete"
+    Delete = "Delete",
+    Rename = "Rename"
 }
 
 export enum SignalDirection {
@@ -12,7 +13,8 @@ export enum SignalDirection {
 
 export enum GateRole {
     Switch = "Switch",
-    Output = "Output" //LED
+    Output = "Output",
+    Clock = "Clock"
 }
 
 export interface WireModel {
@@ -23,6 +25,7 @@ export interface WireModel {
 
 export interface Gate {
     id: string;
+    name?: string;
     state: TriState;
     type: GateType;
     signalDirection?: SignalDirection;

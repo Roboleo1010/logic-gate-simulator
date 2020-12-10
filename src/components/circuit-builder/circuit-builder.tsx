@@ -135,11 +135,12 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
             //Show switch inputs
             if (gate.role === GateRole.Switch && gate.type === GateType.Controlled) {
                 gate.type = GateType.Relay;
-                gate.hidden = undefined;
+                gate.signalDirection = SignalDirection.In;
             }
             //Show output outputs
-            else if (gate.role === GateRole.Output)
-                gate.hidden = undefined;
+            else if (gate.role === GateRole.Output) {
+                gate.signalDirection = SignalDirection.Out;
+            }
             //hide all unused outputs
             else if (allWires.filter(wire => wire.fromId === gate.id).length === 0)
                 gate.hidden = true;
@@ -175,7 +176,6 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         context.activeTool = tool;
 
         this.setState({ context: context, lastClickedPin: undefined });
-        this.forceUpdate();
     }
 
     //#region Simulation
@@ -205,9 +205,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.setPinState(result.states);
         this.setWireState(result.states);
 
-        // console.log(result);
-
-        this.forceUpdate();     //FIXME: Update State correctly
+        this.forceUpdate();
     }
 
     stopSimulation() {
@@ -266,14 +264,14 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         if (highlight && missingInputs.length > 0) {
             this.resetPinError();
             this.setPinError(missingInputs);
-            this.forceUpdate(); //FIXME: Update State correctly
+            this.forceUpdate();
         }
 
         return missingInputs;
     }
 
-    //FIXME: Update State correctly
     setPinState(results: SimulationState[]) {
+
         this.state.chips.forEach(chip => {
             chip.graph.nodes.forEach(gate => {
                 const result = results.find(res => res.id === gate.id);
@@ -282,15 +280,13 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         });
     }
 
-    //FIXME: Update State correctly
     setWireState(results: SimulationState[]) {
         this.state.wires.forEach(wire => {
             const result = results.find(res => res.id === wire.fromId);
             wire.state = result?.state!;
-        })
+        });
     }
 
-    //FIXME: Update State correctly
     resetPinError() {
         this.state.chips.forEach(chip => {
             chip.graph.nodes.forEach(gate => {
@@ -299,7 +295,6 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         });
     }
 
-    //FIXME: Update State correctly
     setPinError(missingConnections: Gate[]) {
         missingConnections.forEach(gate => {
             this.getGateById(gate.id)!.error = true;
@@ -357,6 +352,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
                         <ToolbarGroup>
                             <ToolbarButtonMulti icon={Icons.iconMove} text="Move" onClick={() => this.setTool(Tool.Move)} isActive={this.state.context.activeTool === Tool.Move}></ToolbarButtonMulti>
                             <ToolbarButtonMulti icon={Icons.iconDelete} text="Delete" onClick={() => this.setTool(Tool.Delete)} isActive={this.state.context.activeTool === Tool.Delete}></ToolbarButtonMulti>
+                            <ToolbarButtonMulti icon={Icons.iconRename} text="Rename" onClick={() => this.setTool(Tool.Rename)} isActive={this.state.context.activeTool === Tool.Rename}></ToolbarButtonMulti>
                         </ToolbarGroup>
                         <ToolbarGroup>
                             <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.state.context.isSimulationRunning} onClick={this.state.context.isSimulationRunning ? this.stopSimulation.bind(this) : this.startSimulation.bind(this)}></ToolbarButtonToggle>

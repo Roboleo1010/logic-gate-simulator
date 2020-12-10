@@ -38,11 +38,11 @@ class Chip extends Component<ChipProps, ChipState> {
         let gatesOut = this.props.chip.graph.nodes.filter(gate => gate.signalDirection === SignalDirection.Out && !(gate.hidden === true) && this.props.chip.graph.edges.filter(wire => gate.id === wire.from).length === 0);
 
         gatesIn.forEach((gate, index) => {
-            pins.push(<Pin key={gate.id} context={this.props.context} gate={gate} pinsForSideCount={gatesIn.length} pinForSideIndex={index} onClick={this.props.onPinClicked}></Pin>);
+            pins.push(<Pin key={gate.id} context={this.props.context} gate={gate} pinsForSideCount={gatesIn.length} pinForSideIndex={index} startWire={this.props.onPinClicked}></Pin>);
         });
 
         gatesOut.forEach((gate, index) => {
-            pins.push(<Pin key={gate.id} context={this.props.context} gate={gate} pinsForSideCount={gatesOut.length} pinForSideIndex={index} onClick={this.props.onPinClicked}></Pin>);
+            pins.push(<Pin key={gate.id} context={this.props.context} gate={gate} pinsForSideCount={gatesOut.length} pinForSideIndex={index} startWire={this.props.onPinClicked}></Pin>);
         });
 
         let className = 'chip chip-on-board ';

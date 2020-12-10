@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { CircuitBuilderContext, Gate, SignalDirection } from '../../model/circuit-builder.types';
+import { CircuitBuilderContext, Gate, SignalDirection, Tool } from '../../model/circuit-builder.types';
 import { TriState } from '../../simulation/simulator.types';
 import './pin.scss';
 
@@ -8,10 +8,19 @@ interface PinProps {
     pinsForSideCount: number;
     pinForSideIndex: number;
     context: CircuitBuilderContext;
-    onClick: (gate: Gate) => void;
+    startWire: (gate: Gate) => void;
 }
 
 class Pin extends Component<PinProps>{
+    renamePin() {
+        let name = window.prompt("Pin name:", this.props.gate.name);
+
+        if (!name || name === '')
+            return;
+
+        this.props.gate.name = name;
+        this.forceUpdate();
+    }
 
     render() {
         let className = "pin ";
@@ -43,8 +52,18 @@ class Pin extends Component<PinProps>{
             }
         }
 
+        let clickEvent = () => { };
 
-        return (<div data-gateid={this.props.gate.id} className={className} style={style} title={this.props.gate.id} onClick={() => this.props.onClick(this.props.gate)}></div >);
+        if (this.props.context.activeTool === Tool.Move) {
+            clickEvent = () => this.props.startWire(this.props.gate);
+            className += "pin-tool-move ";
+        }
+        else if (this.props.context.activeTool === Tool.Rename) {
+            clickEvent = () => this.renamePin.bind(this);
+            className += "pin-tool-rename ";
+        }
+
+        return (<div data-gateid={this.props.gate.id} className={className} style={style} title={this.props.gate.name} onClick={clickEvent}></div >);
     }
 }
 
