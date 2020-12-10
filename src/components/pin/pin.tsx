@@ -59,7 +59,7 @@ class Pin extends Component<PinProps>{
             className += "pin-tool-move ";
         }
         else if (this.props.context.activeTool === Tool.Rename) {
-            clickEvent = () => this.renamePin.bind(this);
+            clickEvent = () => this.renamePin();
             className += "pin-tool-rename ";
         }
 

@@ -1,3 +1,4 @@
+import ChipBlueprint from './chip-blueprint';
 import { GateType, TriState } from '../simulation/simulator.types';
 
 export enum Tool {
@@ -37,4 +38,9 @@ export interface Gate {
 export interface CircuitBuilderContext {
     isSimulationRunning: boolean;
     activeTool: Tool;
+}
+
+export interface BlueprintSaveData {
+    version: number;
+    blueprints: ChipBlueprint[];
 }

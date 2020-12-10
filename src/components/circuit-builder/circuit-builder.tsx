@@ -2,6 +2,7 @@ import Board from '../board/board';
 import ChipBlueprint from '../../model/chip-blueprint';
 import ChipInstance from '../../model/chip-instance';
 import ChipManager from '../../manager/chip-manager';
+import Constants from '../../constants';
 import Graph from '../../utilities/graph/graph';
 import Icons from '../../assets/icons/icons';
 import NotificationManager, { NotificationType } from '../../manager/notification-manager';
@@ -14,7 +15,7 @@ import ToolbarButtonMulti from '../toolbar/toolbar-button-multi/toolbar-button-m
 import ToolbarButtonToggle from '../toolbar/toolbar-button-toggle/toolbar-button-toggle';
 import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
 import Toolbox from '../toolbox/toolbox';
-import { CircuitBuilderContext, Gate, GateRole, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
+import { BlueprintSaveData, CircuitBuilderContext, Gate, GateRole, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
 import { Gate as SimulationGate, GateType, SimulationState, TriState } from '../../simulation/simulator.types';
 import './circuit-builder.scss';
 import 'react-notifications-component/dist/theme.css';
@@ -100,6 +101,13 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         this.setState({ wires: this.state.wires.filter(wire => wire.fromId !== wireToDelete.fromId || wire.toId !== wireToDelete.toId) });
     }
 
+    setTool(tool: Tool) {
+        let context = this.state.context;
+        context.activeTool = tool;
+
+        this.setState({ context: context, lastClickedPin: undefined });
+    }
+
     packageChip() {
         //Check for validity
         if (this.checkValidity().length > 0) {
@@ -160,8 +168,6 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
 
         const blueprint = new ChipBlueprint(name, "#aaff33", "custom", graph)
 
-        console.log(blueprint);
-
         //Add to Manager
         let newBlueprints = this.state.chipBlueprints;
         newBlueprints.push(blueprint);
@@ -171,12 +177,39 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
     }
     //#endregion
 
-    setTool(tool: Tool) {
-        let context = this.state.context;
-        context.activeTool = tool;
+    //#region Loading/ Saving
 
-        this.setState({ context: context, lastClickedPin: undefined });
+    saveBlueprints() {
+        let saveData: BlueprintSaveData = { version: Constants.SaveVersion, blueprints: this.state.chipBlueprints.filter(bp => bp.category === 'custom') };
+        window.prompt("Please copy your savedata here:", JSON.stringify(saveData))
+
+        NotificationManager.addNotification("Saving successfull", "Paste the data you copied into the loading dialouge to load your chips.", NotificationType.Success);
     }
+
+    loadBlueprints() {
+        let dataJson = window.prompt("Please paste your savedata here:");
+
+        if (dataJson === undefined || dataJson === "") {
+            NotificationManager.addNotification("Loading Error", "No savedata input.", NotificationType.Error);
+            return;
+        }
+
+        let saveData: BlueprintSaveData = JSON.parse(dataJson!);
+
+        if (saveData.version !== Constants.SaveVersion) {
+            NotificationManager.addNotification("Loading Error", "This software has been updated and your savedata is not longer supported.", NotificationType.Error);
+            return;
+        }
+
+        let newBlueprints = this.state.chipBlueprints;
+        newBlueprints.push(...saveData.blueprints);
+        this.setState({ chipBlueprints: newBlueprints });
+
+
+        NotificationManager.addNotification("Loading successfull", " ", NotificationType.Success);
+    }
+
+    //#endregion
 
     //#region Simulation
     startSimulation() {
@@ -359,6 +392,10 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
                         </ToolbarGroup>
                         <ToolbarGroup>
                             <ToolbarButton icon={Icons.iconChip} text="Package Chip" onClick={this.packageChip.bind(this)}></ToolbarButton>
+                        </ToolbarGroup>
+                        <ToolbarGroup>
+                            <ToolbarButton icon={Icons.iconSave} text="Save custom chips" onClick={this.saveBlueprints.bind(this)}></ToolbarButton>
+                            <ToolbarButton icon={Icons.iconLoad} text="Load custom chips" onClick={this.loadBlueprints.bind(this)}></ToolbarButton>
                         </ToolbarGroup>
                     </Toolbar>
                 </div>
