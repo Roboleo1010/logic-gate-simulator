@@ -4,23 +4,22 @@ $pinWidth: 16px;
 $pinWidthHalfed: $pinWidth / 2;
 
 .pin {
-    height: 16px;
-    width: 16px;
+    height: $pinWidth;
+    width: $pinWidth;
     display: block;
     position: absolute;
 
     border-radius: 50%;
     border: 3px solid var(--text-reverse);
-    box-sizing: border-box;
-
     background-color: var(--text);
+
+    box-sizing: border-box;
 }
 
 .pin-tool-rename {
     cursor: text;
 }
-.pin-tool-delete {
-}
+
 .pin-tool-move {
     cursor: pointer;
 }

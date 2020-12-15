@@ -31,6 +31,7 @@ export interface Gate {
     type: GateType;
     signalDirection?: SignalDirection;
     role?: GateRole;
+    isFirstLayer: boolean;
     error?: boolean;
     hidden?: boolean;
 }

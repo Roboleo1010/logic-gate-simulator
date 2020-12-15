@@ -24,16 +24,13 @@ class Pin extends Component<PinProps>{
 
     render() {
         let className = "pin ";
-        let style;
 
-        if (this.props.gate.signalDirection === SignalDirection.In) {
+        if (this.props.gate.signalDirection === SignalDirection.In)
             className += 'pin-side-left ';
-            style = { top: `calc(${(100 / (this.props.pinsForSideCount + 1)) * (this.props.pinForSideIndex + 1)}% - 8px)` }
-        }
-        else if (this.props.gate.signalDirection === SignalDirection.Out) {
+        else
             className += 'pin-side-right ';
-            style = { top: `calc(${(100 / (this.props.pinsForSideCount + 1)) * (this.props.pinForSideIndex + 1)}% - 8px)` }
-        }
+
+        const style = { top: `calc(${(100 / (this.props.pinsForSideCount + 1)) * (this.props.pinForSideIndex + 1)}% - 8px)` }
 
         if (this.props.gate.error === true)
             className += "pin-error ";

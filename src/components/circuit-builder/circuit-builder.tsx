@@ -118,11 +118,11 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
             NotificationManager.addNotification("Pin Error", "Please connect all unconnected inputs.", NotificationType.Error);
             return;
         }
-        if (this.getGatesByRole(GateRole.Switch).length === 0) {
-            NotificationManager.addNotification("Package Error", "A Chip should include at least one Input", NotificationType.Error);
+        if (this.getGatesByRole(GateRole.Switch, true).length === 0 && this.getGatesByRole(GateRole.Clock, true).length === 0) {
+            NotificationManager.addNotification("Package Error", "A Chip should include at least one Input (Switch or Clock)", NotificationType.Error);
             return;
         }
-        if (this.getGatesByRole(GateRole.Output).length === 0) {
+        if (this.getGatesByRole(GateRole.Output, true).length === 0) {
             NotificationManager.addNotification("Package Error", "A Chip should include at least one Output", NotificationType.Error);
             return;
         }
@@ -161,6 +161,8 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
             //hide all unused outputs
             else if (allWires.filter(wire => wire.fromId === gate.id).length === 0)
                 gate.hidden = true;
+
+            gate.isFirstLayer = false;
         });
 
         graph.addNodes(allGates);
@@ -245,8 +247,9 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
 
     simulate() {
         this.state.chips.forEach(chip => {
-            chip.graph.nodes.filter(gate => gate.role === GateRole.Clock && gate.type === GateType.Controlled).forEach(clock => {
+            chip.graph.nodes.filter(gate => gate.role === GateRole.Clock && gate.isFirstLayer).forEach(clock => {
                 clock.state = clock.state === TriState.False ? TriState.True : TriState.False;
+                console.log(clock.id);
             });
         });
 
@@ -379,11 +382,11 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
         return result;
     }
 
-    getGatesByRole(role: GateRole): Gate[] {
+    getGatesByRole(role: GateRole, inFirstLayer: boolean): Gate[] {
         let result: Gate[] = [];
 
         this.state.chips.forEach(chip => {
-            result.push(...chip.graph.nodes.filter(gate => gate.role === role));
+            result.push(...chip.graph.nodes.filter(gate => gate.role === role && gate.isFirstLayer === true));
         });
 
         return result;

@@ -1,19 +1,24 @@
 @import "../../design.scss";
 
-$chip-height: 50px;
+$chip-height-toolbox: 50px;
 
 .chip {
     padding: 15px 0;
     text-align: center;
-    height: $chip-height;
     width: 125px;
     box-sizing: border-box;
     border-radius: 3px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     > span {
         color: white;
         font-weight: bold;
         font-size: 16px;
+        flex: 0 0;
+        white-space: nowrap;
 
         -webkit-user-select: none; /* Safari */
         -moz-user-select: none; /* Firefox */
@@ -23,16 +28,20 @@ $chip-height: 50px;
 }
 
 .chip-on-toolbox-wrapper {
-    height: $chip-height;
+    height: $chip-height-toolbox;
 
     .chip-on-toolbox {
-        cursor: pointer;
+        height: $chip-height-toolbox;
         position: relative;
         margin-left: 10px;
+
+        cursor: pointer;
     }
 
     .chip-on-toolbox-fake {
-        top: -$chip-height;
+        height: $chip-height-toolbox;
+        top: -$chip-height-toolbox;
+
         pointer-events: none;
         touch-action: none;
     }

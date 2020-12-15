@@ -16,7 +16,6 @@ interface ChipProps {
 
 interface ChipState {
     switch?: Gate;
-    output?: Gate;
 }
 
 class Chip extends Component<ChipProps, ChipState> {
@@ -24,18 +23,15 @@ class Chip extends Component<ChipProps, ChipState> {
         super(props);
 
         this.state = {
-            switch: this.props.chip.graph.nodes.find(gate => gate.role === GateRole.Switch),
-            output: this.props.chip.graph.nodes.find(gate => gate.role === GateRole.Output)
+            switch: this.props.chip.graph.nodes.find(gate => gate.role === GateRole.Switch && gate.isFirstLayer),
         }
     }
 
     render() {
-        let style = { backgroundColor: this.props.chip.blueprint.color };
-
         let pins: JSX.Element[] = [];
 
-        let gatesIn = this.props.chip.graph.nodes.filter(gate => gate.signalDirection === SignalDirection.In && !(gate.hidden === true) && this.props.chip.graph.edges.filter(wire => gate.id === wire.to).length === 0);
-        let gatesOut = this.props.chip.graph.nodes.filter(gate => gate.signalDirection === SignalDirection.Out && !(gate.hidden === true) && this.props.chip.graph.edges.filter(wire => gate.id === wire.from).length === 0);
+        const gatesIn = this.props.chip.graph.nodes.filter(gate => gate.signalDirection === SignalDirection.In && !(gate.hidden === true) && this.props.chip.graph.edges.filter(wire => gate.id === wire.to).length === 0);
+        const gatesOut = this.props.chip.graph.nodes.filter(gate => gate.signalDirection === SignalDirection.Out && !(gate.hidden === true) && this.props.chip.graph.edges.filter(wire => gate.id === wire.from).length === 0);
 
         gatesIn.forEach((gate, index) => {
             pins.push(<Pin key={gate.id} context={this.props.context} gate={gate} pinsForSideCount={gatesIn.length} pinForSideIndex={index} startWire={this.props.onPinClicked}></Pin>);
@@ -44,6 +40,8 @@ class Chip extends Component<ChipProps, ChipState> {
         gatesOut.forEach((gate, index) => {
             pins.push(<Pin key={gate.id} context={this.props.context} gate={gate} pinsForSideCount={gatesOut.length} pinForSideIndex={index} startWire={this.props.onPinClicked}></Pin>);
         });
+
+        const style = { backgroundColor: this.props.chip.blueprint.color, height: Math.max(gatesIn.length, gatesOut.length) * 16 + 20 };
 
         let className = 'chip chip-on-board ';
 
@@ -72,7 +70,7 @@ class Chip extends Component<ChipProps, ChipState> {
         }
 
         return (
-            <Draggable grid={[25, 25]} position={startPos} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.props.context.activeTool !== Tool.Move || this.props.context.isSimulationRunning}>
+            <Draggable grid={[5, 5]} position={startPos} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.props.context.activeTool !== Tool.Move || this.props.context.isSimulationRunning}>
                 <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
                     <span>{this.props.chip.blueprint.name}</span>
                     {pins}

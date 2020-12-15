@@ -23,7 +23,7 @@ class ChipToolbox extends Component<ChipToolboxProps> {
 
         return (
             <div className="chip-on-toolbox-wrapper">
-                <Draggable grid={[25, 25]} onStop={this.onStop.bind(this)} position={{ x: 0, y: 0 }} >
+                <Draggable grid={[5, 5]} onStop={this.onStop.bind(this)} position={{ x: 0, y: 0 }} >
                     <div className="chip chip-on-toolbox" style={style} title={this.props.blueprint.description} >
                         <span>
                             {this.props.blueprint.name}
