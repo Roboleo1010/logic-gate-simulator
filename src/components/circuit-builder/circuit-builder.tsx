@@ -144,8 +144,13 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
         let graph: Graph<Gate> = new Graph<Gate>();
 
         allGates.forEach(gate => {
-            //Show switch inputs
+            //Show switches
             if (gate.role === GateRole.Switch && gate.type === GateType.Controlled) {
+                gate.type = GateType.Relay;
+                gate.signalDirection = SignalDirection.In;
+            }
+            //Show clocks
+            else if (gate.role === GateRole.Clock && gate.type === GateType.Controlled) {
                 gate.type = GateType.Relay;
                 gate.signalDirection = SignalDirection.In;
             }
@@ -237,6 +242,12 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     }
 
     simulate() {
+        this.state.chips.forEach(chip => {
+            chip.graph.nodes.filter(gate => gate.role === GateRole.Clock && gate.type === GateType.Controlled).forEach(clock => {
+                clock.state = clock.state === TriState.False ? TriState.True : TriState.False;
+            });
+        });
+
         const result = new Simulation(this.getGates()).simulate();
 
         this.setPinState(result.states);

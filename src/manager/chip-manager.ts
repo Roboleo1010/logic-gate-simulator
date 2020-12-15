@@ -63,17 +63,19 @@ class ChipManager {
         let graphInput = new Graph<Gate>();
         graphInput.addNodes([{ id: "switch", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, role: GateRole.Switch, name: 'In' }]);
 
-        this.blueprints.push(new ChipBlueprint("Input", "#fd7e14", "io", graphInput));
+        this.blueprints.push(new ChipBlueprint("Input", "#fd7e14", "io", graphInput, "Click this switch to toggle it's state. Gets converted to Chip Input after Packaging"));
+
+        //OUTPUT-Chip
+        let graphOutput = new Graph<Gate>();
+        graphOutput.addNodes([{ id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out' }]);
+
+        this.blueprints.push(new ChipBlueprint("Output", "#fd7e14", "io", graphOutput, "Gets converted to Chip Output after Packaging"));
 
         //CLOCK-Chip
         let graphClock = new Graph<Gate>();
-        graphClock.addNodes([
-            { id: "clock", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Clock, name: 'Clock', hidden: true },
-            { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out, name: 'Clock' }]);
+        graphClock.addNodes([{ id: "clock", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, role: GateRole.Clock, name: 'Clock' }]);
 
-        graphClock.addEdges([{ from: "clock", to: "out" }]);
-
-        this.blueprints.push(new ChipBlueprint("Clock", "#20c997", "io", graphClock));
+        this.blueprints.push(new ChipBlueprint("Clock", "#20c997", "io", graphClock, "Gets converted to Chip Input after Packaging."));
 
         //CONSTANT-ON
         let graphConstantOn = new Graph<Gate>();
@@ -88,12 +90,6 @@ class ChipManager {
             { id: "out", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, name: 'Out' }]);
 
         this.blueprints.push(new ChipBlueprint("Constant Off", "#dc3545", "io", graphConstantOff));
-
-        //OUTPUT-Chip
-        let graphOutput = new Graph<Gate>();
-        graphOutput.addNodes([{ id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out' }]);
-
-        this.blueprints.push(new ChipBlueprint("Output", "#fd7e14", "io", graphOutput));
     }
 
     public static getBlueprints(): ChipBlueprint[] {
