@@ -27,7 +27,7 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
     }
 
     render() {
-        const tabs: TabData[] = [{ id: 'chips-logic', name: 'Chips (Logic)' }, { id: 'chips-io', name: 'Chips (In/ Out)' }, { id: 'chips-custom', name: 'Chips (Custom)' }, { id: 'oscilloscope', name: 'Oscilloscope' }];
+        const tabs: TabData[] = [{ id: 'chips-logic', name: 'Chips (Logic)' }, { id: 'chips-io', name: 'Chips (In/ Out)' }, { id: 'chips-custom', name: 'Chips (Custom)' }];
 
         return (
             <div className="toolbox">
@@ -52,9 +52,6 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
                                 return <ChipToolbox blueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
                             })}
                         </div>
-                    </Tab>
-                    <Tab isSelected={this.state.selectedTab === tabs[3].id}>
-
                     </Tab>
                 </TabNav>
             </div>

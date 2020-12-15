@@ -9,6 +9,7 @@ $themes: (
             secondary-light: #ffa040,
             secondary-dark: #c43e00,
             text: white,
+            text-reverse: black,
             success: #28a745,
             danger: #dc3545,
             warning: #ffc107,
@@ -24,6 +25,7 @@ $themes: (
             secondary-light: #ffa040,
             secondary-dark: #c43e00,
             text: black,
+            text-reverse: white,
             success: #28a745,
             danger: #dc3545,
             warning: #ffc107,
@@ -48,7 +50,6 @@ $height-toolbox: 110px;
 
 $color-true: green;
 $color-false: red;
-$color-floating: white;
 $color-error: red;
 
 .unselectable {

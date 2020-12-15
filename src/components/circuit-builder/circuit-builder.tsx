@@ -170,10 +170,12 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
         })
 
         //Build Blueprint
-        let name = window.prompt("Please enter a name for your chip:");
+        let name = window.prompt("Please enter a name for your chip:", `Custom-${ChipManager.getChipId("Custom")}`);
 
-        if (!name)
-            name = `Custom-${ChipManager.getChipId("Custom")}`;
+        if (!name) {
+            NotificationManager.addNotification("Chip packaging aborted", `No name enterd or arborted.`, NotificationType.Warning);
+            return;
+        }
 
         const blueprint = new ChipBlueprint(name, ChipManager.getNewColor(), "custom", graph)
 

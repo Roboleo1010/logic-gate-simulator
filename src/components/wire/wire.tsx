@@ -28,14 +28,9 @@ class Wire extends Component<WireProps> {
                 case TriState.False:
                     className += 'wire-false ';
                     break;
-                case TriState.Floating:
-                    className += 'wire-floating ';
-                    break;
             }
         }
         else {
-            className += "wire-floating ";
-
             if (this.props.context.activeTool === Tool.Delete) {
                 className += 'wire-tool-delete ';
                 clickEvent = () => { this.props.onWireDelete(this.props.wire) };

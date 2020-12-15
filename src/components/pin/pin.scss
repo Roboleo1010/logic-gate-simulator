@@ -10,10 +10,10 @@ $pinWidthHalfed: $pinWidth / 2;
     position: absolute;
 
     border-radius: 50%;
-    border: 3px solid black;
+    border: 3px solid var(--text-reverse);
     box-sizing: border-box;
 
-    background-color: #fff;
+    background-color: var(--text);
 }
 
 .pin-tool-rename {
@@ -39,10 +39,6 @@ $pinWidthHalfed: $pinWidth / 2;
 
 .pin-false {
     background-color: $color-false;
-}
-
-.pin-floating {
-    background-color: $color-floating;
 }
 
 .pin-error {

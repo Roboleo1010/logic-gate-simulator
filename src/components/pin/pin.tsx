@@ -46,9 +46,6 @@ class Pin extends Component<PinProps>{
                 case TriState.False:
                     className += 'pin-false ';
                     break;
-                case TriState.Floating:
-                    className += 'pin-floating ';
-                    break;
             }
         }
 

@@ -11,16 +11,14 @@
 
     .wire {
         stroke-width: 3px;
+        stroke: var(--text);
     }
 
     .wire-true {
-        stroke: $color-true;
+        stroke: $color-true !important;
     }
     .wire-false {
-        stroke: $color-false;
-    }
-    .wire-floating {
-        stroke: $color-floating;
+        stroke: $color-false !important;
     }
 
     .wire-tool-delete {
