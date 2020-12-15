@@ -8,6 +8,18 @@ class ChipManager {
     private blueprints: ChipBlueprint[];
     private chipIds: Map<string, number>;
 
+    private colors: string[] = [
+        '#6610f2',
+        '#6f42c1',
+        '#ffc107',
+        '#20c997',
+        '#17a2b8',
+        '#006400',
+        '#e9967a',
+        '#ee82ee'];
+
+    private colorIndex = 0;
+
     private constructor() {
         ChipManager.instance = this;
         this.blueprints = [];
@@ -33,7 +45,7 @@ class ChipManager {
 
         graphNOT.addEdges([{ from: "in", to: "not" }, { from: "not", to: "out" }])
 
-        this.blueprints.push(new ChipBlueprint("NOT", "#e76f51", "logic", graphNOT));
+        this.blueprints.push(new ChipBlueprint("NOT", "#007bff", "logic", graphNOT));
 
         //AND-Chip
         let graphAND = new Graph<Gate>();
@@ -45,43 +57,43 @@ class ChipManager {
 
         graphAND.addEdges([{ from: "in1", to: "and" }, { from: "in2", to: "and" }, { from: "and", to: "out" }]);
 
-        this.blueprints.push(new ChipBlueprint("AND", "#2a9d8f", "logic", graphAND));
+        this.blueprints.push(new ChipBlueprint("AND", "#e83e8c", "logic", graphAND));
 
         //INPUT-Chip
         let graphInput = new Graph<Gate>();
         graphInput.addNodes([{ id: "switch", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, role: GateRole.Switch, name: 'In' }]);
 
-        this.blueprints.push(new ChipBlueprint("Input", "#FE5F00", "io", graphInput));
+        this.blueprints.push(new ChipBlueprint("Input", "#fd7e14", "io", graphInput));
 
         //CLOCK-Chip
-        // let graphClock = new Graph<Gate>();
-        // graphClock.addNodes([
-        //     { id: "clock", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Clock, name: 'Clock', hidden: true },
-        //     { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out, name: 'Clock' }]);
+        let graphClock = new Graph<Gate>();
+        graphClock.addNodes([
+            { id: "clock", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Clock, name: 'Clock', hidden: true },
+            { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out, name: 'Clock' }]);
 
-        // graphClock.addEdges([{ from: "clock", to: "out" }]);
+        graphClock.addEdges([{ from: "clock", to: "out" }]);
 
-        // this.blueprints.push(new ChipBlueprint("Clock", "#FE5F00", "io", graphClock));
+        this.blueprints.push(new ChipBlueprint("Clock", "#20c997", "io", graphClock));
 
         //CONSTANT-ON
         let graphConstantOn = new Graph<Gate>();
         graphConstantOn.addNodes([
             { id: "out", type: GateType.Controlled, state: TriState.True, signalDirection: SignalDirection.Out, name: 'Out' }]);
 
-        this.blueprints.push(new ChipBlueprint("Constant On", "#FE5F00", "io", graphConstantOn));
+        this.blueprints.push(new ChipBlueprint("Constant On", "#28a745", "io", graphConstantOn));
 
         //CONSTANT-OFF
         let graphConstantOff = new Graph<Gate>();
         graphConstantOff.addNodes([
             { id: "out", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, name: 'Out' }]);
 
-        this.blueprints.push(new ChipBlueprint("Constant Off", "#FE5F00", "io", graphConstantOff));
+        this.blueprints.push(new ChipBlueprint("Constant Off", "#dc3545", "io", graphConstantOff));
 
         //OUTPUT-Chip
         let graphOutput = new Graph<Gate>();
         graphOutput.addNodes([{ id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out' }]);
 
-        this.blueprints.push(new ChipBlueprint("Output", "#FE5F00", "io", graphOutput));
+        this.blueprints.push(new ChipBlueprint("Output", "#fd7e14", "io", graphOutput));
     }
 
     public static getBlueprints(): ChipBlueprint[] {
@@ -100,6 +112,14 @@ class ChipManager {
         id++;
         instance.chipIds.set(name, id);
         return id;
+    }
+
+    public static getNewColor(): string {
+        const instance = ChipManager.getInstance();
+        if (instance.colorIndex === instance.colors.length)
+            instance.colorIndex = 0;
+
+        return (instance.colors[instance.colorIndex++]);
     }
 }
 

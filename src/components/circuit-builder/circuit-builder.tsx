@@ -20,6 +20,10 @@ import { Gate as SimulationGate, GateType, SimulationState, TriState } from '../
 import './circuit-builder.scss';
 import 'react-notifications-component/dist/theme.css';
 
+interface ChipBuilderProps {
+    onSwitchTheme: () => void;
+}
+
 interface CircuitBuilderState {
     chipBlueprints: ChipBlueprint[];
     chips: ChipInstance[];
@@ -29,7 +33,7 @@ interface CircuitBuilderState {
     context: CircuitBuilderContext;
 }
 
-class CircuitBuilder extends Component<{}, CircuitBuilderState> {
+class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     constructor(props: any) {
         super(props);
         this.state = { chips: [], wires: [], chipBlueprints: ChipManager.getBlueprints(), context: { activeTool: Tool.Move, isSimulationRunning: false } };
@@ -166,7 +170,7 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
         if (!name)
             name = `Custom-${ChipManager.getChipId("Custom")}`;
 
-        const blueprint = new ChipBlueprint(name, "#aaff33", "custom", graph)
+        const blueprint = new ChipBlueprint(name, ChipManager.getNewColor(), "custom", graph)
 
         //Add to Manager
         let newBlueprints = this.state.chipBlueprints;
@@ -396,6 +400,9 @@ class CircuitBuilder extends Component<{}, CircuitBuilderState> {
                         <ToolbarGroup>
                             <ToolbarButton icon={Icons.iconSave} text="Save custom chips" onClick={this.saveBlueprints.bind(this)}></ToolbarButton>
                             <ToolbarButton icon={Icons.iconLoad} text="Load custom chips" onClick={this.loadBlueprints.bind(this)}></ToolbarButton>
+                        </ToolbarGroup>
+                        <ToolbarGroup>
+                            <ToolbarButton icon={Icons.iconTheme} text="Change Theme" onClick={this.props.onSwitchTheme}></ToolbarButton>
                         </ToolbarGroup>
                     </Toolbar>
                 </div>

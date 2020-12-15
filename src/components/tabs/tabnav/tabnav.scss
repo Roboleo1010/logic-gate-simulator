@@ -15,11 +15,11 @@
             text-align: center;
             cursor: pointer;
 
-            background-color: $tab-color;
+            background-color: var(--primary-light);
             border-radius: 3px 3px 0px 0px;
         }
         .tabnav-active {
-            border-top: 3px solid #ff6363;
+            border-top: 3px solid var(--secondary);
         }
     }
 }

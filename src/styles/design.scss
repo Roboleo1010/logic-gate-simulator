@@ -1,7 +1,50 @@
-$color-board: #1e1e1e;
-$color-toolbox: #202040;
+$themes: (
+    //https://material.io/resources/color/#!/?view.left=0&view.right=0&primary.color=121212&secondary.color=ff9100
+    dark:
+        (
+            primary: #121212,
+            primary-light: #383838,
+            primary-dark: #000000,
+            secondary: #ff6f00,
+            secondary-light: #ffa040,
+            secondary-dark: #c43e00,
+            text: white,
+            success: #28a745,
+            danger: #dc3545,
+            warning: #ffc107,
+            info: #17a2b8,
+        ),
+    //https://material.io/resources/color/#!/?view.left=0&view.right=1&primary.color=ececec&secondary.color=FF6F00
+    light:
+        (
+            primary: #ececec,
+            primary-light: #ffffff,
+            primary-dark: #bababa,
+            secondary: #ff6f00,
+            secondary-light: #ffa040,
+            secondary-dark: #c43e00,
+            text: black,
+            success: #28a745,
+            danger: #dc3545,
+            warning: #ffc107,
+            info: #17a2b8,
+        )
+);
+
+@each $name, $map in $themes {
+    .theme-#{$name} {
+        @each $key, $value in $map {
+            --#{$key}: #{$value};
+        }
+    }
+}
+
+.theme-dark,
+.theme-light {
+    color: var(--text);
+}
+
 $height-toolbox: 130px;
-$tab-color: #ffffff;
 
 $color-true: green;
 $color-false: red;

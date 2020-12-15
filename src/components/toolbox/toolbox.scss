@@ -2,11 +2,10 @@
 
 .toolbox {
     height: $height-toolbox;
-    background-color: $color-toolbox;
-
+    background-color: var(--primary-light);
     .tabnav {
         .tabnav-tabs {
-            background-color: $color-board;
+            background-color: var(--primary);
         }
     }
 

@@ -1,2 +1,8 @@
+@import "toolbar-button.scss";
+
 .toolbar {
+    height: $toolbar-height;
+    background-color: var(--primary-light);
+    border-radius: 3px 3px 0px 0px;
+    margin-right: 5px;
 }
