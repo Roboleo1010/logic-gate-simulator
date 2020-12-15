@@ -1,4 +1,4 @@
-@import "../../styles/design.scss";
+@import "../../design.scss";
 
 .toolbox {
     height: $height-toolbox;
@@ -11,7 +11,7 @@
 
     .tab-chips {
         width: 100%;
-        height: calc(#{$height-toolbox} - 54px);
+        height: calc(#{$height-toolbox} - 46px);
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
