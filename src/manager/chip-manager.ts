@@ -96,7 +96,7 @@ class ChipManager {
         graphTest.addNodes([{ id: "ou124323423332", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
         graphTest.addNodes([{ id: "ou3234132", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
         graphTest.addNodes([{ id: "ou32344332", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
-        graphTest.addNodes([{ id: "ou332432", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
+        graphTest.addNodes([{ id: "ou332432", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Right }]);
 
         this.blueprints.push({ name: "Test", color: "#fd7e14", category: ChipCategory.Io, graph: graphTest, type: BlueprintType.Builtin, });
 

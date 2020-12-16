@@ -6,8 +6,6 @@ $pinWidthHalfed: $pinWidth / 2;
 .pin {
     height: $pinWidth;
     width: $pinWidth;
-    display: block;
-    position: absolute;
 
     border-radius: 50%;
     border: 3px solid var(--text-reverse);
@@ -22,22 +20,6 @@ $pinWidthHalfed: $pinWidth / 2;
 
 .pin-tool-move {
     cursor: pointer;
-}
-
-.pin-side-left {
-    left: -$pinWidthHalfed;
-}
-
-.pin-side-right {
-    right: -$pinWidthHalfed;
-}
-
-.pin-side-top {
-    top: -$pinWidthHalfed;
-}
-
-.pin-side-bottom {
-    bottom: -$pinWidthHalfed;
 }
 
 .pin-true {

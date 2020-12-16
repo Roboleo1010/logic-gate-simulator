@@ -32,29 +32,12 @@ class Chip extends Component<ChipProps, ChipState> {
     }
 
     render() {
-        let pins: JSX.Element[] = [];
-
         const gatesLeft = this.getGatesForPinSide(PinSide.Left);
         const gatesRight = this.getGatesForPinSide(PinSide.Right);
         const gatesTop = this.getGatesForPinSide(PinSide.Top);
         const gatesBottom = this.getGatesForPinSide(PinSide.Bottom);
 
-        gatesLeft.forEach((gate, index) => {
-            pins.push(<Pin key={gate.id} context={this.props.context} gate={gate} pinsForSideCount={gatesLeft.length} pinForSideIndex={index} startWire={this.props.onPinClicked}></Pin>);
-        });
-
-        gatesRight.forEach((gate, index) => {
-            pins.push(<Pin key={gate.id} context={this.props.context} gate={gate} pinsForSideCount={gatesRight.length} pinForSideIndex={index} startWire={this.props.onPinClicked}></Pin>);
-        });
-        gatesTop.forEach((gate, index) => {
-            pins.push(<Pin key={gate.id} context={this.props.context} gate={gate} pinsForSideCount={gatesTop.length} pinForSideIndex={index} startWire={this.props.onPinClicked}></Pin>);
-        });
-        gatesBottom.forEach((gate, index) => {
-            pins.push(<Pin key={gate.id} context={this.props.context} gate={gate} pinsForSideCount={gatesBottom.length} pinForSideIndex={index} startWire={this.props.onPinClicked}></Pin>);
-        });
-
-        const style = { backgroundColor: this.props.chip.blueprint.color, height: Math.max(gatesLeft.length, gatesRight.length) * 16 + 20, width: Math.max(gatesTop.length, gatesBottom.length) * 16 + 20 };
-
+        const style = { backgroundColor: this.props.chip.blueprint.color, height: Math.max(gatesLeft.length, gatesRight.length) * 16 + 25, width: Math.max(gatesTop.length, gatesBottom.length) * 16 + 40 };
         let className = 'chip chip-on-board ';
 
         if (!this.props.context.isSimulationRunning) {
@@ -85,7 +68,26 @@ class Chip extends Component<ChipProps, ChipState> {
             <Draggable grid={[5, 5]} position={startPos} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.props.context.activeTool !== Tool.Move || this.props.context.isSimulationRunning}>
                 <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
                     <span>{this.props.chip.blueprint.name}</span>
-                    {pins}
+                    <div className="pin-side pins-left">
+                        {gatesLeft.map((gate) => {
+                            return <Pin key={gate.id} context={this.props.context} gate={gate} startWire={this.props.onPinClicked}></Pin>;
+                        })}
+                    </div>
+                    <div className="pin-side pins-right">
+                        {gatesRight.map((gate) => {
+                            return <Pin key={gate.id} context={this.props.context} gate={gate} startWire={this.props.onPinClicked}></Pin>;
+                        })}
+                    </div>
+                    <div className="pin-side pins-top">
+                        {gatesTop.map((gate) => {
+                            return <Pin key={gate.id} context={this.props.context} gate={gate} startWire={this.props.onPinClicked}></Pin>;
+                        })}
+                    </div>
+                    <div className="pin-side pins-bottom">
+                        {gatesBottom.map((gate) => {
+                            return <Pin key={gate.id} context={this.props.context} gate={gate} startWire={this.props.onPinClicked}></Pin>;
+                        })}
+                    </div>
                 </div>
             </Draggable >
         );

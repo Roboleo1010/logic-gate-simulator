@@ -1,4 +1,5 @@
 @import "../../design.scss";
+@import "../pin/pin.scss";
 
 $chip-height-toolbox: 50px;
 
@@ -50,6 +51,33 @@ $chip-height-toolbox: 50px;
 
 .chip-on-board {
     position: absolute;
+
+    .pin-side {
+        display: flex;
+        position: absolute;
+        justify-content: space-evenly;
+    }
+
+    .pins-left {
+        flex-direction: column;
+        left: -$pinWidthHalfed;
+        height: 90%;
+    }
+    .pins-right {
+        flex-direction: column;
+        right: -$pinWidthHalfed;
+        height: 90%;
+    }
+    .pins-top {
+        flex-direction: row;
+        top: -$pinWidthHalfed;
+        width: 90%;
+    }
+    .pins-bottom {
+        flex-direction: row;
+        bottom: -$pinWidthHalfed;
+        width: 90%;
+    }
 }
 
 .chip-tool-move {
