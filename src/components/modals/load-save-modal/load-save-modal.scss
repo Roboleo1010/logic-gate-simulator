@@ -1,0 +1,41 @@
+.load-save-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    gap: 20px 10px;
+    justify-items: stretch;
+
+    grid-template-areas:
+        "description-load description-save"
+        "load save"
+        "button-load button-save ";
+
+    #description-load {
+        grid-area: description-load;
+    }
+
+    #description-save {
+        grid-area: description-save;
+    }
+
+    #load {
+        grid-area: load;
+    }
+
+    #save {
+        grid-area: save;
+    }
+
+    #button-load {
+        grid-area: button-load;
+    }
+
+    #button-save {
+        grid-area: button-save;
+    }
+
+    input,
+    textarea {
+        padding: 12px 20px;
+    }
+}

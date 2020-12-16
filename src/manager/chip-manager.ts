@@ -1,5 +1,5 @@
 import Graph from '../utilities/graph/graph';
-import { ChipBlueprint, ChipCategory, Gate, GateRole, SignalDirection } from '../model/circuit-builder.types';
+import { BlueprintType, ChipBlueprint, ChipCategory, Gate, GateRole, SignalDirection } from '../model/circuit-builder.types';
 import { GateType, TriState } from '../simulation/simulator.types';
 
 class ChipManager {
@@ -32,7 +32,7 @@ class ChipManager {
 
         graphNOT.addEdges([{ from: "in", to: "not" }, { from: "not", to: "out" }])
 
-        this.blueprints.push({ name: "NOT", color: "#007bff", category: ChipCategory.Logic, graph: graphNOT });
+        this.blueprints.push({ name: "NOT", color: "#007bff", category: ChipCategory.Logic, type: BlueprintType.Builtin, graph: graphNOT });
 
         //AND-Chip
         let graphAND = new Graph<Gate>();
@@ -44,39 +44,39 @@ class ChipManager {
 
         graphAND.addEdges([{ from: "in1", to: "and" }, { from: "in2", to: "and" }, { from: "and", to: "out" }]);
 
-        this.blueprints.push({ name: "AND", color: "#e83e8c", category: ChipCategory.Logic, graph: graphAND });
+        this.blueprints.push({ name: "AND", color: "#e83e8c", category: ChipCategory.Logic, type: BlueprintType.Builtin, graph: graphAND });
 
         //INPUT-Chip
         let graphInput = new Graph<Gate>();
         graphInput.addNodes([{ id: "switch", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, role: GateRole.Switch, name: 'In', isFirstLayer: true }]);
 
-        this.blueprints.push({ name: "Input", color: "#fd7e14", category: ChipCategory.Io, graph: graphInput, description: "Click this switch to toggle it's state. Gets converted to Chip Input after Packaging" });
+        this.blueprints.push({ name: "Input", color: "#fd7e14", category: ChipCategory.Io, graph: graphInput, type: BlueprintType.Builtin, description: "Click this switch to toggle it's state. Gets converted to Chip Input after Packaging" });
 
         //OUTPUT-Chip
         let graphOutput = new Graph<Gate>();
         graphOutput.addNodes([{ id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true }]);
 
-        this.blueprints.push({ name: "Output", color: "#fd7e14", category: ChipCategory.Io, graph: graphOutput, description: "Gets converted to Chip Output after Packaging" });
+        this.blueprints.push({ name: "Output", color: "#fd7e14", category: ChipCategory.Io, graph: graphOutput, type: BlueprintType.Builtin, description: "Gets converted to Chip Output after Packaging" });
 
         //CLOCK-Chip
         let graphClock = new Graph<Gate>();
         graphClock.addNodes([{ id: "clock", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, role: GateRole.Clock, name: 'Clock', isFirstLayer: true }]);
 
-        this.blueprints.push({ name: "Clock", color: "#20c997", category: ChipCategory.Io, graph: graphClock, description: "Gets converted to Chip Input after Packaging." });
+        this.blueprints.push({ name: "Clock", color: "#20c997", category: ChipCategory.Io, graph: graphClock, type: BlueprintType.Builtin, description: "Gets converted to Chip Input after Packaging." });
 
         //CONSTANT-ON
         let graphConstantOn = new Graph<Gate>();
         graphConstantOn.addNodes([
             { id: "out", type: GateType.Controlled, state: TriState.True, signalDirection: SignalDirection.Out, name: 'Out', isFirstLayer: true }]);
 
-        this.blueprints.push({ name: "Constant On", color: "#28a745", category: ChipCategory.Io, graph: graphConstantOn });
+        this.blueprints.push({ name: "Constant On", color: "#28a745", category: ChipCategory.Io, type: BlueprintType.Builtin, graph: graphConstantOn });
 
         //CONSTANT-OFF
         let graphConstantOff = new Graph<Gate>();
         graphConstantOff.addNodes([
             { id: "out", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, name: 'Out', isFirstLayer: true }]);
 
-        this.blueprints.push({ name: "Constant Off", color: "#dc3545", category: ChipCategory.Io, graph: graphConstantOff });
+        this.blueprints.push({ name: "Constant Off", color: "#dc3545", category: ChipCategory.Io, type: BlueprintType.Builtin, graph: graphConstantOff });
     }
 
     public static getBlueprints(): ChipBlueprint[] {

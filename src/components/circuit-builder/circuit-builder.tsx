@@ -4,6 +4,7 @@ import ChipManager from '../../manager/chip-manager';
 import Constants from '../../constants';
 import Graph from '../../utilities/graph/graph';
 import Icons from '../../assets/icons/icons';
+import LoadSaveModal from '../modals/load-save-modal/load-save-modal';
 import NotificationManager, { NotificationType } from '../../manager/notification-manager';
 import PackageChipModal from '../modals/package-chip-modal/package-chip-modal';
 import React, { Component } from 'react';
@@ -15,7 +16,7 @@ import ToolbarButtonMulti from '../toolbar/toolbar-button-multi/toolbar-button-m
 import ToolbarButtonToggle from '../toolbar/toolbar-button-toggle/toolbar-button-toggle';
 import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
 import Toolbox from '../toolbox/toolbox';
-import { BlueprintSaveData, ChipBlueprint, ChipCategory, CircuitBuilderContext, Gate, GateRole, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
+import { BlueprintSaveData, BlueprintType, ChipBlueprint, ChipCategory, CircuitBuilderContext, Gate, GateRole, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
 import { Gate as SimulationGate, GateType, SimulationState, TriState } from '../../simulation/simulator.types';
 import './circuit-builder.scss';
 import 'react-notifications-component/dist/theme.css';
@@ -32,6 +33,7 @@ interface CircuitBuilderState {
     simulationHandle?: any;
     context: CircuitBuilderContext;
     showPackageChipModal: boolean;
+    showSaveLoadModal: boolean
 }
 
 class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
@@ -42,8 +44,14 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
             wires: [],
             chipBlueprints: ChipManager.getBlueprints(),
             context: { activeTool: Tool.Move, isSimulationRunning: false },
-            showPackageChipModal: false
+            showPackageChipModal: false,
+            showSaveLoadModal: false
         };
+    }
+
+    componentDidMount() {
+        if (localStorage.getItem(Constants.BlueprintSaveKey))
+            this.loadBlueprints(localStorage.getItem(Constants.BlueprintSaveKey)!);
     }
 
     //#region Chip & Wire Events
@@ -124,18 +132,18 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     //#region Chip Packaging
     onPackageChip() {
         //Check for validity
-        // if (this.checkValidity().length > 0) {
-        //     NotificationManager.addNotification("Pin Error", "Please connect all unconnected inputs.", NotificationType.Error);
-        //     return;
-        // }
-        // if (this.getGatesByRole(GateRole.Switch, true).length === 0 && this.getGatesByRole(GateRole.Clock, true).length === 0) {
-        //     NotificationManager.addNotification("Package Error", "A Chip should include at least one Input (Switch or Clock)", NotificationType.Error);
-        //     return;
-        // }
-        // if (this.getGatesByRole(GateRole.Output, true).length === 0) {
-        //     NotificationManager.addNotification("Package Error", "A Chip should include at least one Output", NotificationType.Error);
-        //     return;
-        // }//TODO: Uncomment
+        if (this.checkValidity().length > 0) {
+            NotificationManager.addNotification("Pin Error", "Please connect all unconnected inputs.", NotificationType.Error);
+            return;
+        }
+        if (this.getGatesByRole(GateRole.Switch, true).length === 0 && this.getGatesByRole(GateRole.Clock, true).length === 0) {
+            NotificationManager.addNotification("Package Error", "A Chip should include at least one Input (Switch or Clock)", NotificationType.Error);
+            return;
+        }
+        if (this.getGatesByRole(GateRole.Output, true).length === 0) {
+            NotificationManager.addNotification("Package Error", "A Chip should include at least one Output", NotificationType.Error);
+            return;
+        }
 
         this.setState({ showPackageChipModal: true });
     }
@@ -187,7 +195,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
 
 
         //Build Blueprint
-        const blueprint: ChipBlueprint = { name: name, color: color, category: category, graph: graph, description: description };
+        const blueprint: ChipBlueprint = { name: name, color: color, category: category, graph: graph, description: description, type: BlueprintType.Custom };
 
         //Add to Manager
         let newBlueprints = this.state.chipBlueprints;
@@ -196,41 +204,40 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
 
         NotificationManager.addNotification("Chip Packaged", `Added ${name} to ${category}`, NotificationType.Success);
 
-        this.setState({ showPackageChipModal: false });
+        localStorage.setItem(Constants.BlueprintSaveKey, this.getBlueprintSaveJSON());
     }
 
     //#endregion
 
     //#region Loading/ Saving
 
-    saveBlueprints() {
-        let saveData: BlueprintSaveData = { version: Constants.SaveVersion, blueprints: this.state.chipBlueprints };
-        window.prompt("Please copy your savedata here:", JSON.stringify(saveData))
-
-        NotificationManager.addNotification("Saving successfull", "Paste the data you copied into the loading dialouge to load your chips.", NotificationType.Success);
+    getBlueprintSaveJSON(): string {
+        return JSON.stringify({ version: Constants.SaveVersion, blueprints: this.state.chipBlueprints.filter(blueprint => blueprint.type === BlueprintType.Custom) });
     }
 
-    loadBlueprints() {
-        let dataJson = window.prompt("Please paste your savedata here:");
-
-        if (dataJson === undefined || dataJson === "") {
+    loadBlueprints(blueprintData: string) {
+        if (blueprintData === undefined || blueprintData === "") {
             NotificationManager.addNotification("Loading Error", "No savedata input.", NotificationType.Error);
             return;
         }
 
-        let saveData: BlueprintSaveData = JSON.parse(dataJson!);
+        try {
+            let blueprintSaveData: BlueprintSaveData = JSON.parse(blueprintData!);
 
-        if (saveData.version !== Constants.SaveVersion) {
-            NotificationManager.addNotification("Loading Error", "This software has been updated and your savedata is not longer supported.", NotificationType.Error);
-            return;
+            if (blueprintSaveData.version !== Constants.SaveVersion) {
+                NotificationManager.addNotification("Loading Error", "This software has been updated and your savedata is not longer supported.", NotificationType.Error);
+                return;
+            }
+
+            let newBlueprints = this.state.chipBlueprints;
+            newBlueprints.push(...blueprintSaveData.blueprints);
+            this.setState({ chipBlueprints: newBlueprints });
+
+            NotificationManager.addNotification("Loading successfull", " ", NotificationType.Success);
         }
-
-        let newBlueprints = [];
-        newBlueprints.push(...saveData.blueprints);
-        this.setState({ chipBlueprints: newBlueprints });
-
-
-        NotificationManager.addNotification("Loading successfull", " ", NotificationType.Success);
+        catch {
+            NotificationManager.addNotification("Loading Error", "Your Savedata is invalid. Please check that you've copied the entire savedata.", NotificationType.Error);
+        }
     }
 
     //#endregion
@@ -425,16 +432,15 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                             <ToolbarButton icon={Icons.iconChip} text="Package Chip" onClick={this.onPackageChip.bind(this)}></ToolbarButton>
                         </ToolbarGroup>
                         <ToolbarGroup>
-                            <ToolbarButton icon={Icons.iconSave} text="Save custom chips" onClick={this.saveBlueprints.bind(this)}></ToolbarButton>
-                            <ToolbarButton icon={Icons.iconLoad} text="Load custom chips" onClick={this.loadBlueprints.bind(this)}></ToolbarButton>
-                        </ToolbarGroup>
-                        <ToolbarGroup>
+                            <ToolbarButton icon={Icons.iconSave} text="Save/ Load Blueprint" onClick={() => this.setState({ showSaveLoadModal: true })}></ToolbarButton>
                             <ToolbarButton icon={Icons.iconTheme} text="Change Theme" onClick={this.props.onSwitchTheme}></ToolbarButton>
                         </ToolbarGroup>
                     </Toolbar>
                 </div>
                 {this.state.showPackageChipModal &&
                     <PackageChipModal onSubmitCallback={this.packageChip.bind(this)} onCloseCallback={() => this.setState({ showPackageChipModal: false })} defaultName={`Custom ${ChipManager.getChipId("Custom")}`} />}
+                {this.state.showSaveLoadModal &&
+                    <LoadSaveModal onLoadCallback={this.loadBlueprints.bind(this)} onCloseCallback={() => this.setState({ showSaveLoadModal: false })} saveData={this.getBlueprintSaveJSON()} />}
             </div >
         );
     }

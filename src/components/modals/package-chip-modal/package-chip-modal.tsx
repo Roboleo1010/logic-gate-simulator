@@ -29,6 +29,7 @@ class PackageChipModal extends Component<PackageChipModalProps, PackageChipModal
             name = this.props.defaultName;
 
         this.props.onSubmitCallback(name, this.state.color, category as ChipCategory, description);
+        this.props.onCloseCallback();
     }
 
     render() {
@@ -46,7 +47,7 @@ class PackageChipModal extends Component<PackageChipModalProps, PackageChipModal
                     </div>
                     <input type="text" placeholder="Description" name="descripton" id='description' />
 
-                    <button onClick={this.onSubmit.bind(this)} id='submit'>Submit</button>
+                    <button onClick={this.onSubmit.bind(this)} id='submit'>Add Blueprint</button>
                 </div>
             </Modal >
         );

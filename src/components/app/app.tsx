@@ -1,4 +1,5 @@
 import CircuitBuilder from '../circuit-builder/circuit-builder';
+import Constants from '../../constants';
 import React, { Component } from 'react';
 import './app.scss';
 
@@ -13,8 +14,15 @@ class App extends Component<{}, AppState>{
     this.state = { theme: "dark" };
   }
 
+  componentDidMount() {
+    if (localStorage.getItem(Constants.ThemeKey))
+      this.setState({ theme: localStorage.getItem(Constants.ThemeKey)! })
+  }
+
   switchTheme() {
-    this.setState({ theme: this.state.theme === 'dark' ? 'light' : 'dark' })
+    const newTheme = this.state.theme === 'dark' ? 'light' : 'dark';
+    this.setState({ theme: newTheme })
+    localStorage.setItem(Constants.ThemeKey, newTheme)
   }
 
   render() {

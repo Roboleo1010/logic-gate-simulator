@@ -42,6 +42,7 @@ export interface ChipBlueprint {
     graph: Graph<Gate>;
     category: ChipCategory;
     description?: string;
+    type: BlueprintType;
 }
 
 
@@ -60,4 +61,9 @@ export enum ChipCategory {
     Io = "Io",
     Arithmetic = "Arithmetic",
     Other = "Other"
+}
+
+export enum BlueprintType {
+    Builtin = "Builtin",
+    Custom = "Custom"
 }
