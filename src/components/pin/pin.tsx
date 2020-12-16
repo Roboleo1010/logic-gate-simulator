@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { CircuitBuilderContext, Gate, SignalDirection, Tool } from '../../model/circuit-builder.types';
+import { CircuitBuilderContext, Gate, PinSide, Tool } from '../../model/circuit-builder.types';
 import { TriState } from '../../simulation/simulator.types';
 import './pin.scss';
 
@@ -25,12 +25,26 @@ class Pin extends Component<PinProps>{
     render() {
         let className = "pin ";
 
-        if (this.props.gate.signalDirection === SignalDirection.In)
-            className += 'pin-side-left ';
-        else
-            className += 'pin-side-right ';
+        switch (this.props.gate.pinSide) {
+            case PinSide.Top:
+                className += 'pin-side-top ';
+                break;
+            case PinSide.Left:
+                className += 'pin-side-left ';
+                break;
+            case PinSide.Right:
+                className += 'pin-side-right ';
+                break;
+            case PinSide.Bottom:
+                className += 'pin-side-bottom ';
+                break;
+        }
+        let style = {};
 
-        const style = { top: `calc(${(100 / (this.props.pinsForSideCount + 1)) * (this.props.pinForSideIndex + 1)}% - 8px)` }
+        if (this.props.gate.pinSide === PinSide.Left || this.props.gate.pinSide === PinSide.Right)
+            style = { top: `calc(${(100 / (this.props.pinsForSideCount + 1)) * (this.props.pinForSideIndex + 1)}% - 8px)` }
+        else
+            style = { left: `calc(${(100 / (this.props.pinsForSideCount + 1)) * (this.props.pinForSideIndex + 1)}% - 8px)` }
 
         if (this.props.gate.error === true)
             className += "pin-error ";

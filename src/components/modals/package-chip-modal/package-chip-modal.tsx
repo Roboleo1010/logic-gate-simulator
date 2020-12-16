@@ -46,6 +46,9 @@ class PackageChipModal extends Component<PackageChipModalProps, PackageChipModal
                         <SliderPicker color={this.state.color} onChange={(color) => this.setState({ color: color.hex })} />
                     </div>
                     <input type="text" placeholder="Description" name="descripton" id='description' />
+                    <div className="pin-sorting-wrapper" id="pin-sorting">
+
+                    </div>
 
                     <button onClick={this.onSubmit.bind(this)} id='submit'>Add Blueprint</button>
                 </div>

@@ -32,6 +32,14 @@ $pinWidthHalfed: $pinWidth / 2;
     right: -$pinWidthHalfed;
 }
 
+.pin-side-top {
+    top: -$pinWidthHalfed;
+}
+
+.pin-side-bottom {
+    bottom: -$pinWidthHalfed;
+}
+
 .pin-true {
     background-color: $color-true;
 }

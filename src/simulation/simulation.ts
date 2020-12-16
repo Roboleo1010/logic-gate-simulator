@@ -5,7 +5,7 @@ class Simulation {
 
     private result: SimulationResult;
 
-    evalsPerTick: number = 50;
+    evalsPerTick: number = 100;
 
     constructor(gates: Gate[]) {
         this.gates = gates;

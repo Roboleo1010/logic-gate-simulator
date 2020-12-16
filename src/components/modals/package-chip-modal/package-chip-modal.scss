@@ -9,6 +9,7 @@
         "name category"
         "color color"
         "description description"
+        "pin-sorting pin-sorting"
         ". submit";
 
     #name {
@@ -27,11 +28,20 @@
         grid-area: description;
     }
 
+    #pin-sorting {
+        grid-area: pin-sorting;
+    }
+
     #submit {
         grid-area: submit;
     }
 
     input {
         padding: 12px 20px;
+    }
+
+    .pin-sorting-wrapper {
+        background-color: chartreuse;
+        height: 100px;
     }
 }

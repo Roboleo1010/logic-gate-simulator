@@ -18,6 +18,26 @@ export enum GateRole {
     Clock = "Clock"
 }
 
+export enum ChipCategory {
+    Logic = "Logic",
+    Io = "Io",
+    Arithmetic = "Arithmetic",
+    Memory = "Memory",
+    Other = "Other"
+}
+
+export enum BlueprintType {
+    Builtin = "Builtin",
+    Custom = "Custom"
+}
+
+export enum PinSide {
+    Top = "Top",
+    Left = "Left",
+    Bottom = "Bottom",
+    Right = "Right"
+}
+
 export interface WireModel {
     fromId: string;
     toId: string;
@@ -30,6 +50,7 @@ export interface Gate {
     state: TriState;
     type: GateType;
     signalDirection?: SignalDirection;
+    pinSide?: PinSide;
     role?: GateRole;
     isFirstLayer: boolean;
     error?: boolean;
@@ -54,16 +75,4 @@ export interface CircuitBuilderContext {
 export interface BlueprintSaveData {
     version: number;
     blueprints: ChipBlueprint[];
-}
-
-export enum ChipCategory {
-    Logic = "Logic",
-    Io = "Io",
-    Arithmetic = "Arithmetic",
-    Other = "Other"
-}
-
-export enum BlueprintType {
-    Builtin = "Builtin",
-    Custom = "Custom"
 }

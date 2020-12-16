@@ -1,5 +1,5 @@
 import Graph from '../utilities/graph/graph';
-import { BlueprintType, ChipBlueprint, ChipCategory, Gate, GateRole, SignalDirection } from '../model/circuit-builder.types';
+import { BlueprintType, ChipBlueprint, ChipCategory, Gate, GateRole, PinSide, SignalDirection } from '../model/circuit-builder.types';
 import { GateType, TriState } from '../simulation/simulator.types';
 
 class ChipManager {
@@ -26,9 +26,9 @@ class ChipManager {
         //NOT-Chip 
         let graphNOT = new Graph<Gate>();
         graphNOT.addNodes([
-            { id: "in", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, name: 'In', isFirstLayer: true },
+            { id: "in", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, name: 'In', isFirstLayer: true, pinSide: PinSide.Left },
             { id: "not", type: GateType.NOT, state: TriState.False, isFirstLayer: false },
-            { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out, name: 'Out', isFirstLayer: true }]);
+            { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out, name: 'Out', isFirstLayer: true, pinSide: PinSide.Right }]);
 
         graphNOT.addEdges([{ from: "in", to: "not" }, { from: "not", to: "out" }])
 
@@ -37,10 +37,10 @@ class ChipManager {
         //AND-Chip
         let graphAND = new Graph<Gate>();
         graphAND.addNodes([
-            { id: "in1", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, name: 'In 1', isFirstLayer: true },
-            { id: "in2", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, name: 'In 2', isFirstLayer: true },
+            { id: "in1", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, name: 'In 1', isFirstLayer: true, pinSide: PinSide.Left },
+            { id: "in2", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, name: 'In 2', isFirstLayer: true, pinSide: PinSide.Left },
             { id: "and", type: GateType.AND, state: TriState.False, isFirstLayer: false },
-            { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out, name: 'Out', isFirstLayer: true }])
+            { id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.Out, name: 'Out', isFirstLayer: true, pinSide: PinSide.Right }])
 
         graphAND.addEdges([{ from: "in1", to: "and" }, { from: "in2", to: "and" }, { from: "and", to: "out" }]);
 
@@ -48,35 +48,58 @@ class ChipManager {
 
         //INPUT-Chip
         let graphInput = new Graph<Gate>();
-        graphInput.addNodes([{ id: "switch", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, role: GateRole.Switch, name: 'In', isFirstLayer: true }]);
+        graphInput.addNodes([{ id: "switch", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, role: GateRole.Switch, name: 'In', isFirstLayer: true, pinSide: PinSide.Right }]);
 
         this.blueprints.push({ name: "Input", color: "#fd7e14", category: ChipCategory.Io, graph: graphInput, type: BlueprintType.Builtin, description: "Click this switch to toggle it's state. Gets converted to Chip Input after Packaging" });
 
-        //OUTPUT-Chip
-        let graphOutput = new Graph<Gate>();
-        graphOutput.addNodes([{ id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true }]);
-
-        this.blueprints.push({ name: "Output", color: "#fd7e14", category: ChipCategory.Io, graph: graphOutput, type: BlueprintType.Builtin, description: "Gets converted to Chip Output after Packaging" });
-
         //CLOCK-Chip
         let graphClock = new Graph<Gate>();
-        graphClock.addNodes([{ id: "clock", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, role: GateRole.Clock, name: 'Clock', isFirstLayer: true }]);
+        graphClock.addNodes([{ id: "clock", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, role: GateRole.Clock, name: 'Clock', isFirstLayer: true, pinSide: PinSide.Right }]);
 
         this.blueprints.push({ name: "Clock", color: "#20c997", category: ChipCategory.Io, graph: graphClock, type: BlueprintType.Builtin, description: "Gets converted to Chip Input after Packaging." });
 
         //CONSTANT-ON
         let graphConstantOn = new Graph<Gate>();
         graphConstantOn.addNodes([
-            { id: "out", type: GateType.Controlled, state: TriState.True, signalDirection: SignalDirection.Out, name: 'Out', isFirstLayer: true }]);
+            { id: "out", type: GateType.Controlled, state: TriState.True, signalDirection: SignalDirection.Out, name: 'Out', isFirstLayer: true, pinSide: PinSide.Right }]);
 
         this.blueprints.push({ name: "Constant On", color: "#28a745", category: ChipCategory.Io, type: BlueprintType.Builtin, graph: graphConstantOn });
 
         //CONSTANT-OFF
         let graphConstantOff = new Graph<Gate>();
         graphConstantOff.addNodes([
-            { id: "out", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, name: 'Out', isFirstLayer: true }]);
+            { id: "out", type: GateType.Controlled, state: TriState.False, signalDirection: SignalDirection.Out, name: 'Out', isFirstLayer: true, pinSide: PinSide.Right }]);
 
         this.blueprints.push({ name: "Constant Off", color: "#dc3545", category: ChipCategory.Io, type: BlueprintType.Builtin, graph: graphConstantOff });
+
+        //OUTPUT-Chip
+        let graphOutput = new Graph<Gate>();
+        graphOutput.addNodes([{ id: "out", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Left }]);
+
+        this.blueprints.push({ name: "Output", color: "#fd7e14", category: ChipCategory.Io, graph: graphOutput, type: BlueprintType.Builtin, description: "Gets converted to Chip Output after Packaging" });
+
+        //Test Chip
+        let graphTest = new Graph<Gate>();
+        graphTest.addNodes([{ id: "out1", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Left }]);
+        graphTest.addNodes([{ id: "ou2", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
+        graphTest.addNodes([{ id: "out3", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Bottom }]);
+        graphTest.addNodes([{ id: "out4", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Right }]);
+        graphTest.addNodes([{ id: "ou22", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
+        graphTest.addNodes([{ id: "ou242", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
+        graphTest.addNodes([{ id: "ou232", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
+        graphTest.addNodes([{ id: "ou332", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
+        graphTest.addNodes([{ id: "ou1t1", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Left }]);
+        graphTest.addNodes([{ id: "o2ut1", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Left }]);
+        graphTest.addNodes([{ id: "ou3t1", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Left }]);
+        graphTest.addNodes([{ id: "o45ut1", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Left }]);
+        graphTest.addNodes([{ id: "ou15t1", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Left }]);
+        graphTest.addNodes([{ id: "ou124323423332", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
+        graphTest.addNodes([{ id: "ou3234132", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
+        graphTest.addNodes([{ id: "ou32344332", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
+        graphTest.addNodes([{ id: "ou332432", type: GateType.Relay, state: TriState.False, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', isFirstLayer: true, pinSide: PinSide.Top }]);
+
+        this.blueprints.push({ name: "Test", color: "#fd7e14", category: ChipCategory.Io, graph: graphTest, type: BlueprintType.Builtin, });
+
     }
 
     public static getBlueprints(): ChipBlueprint[] {
