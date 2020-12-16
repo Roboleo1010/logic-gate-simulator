@@ -1,8 +1,8 @@
-import ChipBlueprint from '../../model/chip-blueprint';
 import ChipToolbox from '../chip/chip-toolbox';
 import React, { Component } from 'react';
 import Tab from '../tabs/tab/tab';
 import TabNav from '../tabs/tabnav/tabnav';
+import { ChipBlueprint, ChipCategory } from '../../model/circuit-builder.types';
 import { TabData } from '../tabs/tab.types';
 import './toolbox.scss';
 
@@ -19,7 +19,7 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
     constructor(props: ToolboxProps) {
         super(props);
 
-        this.state = { selectedTab: 'chips-logic' };
+        this.state = { selectedTab: 'Logic' };
     }
 
     setSelected(tab: TabData) {
@@ -27,32 +27,26 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
     }
 
     render() {
-        const tabs: TabData[] = [{ id: 'chips-logic', name: 'Chips (Logic)' }, { id: 'chips-io', name: 'Chips (In/ Out)' }, { id: 'chips-custom', name: 'Chips (Custom)' }];
+        let tabs: TabData[] = [];
+
+        Object.keys(ChipCategory).forEach(category =>
+            tabs.push({ id: category, name: `Chips (${category})` })
+        );
 
         return (
             <div className="toolbox">
                 <TabNav tabs={tabs} selectedId={this.state.selectedTab} setSelected={this.setSelected.bind(this)}>
-                    <Tab isSelected={this.state.selectedTab === tabs[0].id}>
-                        <div className="tab-chips">
-                            {this.props.blueprints.filter(blueprint => blueprint.category === 'logic').map(chip => {
-                                return <ChipToolbox blueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
-                            })}
-                        </div>
-                    </Tab>
-                    <Tab isSelected={this.state.selectedTab === tabs[1].id}>
-                        <div className="tab-chips">
-                            {this.props.blueprints.filter(blueprint => blueprint.category === 'io').map(chip => {
-                                return <ChipToolbox blueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
-                            })}
-                        </div>
-                    </Tab>
-                    <Tab isSelected={this.state.selectedTab === tabs[2].id}>
-                        <div className="tab-chips">
-                            {this.props.blueprints.filter(blueprint => blueprint.category === 'custom').map(chip => {
-                                return <ChipToolbox blueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
-                            })}
-                        </div>
-                    </Tab>
+                    {tabs.map(tab => {
+                        return (
+                            <Tab isSelected={this.state.selectedTab === tab.id} key={tab.id}>
+                                <div className="tab-chips">
+                                    {
+                                        this.props.blueprints.filter(blueprint => blueprint.category === tab.id).map(chip => {
+                                            return <ChipToolbox blueprint={chip} key={chip.name} onChipClicked={this.props.onChipClicked}></ChipToolbox>;
+                                        })}
+                                </div>
+                            </Tab>)
+                    })}
                 </TabNav>
             </div>
         );

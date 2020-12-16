@@ -1,0 +1,38 @@
+.package-chip-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    gap: 20px 10px;
+    justify-items: stretch;
+
+    grid-template-areas:
+        "name category"
+        "color color"
+        "description description"
+        ". submit";
+
+    #name {
+        grid-area: name;
+    }
+
+    #category {
+        grid-area: category;
+    }
+
+    #color {
+        grid-area: color;
+    }
+
+    #description {
+        grid-area: description;
+    }
+
+    #submit {
+        grid-area: submit;
+    }
+
+    input {
+        padding: 12px 20px;
+        border: 0;
+    }
+}

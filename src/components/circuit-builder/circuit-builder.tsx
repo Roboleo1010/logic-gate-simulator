@@ -1,11 +1,11 @@
 import Board from '../board/board';
-import ChipBlueprint from '../../model/chip-blueprint';
 import ChipInstance from '../../model/chip-instance';
 import ChipManager from '../../manager/chip-manager';
 import Constants from '../../constants';
 import Graph from '../../utilities/graph/graph';
 import Icons from '../../assets/icons/icons';
 import NotificationManager, { NotificationType } from '../../manager/notification-manager';
+import PackageChipModal from '../modals/package-chip-modal/package-chip-modal';
 import React, { Component } from 'react';
 import ReactNotification from 'react-notifications-component';
 import Simulation from '../../simulation/simulation';
@@ -15,7 +15,7 @@ import ToolbarButtonMulti from '../toolbar/toolbar-button-multi/toolbar-button-m
 import ToolbarButtonToggle from '../toolbar/toolbar-button-toggle/toolbar-button-toggle';
 import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
 import Toolbox from '../toolbox/toolbox';
-import { BlueprintSaveData, CircuitBuilderContext, Gate, GateRole, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
+import { BlueprintSaveData, ChipBlueprint, ChipCategory, CircuitBuilderContext, Gate, GateRole, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
 import { Gate as SimulationGate, GateType, SimulationState, TriState } from '../../simulation/simulator.types';
 import './circuit-builder.scss';
 import 'react-notifications-component/dist/theme.css';
@@ -31,12 +31,19 @@ interface CircuitBuilderState {
     lastClickedPin?: Gate;
     simulationHandle?: any;
     context: CircuitBuilderContext;
+    showPackageChipModal: boolean;
 }
 
 class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     constructor(props: any) {
         super(props);
-        this.state = { chips: [], wires: [], chipBlueprints: ChipManager.getBlueprints(), context: { activeTool: Tool.Move, isSimulationRunning: false } };
+        this.state = {
+            chips: [],
+            wires: [],
+            chipBlueprints: ChipManager.getBlueprints(),
+            context: { activeTool: Tool.Move, isSimulationRunning: false },
+            showPackageChipModal: false
+        };
     }
 
     //#region Chip & Wire Events
@@ -112,21 +119,28 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
         this.setState({ context: context, lastClickedPin: undefined });
     }
 
-    packageChip() {
-        //Check for validity
-        if (this.checkValidity().length > 0) {
-            NotificationManager.addNotification("Pin Error", "Please connect all unconnected inputs.", NotificationType.Error);
-            return;
-        }
-        if (this.getGatesByRole(GateRole.Switch, true).length === 0 && this.getGatesByRole(GateRole.Clock, true).length === 0) {
-            NotificationManager.addNotification("Package Error", "A Chip should include at least one Input (Switch or Clock)", NotificationType.Error);
-            return;
-        }
-        if (this.getGatesByRole(GateRole.Output, true).length === 0) {
-            NotificationManager.addNotification("Package Error", "A Chip should include at least one Output", NotificationType.Error);
-            return;
-        }
+    //#endregion
 
+    //#region Chip Packaging
+    onPackageChip() {
+        //Check for validity
+        // if (this.checkValidity().length > 0) {
+        //     NotificationManager.addNotification("Pin Error", "Please connect all unconnected inputs.", NotificationType.Error);
+        //     return;
+        // }
+        // if (this.getGatesByRole(GateRole.Switch, true).length === 0 && this.getGatesByRole(GateRole.Clock, true).length === 0) {
+        //     NotificationManager.addNotification("Package Error", "A Chip should include at least one Input (Switch or Clock)", NotificationType.Error);
+        //     return;
+        // }
+        // if (this.getGatesByRole(GateRole.Output, true).length === 0) {
+        //     NotificationManager.addNotification("Package Error", "A Chip should include at least one Output", NotificationType.Error);
+        //     return;
+        // }//TODO: Uncomment
+
+        this.setState({ showPackageChipModal: true });
+    }
+
+    packageChip(name: string, color: string, category: ChipCategory, description?: string) {
         //Build Graph
         let allGates: Gate[] = [];
         let allWires: WireModel[] = [...this.state.wires];
@@ -171,29 +185,26 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
             graph.addEdge({ from: wire.fromId, to: wire.toId });
         })
 
+
         //Build Blueprint
-        let name = window.prompt("Please enter a name for your chip:", `Custom-${ChipManager.getChipId("Custom")}`);
-
-        if (!name) {
-            NotificationManager.addNotification("Chip packaging aborted", `No name enterd or arborted.`, NotificationType.Warning);
-            return;
-        }
-
-        const blueprint = new ChipBlueprint(name, ChipManager.getNewColor(), "custom", graph)
+        const blueprint: ChipBlueprint = { name: name, color: color, category: category, graph: graph, description: description };
 
         //Add to Manager
         let newBlueprints = this.state.chipBlueprints;
         newBlueprints.push(blueprint);
         this.setState({ chipBlueprints: newBlueprints });
 
-        NotificationManager.addNotification("Chip Packaged", `Chip ${name} added to category Chips (Custom).`, NotificationType.Success);
+        NotificationManager.addNotification("Chip Packaged", `Added ${name} to ${category}`, NotificationType.Success);
+
+        this.setState({ showPackageChipModal: false });
     }
+
     //#endregion
 
     //#region Loading/ Saving
 
     saveBlueprints() {
-        let saveData: BlueprintSaveData = { version: Constants.SaveVersion, blueprints: this.state.chipBlueprints.filter(bp => bp.category === 'custom') };
+        let saveData: BlueprintSaveData = { version: Constants.SaveVersion, blueprints: this.state.chipBlueprints };
         window.prompt("Please copy your savedata here:", JSON.stringify(saveData))
 
         NotificationManager.addNotification("Saving successfull", "Paste the data you copied into the loading dialouge to load your chips.", NotificationType.Success);
@@ -214,7 +225,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
             return;
         }
 
-        let newBlueprints = this.state.chipBlueprints;
+        let newBlueprints = [];
         newBlueprints.push(...saveData.blueprints);
         this.setState({ chipBlueprints: newBlueprints });
 
@@ -411,7 +422,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                             <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.state.context.isSimulationRunning} onClick={this.state.context.isSimulationRunning ? this.stopSimulation.bind(this) : this.startSimulation.bind(this)}></ToolbarButtonToggle>
                         </ToolbarGroup>
                         <ToolbarGroup>
-                            <ToolbarButton icon={Icons.iconChip} text="Package Chip" onClick={this.packageChip.bind(this)}></ToolbarButton>
+                            <ToolbarButton icon={Icons.iconChip} text="Package Chip" onClick={this.onPackageChip.bind(this)}></ToolbarButton>
                         </ToolbarGroup>
                         <ToolbarGroup>
                             <ToolbarButton icon={Icons.iconSave} text="Save custom chips" onClick={this.saveBlueprints.bind(this)}></ToolbarButton>
@@ -422,6 +433,8 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                         </ToolbarGroup>
                     </Toolbar>
                 </div>
+                {this.state.showPackageChipModal &&
+                    <PackageChipModal onSubmitCallback={this.packageChip.bind(this)} onCloseCallback={() => this.setState({ showPackageChipModal: false })} defaultName={`Custom ${ChipManager.getChipId("Custom")}`} />}
             </div >
         );
     }

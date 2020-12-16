@@ -1,7 +1,6 @@
-import ChipBlueprint from './chip-blueprint';
 import ChipManager from '../manager/chip-manager';
 import Graph from '../utilities/graph/graph';
-import { Gate } from './circuit-builder.types';
+import { ChipBlueprint, Gate } from './circuit-builder.types';
 
 class ChipInstance {
     public blueprint: ChipBlueprint;

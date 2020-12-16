@@ -1,4 +1,4 @@
-import ChipBlueprint from './chip-blueprint';
+import Graph from '../utilities/graph/graph';
 import { GateType, TriState } from '../simulation/simulator.types';
 
 export enum Tool {
@@ -36,6 +36,15 @@ export interface Gate {
     hidden?: boolean;
 }
 
+export interface ChipBlueprint {
+    name: string;
+    color: string;
+    graph: Graph<Gate>;
+    category: ChipCategory;
+    description?: string;
+}
+
+
 export interface CircuitBuilderContext {
     isSimulationRunning: boolean;
     activeTool: Tool;
@@ -44,4 +53,11 @@ export interface CircuitBuilderContext {
 export interface BlueprintSaveData {
     version: number;
     blueprints: ChipBlueprint[];
+}
+
+export enum ChipCategory {
+    Logic = "Logic",
+    Io = "Io",
+    Arithmetic = "Arithmetic",
+    Other = "Other"
 }
