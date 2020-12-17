@@ -16,7 +16,7 @@ import ToolbarButtonMulti from '../toolbar/toolbar-button-multi/toolbar-button-m
 import ToolbarButtonToggle from '../toolbar/toolbar-button-toggle/toolbar-button-toggle';
 import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
 import Toolbox from '../toolbox/toolbox';
-import { BlueprintSaveData, BlueprintType, ChipBlueprint, ChipCategory, CircuitBuilderContext, Gate, GateRole, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
+import { BlueprintSaveData, BlueprintType, ChipBlueprint, ChipCategory, CircuitBuilderContext, Gate, GateRole, PinSide, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
 import { Gate as SimulationGate, GateType, SimulationState, TriState } from '../../simulation/simulator.types';
 import './circuit-builder.scss';
 import 'react-notifications-component/dist/theme.css';
@@ -170,15 +170,18 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
             if (gate.role === GateRole.Switch && gate.type === GateType.Controlled) {
                 gate.type = GateType.Relay;
                 gate.signalDirection = SignalDirection.In;
+                gate.pinSide = PinSide.Left;
             }
             //Show clocks
             else if (gate.role === GateRole.Clock && gate.type === GateType.Controlled) {
                 gate.type = GateType.Relay;
                 gate.signalDirection = SignalDirection.In;
+                gate.pinSide = PinSide.Left;
             }
             //Show output outputs
             else if (gate.role === GateRole.Output) {
                 gate.signalDirection = SignalDirection.Out;
+                gate.pinSide = PinSide.Right;
             }
             //hide all unused outputs
             else if (allWires.filter(wire => wire.fromId === gate.id).length === 0)
@@ -434,13 +437,18 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                         <ToolbarGroup>
                             <ToolbarButton icon={Icons.iconSave} text="Save/ Load Blueprint" onClick={() => this.setState({ showSaveLoadModal: true })}></ToolbarButton>
                             <ToolbarButton icon={Icons.iconTheme} text="Change Theme" onClick={this.props.onSwitchTheme}></ToolbarButton>
+                            <ToolbarButton icon={Icons.logo} text="Install on device" onClick={() => console.log("Install PWA")}></ToolbarButton>
                         </ToolbarGroup>
                     </Toolbar>
-                </div>
-                {this.state.showPackageChipModal &&
-                    <PackageChipModal onSubmitCallback={this.packageChip.bind(this)} onCloseCallback={() => this.setState({ showPackageChipModal: false })} defaultName={`Custom ${ChipManager.getChipId("Custom")}`} />}
-                {this.state.showSaveLoadModal &&
-                    <LoadSaveModal onLoadCallback={this.loadBlueprints.bind(this)} onCloseCallback={() => this.setState({ showSaveLoadModal: false })} saveData={this.getBlueprintSaveJSON()} />}
+                </div >
+                {
+                    this.state.showPackageChipModal &&
+                    <PackageChipModal onSubmitCallback={this.packageChip.bind(this)} onCloseCallback={() => this.setState({ showPackageChipModal: false })} defaultName={`Custom ${ChipManager.getChipId("Custom")}`} />
+                }
+                {
+                    this.state.showSaveLoadModal &&
+                    <LoadSaveModal onLoadCallback={this.loadBlueprints.bind(this)} onCloseCallback={() => this.setState({ showSaveLoadModal: false })} saveData={this.getBlueprintSaveJSON()} />
+                }
             </div >
         );
     }

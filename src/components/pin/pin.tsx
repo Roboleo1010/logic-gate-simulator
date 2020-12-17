@@ -1,3 +1,4 @@
+import Icons from '../../assets/icons/icons';
 import React, { Component } from 'react';
 import { CircuitBuilderContext, Gate, Tool } from '../../model/circuit-builder.types';
 import { TriState } from '../../simulation/simulator.types';
@@ -48,7 +49,7 @@ class Pin extends Component<PinProps>{
             className += "pin-tool-rename ";
         }
 
-        return (<div data-gateid={this.props.gate.id} className={className} title={this.props.gate.name} onClick={clickEvent}></div>);
+        return (<div data-gateid={this.props.gate.id} className={className} title={this.props.gate.name} onClick={clickEvent} style={{ backgroundImage: `url('${Icons.backgroundImage}${Icons.iconTriangle}')` }}></div>);
     }
 }
 
