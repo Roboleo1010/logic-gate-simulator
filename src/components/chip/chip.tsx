@@ -1,6 +1,5 @@
 import ChipInstance from '../../model/chip-instance';
 import Draggable from 'react-draggable';
-import Pin from '../pin/pin';
 import React, { Component } from 'react';
 import { CircuitBuilderContext, Gate, GateRole, PinSide, Tool } from '../../model/circuit-builder.types';
 import { TriState } from '../../simulation/simulator.types';
@@ -27,8 +26,55 @@ class Chip extends Component<ChipProps, ChipState> {
         }
     }
 
+    renamePin(gate: Gate) {
+        let name = window.prompt("Pin name:", gate.name);
+
+        if (!name || name === '')
+            return;
+
+        gate.name = name;
+        this.forceUpdate();
+    }
+
     getGatesForPinSide(side: PinSide) {
         return this.props.chip.graph.nodes.filter(gate => gate.pinSide === side && !(gate.hidden === true) && (this.props.chip.graph.edges.filter(wire => gate.id === wire.to).length === 0 || this.props.chip.graph.edges.filter(wire => gate.id === wire.from).length === 0)); // later part for only getting exposed pins
+    }
+
+    getPinElementsForSide(side: PinSide): JSX.Element {
+        return (
+            <div className={`pin-side pins-${side.toLowerCase()}`}>
+                {this.getGatesForPinSide(side).map((gate) => {
+                    let className = "pin ";
+
+                    if (gate.error === true)
+                        className += "pin-error ";
+
+                    if (this.props.context.isSimulationRunning) {
+                        switch (gate.state) {
+                            case TriState.True:
+                                className += 'pin-true ';
+                                break;
+                            case TriState.False:
+                                className += 'pin-false ';
+                                break;
+                        }
+                    }
+
+                    let clickEvent = () => { };
+
+                    if (this.props.context.activeTool === Tool.Move) {
+                        clickEvent = () => this.props.onPinClicked(gate);
+                        className += "pin-tool-move ";
+                    }
+                    else if (this.props.context.activeTool === Tool.Rename) {
+                        clickEvent = () => this.renamePin(gate);
+                        className += "pin-tool-rename ";
+                    }
+
+                    return (<div data-gateid={gate.id} key={gate.id} className={className} title={gate.name} onClick={clickEvent}></div>);
+                })}
+            </div>
+        );
     }
 
     render() {
@@ -68,26 +114,10 @@ class Chip extends Component<ChipProps, ChipState> {
             <Draggable grid={[5, 5]} position={startPos} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.props.context.activeTool !== Tool.Move || this.props.context.isSimulationRunning}>
                 <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
                     <span>{this.props.chip.blueprint.name}</span>
-                    <div className="pin-side pins-left">
-                        {gatesLeft.map((gate) => {
-                            return <Pin key={gate.id} context={this.props.context} gate={gate} startWire={this.props.onPinClicked}></Pin>;
-                        })}
-                    </div>
-                    <div className="pin-side pins-right">
-                        {gatesRight.map((gate) => {
-                            return <Pin key={gate.id} context={this.props.context} gate={gate} startWire={this.props.onPinClicked}></Pin>;
-                        })}
-                    </div>
-                    <div className="pin-side pins-top">
-                        {gatesTop.map((gate) => {
-                            return <Pin key={gate.id} context={this.props.context} gate={gate} startWire={this.props.onPinClicked}></Pin>;
-                        })}
-                    </div>
-                    <div className="pin-side pins-bottom">
-                        {gatesBottom.map((gate) => {
-                            return <Pin key={gate.id} context={this.props.context} gate={gate} startWire={this.props.onPinClicked}></Pin>;
-                        })}
-                    </div>
+                    {this.getPinElementsForSide(PinSide.Top)}
+                    {this.getPinElementsForSide(PinSide.Left)}
+                    {this.getPinElementsForSide(PinSide.Bottom)}
+                    {this.getPinElementsForSide(PinSide.Right)}
                 </div>
             </Draggable >
         );
