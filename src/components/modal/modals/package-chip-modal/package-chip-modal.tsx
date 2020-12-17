@@ -76,7 +76,7 @@ class PackageChipModal extends Component<PackageChipModalProps, PackageChipModal
         return (
             <Modal title="Package Chip" onClose={this.props.onCloseCallback}>
                 <div className="package-chip-wrapper">
-                    <input type="text" placeholder="Name" name="name" id='name' onChange={(e) => this.setState({ name: e.currentTarget.value !== '' ? e.currentTarget.value : this.props.defaultName })} />
+                    <input type="text" placeholder="Name" name="name" id='name' onChange={(e) => this.setState({ name: e.currentTarget.value !== '' ? e.currentTarget.value : this.props.defaultName })} autoFocus />
                     <select id='category' defaultValue={ChipCategory.Other}>
                         {Object.keys(ChipCategory).map(category => {
                             return <option key={category} value={category}>{`Chips (${category})`}</option>

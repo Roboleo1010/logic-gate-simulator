@@ -1,0 +1,49 @@
+.welcome-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    gap: 20px 10px;
+    justify-items: stretch;
+
+    grid-template-areas:
+        "welcome welcome"
+        "chips chips"
+        "chip chip"
+        "toolbar toolbar"
+        "thanks thanks"
+        ". close";
+
+    a {
+        color: var(--text) !important;
+    }
+
+    h4 {
+        margin: 0 0px 0 5px;
+    }
+
+    #welcome {
+        grid-area: welcome;
+    }
+
+    #chips {
+        grid-area: chips;
+    }
+
+    #chip {
+        grid-area: chip;
+        justify-self: center;
+    }
+
+    #toolbar {
+        grid-area: toolbar;
+    }
+
+    #thanks {
+        grid-area: thanks;
+        justify-self: center;
+    }
+
+    #close {
+        grid-area: close;
+    }
+}

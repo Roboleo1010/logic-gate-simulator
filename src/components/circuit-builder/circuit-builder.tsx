@@ -16,6 +16,7 @@ import ToolbarButtonMulti from '../toolbar/toolbar-button-multi/toolbar-button-m
 import ToolbarButtonToggle from '../toolbar/toolbar-button-toggle/toolbar-button-toggle';
 import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
 import Toolbox from '../toolbox/toolbox';
+import WelcomeMoal from '../modal/modals/welcome-modal/welcome-modal';
 import { BlueprintSaveData, BlueprintType, ChipBlueprint, ChipCategory, CircuitBuilderContext, Gate, GateRole, PinSide, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
 import { Gate as SimulationGate, GateType, SimulationState, TriState } from '../../simulation/simulator.types';
 import './circuit-builder.scss';
@@ -34,10 +35,16 @@ interface CircuitBuilderState {
     context: CircuitBuilderContext;
     showPackageChipModal: boolean;
     showSaveLoadModal: boolean
+    showWelcomeModal: boolean;
 }
 
 class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     constructor(props: any) {
+        let showWelcomeModal = true;
+
+        if (localStorage.getItem(Constants.ShowWelcomeModalKey) && localStorage.getItem(Constants.ShowWelcomeModalKey)! === "false")
+            showWelcomeModal = false;
+
         super(props);
         this.state = {
             chips: [],
@@ -45,7 +52,8 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
             chipBlueprints: ChipManager.getBlueprints(),
             context: { activeTool: Tool.Move, isSimulationRunning: false },
             showPackageChipModal: false,
-            showSaveLoadModal: false
+            showSaveLoadModal: false,
+            showWelcomeModal: showWelcomeModal
         };
     }
 
@@ -419,6 +427,10 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
 
     //#endregion
 
+    installPWA() {
+
+    }
+
     render() {
         return (
             <div className="circuit-builder" >
@@ -440,8 +452,9 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                         </ToolbarGroup>
                         <ToolbarGroup>
                             <ToolbarButton icon={Icons.iconSave} text="Save/ Load Blueprint" onClick={() => this.setState({ showSaveLoadModal: true })}></ToolbarButton>
+                            <ToolbarButton icon={Icons.iconHelp} text="Show introduction" onClick={() => this.setState({ showWelcomeModal: true })}></ToolbarButton>
                             <ToolbarButton icon={Icons.iconTheme} text="Change Theme" onClick={this.props.onSwitchTheme}></ToolbarButton>
-                            <ToolbarButton icon={Icons.logo} text="Install on device" onClick={() => console.log("Install PWA")}></ToolbarButton>
+                            {/* <ToolbarButton icon={Icons.logo} text="Install on device" onClick={this.installPWA.bind(this)}></ToolbarButton> */}
                         </ToolbarGroup>
                     </Toolbar>
                 </div >
@@ -452,6 +465,10 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                 {
                     this.state.showSaveLoadModal &&
                     <LoadSaveModal onLoadCallback={this.loadBlueprints.bind(this)} onCloseCallback={() => this.setState({ showSaveLoadModal: false })} saveData={this.getBlueprintSaveJSON()} />
+                }
+                {
+                    this.state.showWelcomeModal &&
+                    <WelcomeMoal onCloseCallback={() => { this.setState({ showWelcomeModal: false }); localStorage.setItem(Constants.ShowWelcomeModalKey, "false") }} />
                 }
             </div >
         );

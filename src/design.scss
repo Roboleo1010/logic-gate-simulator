@@ -43,7 +43,7 @@ $themes: (
 
 .theme-dark,
 .theme-light {
-    color: var(--text);
+    color: var(--text) !important;
 }
 
 $height-toolbox: 110px;
