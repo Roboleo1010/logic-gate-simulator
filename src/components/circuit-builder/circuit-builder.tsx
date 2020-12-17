@@ -132,23 +132,23 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     //#region Chip Packaging
     onPackageChip() {
         //Check for validity
-        // if (this.checkValidity().length > 0) {
-        //     NotificationManager.addNotification("Pin Error", "Please connect all unconnected inputs.", NotificationType.Error);
-        //     return;
-        // }
-        // if (this.getGatesByRole(GateRole.Switch, true).length === 0 && this.getGatesByRole(GateRole.Clock, true).length === 0) {
-        //     NotificationManager.addNotification("Package Error", "A Chip should include at least one Input (Switch or Clock)", NotificationType.Error);
-        //     return;
-        // }
-        // if (this.getGatesByRole(GateRole.Output, true).length === 0) {
-        //     NotificationManager.addNotification("Package Error", "A Chip should include at least one Output", NotificationType.Error);
-        //     return;
-        // }
+        if (this.checkValidity().length > 0) {
+            NotificationManager.addNotification("Pin Error", "Please connect all unconnected inputs.", NotificationType.Error);
+            return;
+        }
+        if (this.getGatesByRole(GateRole.Switch, true).length === 0 && this.getGatesByRole(GateRole.Clock, true).length === 0) {
+            NotificationManager.addNotification("Package Error", "A Chip should include at least one Input (Switch or Clock)", NotificationType.Error);
+            return;
+        }
+        if (this.getGatesByRole(GateRole.Output, true).length === 0) {
+            NotificationManager.addNotification("Package Error", "A Chip should include at least one Output", NotificationType.Error);
+            return;
+        }
 
         this.setState({ showPackageChipModal: true });
     }
 
-    packageChip(name: string, color: string, category: ChipCategory, description?: string) {
+    getBlueprintGraph(): Graph<Gate> {
         //Build Graph
         let allGates: Gate[] = [];
         let allWires: WireModel[] = [...this.state.wires];
@@ -194,8 +194,12 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
 
         allWires.forEach(wire => {
             graph.addEdge({ from: wire.fromId, to: wire.toId });
-        })
+        });
 
+        return graph;
+    }
+
+    packageChip(name: string, color: string, category: ChipCategory, graph: Graph<Gate>, description?: string) {
 
         //Build Blueprint
         const blueprint: ChipBlueprint = { name: name, color: color, category: category, graph: graph, description: description, type: BlueprintType.Custom };
@@ -443,7 +447,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                 </div >
                 {
                     this.state.showPackageChipModal &&
-                    <PackageChipModal onSubmitCallback={this.packageChip.bind(this)} onCloseCallback={() => this.setState({ showPackageChipModal: false })} defaultName={`Custom ${ChipManager.getChipId("Custom")}`} />
+                    <PackageChipModal onSubmitCallback={this.packageChip.bind(this)} onCloseCallback={() => this.setState({ showPackageChipModal: false })} defaultName={`Custom ${ChipManager.getChipId("Custom")}`} graph={this.getBlueprintGraph()} />
                 }
                 {
                     this.state.showSaveLoadModal &&

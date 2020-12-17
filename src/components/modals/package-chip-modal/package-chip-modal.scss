@@ -1,3 +1,5 @@
+@import "../../pin/pin.scss";
+
 .package-chip-wrapper {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -9,6 +11,7 @@
         "name category"
         "color color"
         "description description"
+        "pin-sorting-info pin-sorting-info"
         "pin-sorting pin-sorting"
         ". submit";
 
@@ -28,6 +31,10 @@
         grid-area: description;
     }
 
+    #pin-sorting-info {
+        grid-area: pin-sorting-info;
+    }
+
     #pin-sorting {
         grid-area: pin-sorting;
     }
@@ -41,7 +48,22 @@
     }
 
     .pin-sorting-wrapper {
-        background-color: chartreuse;
         height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .chip-on-board {
+            .pin-side {
+                border: 1px dashed var(--text-reverse);
+                border-radius: 10px;
+                z-index: 500;
+
+                .pin {
+                    z-index: 505;
+                    cursor: move;
+                }
+            }
+        }
     }
 }

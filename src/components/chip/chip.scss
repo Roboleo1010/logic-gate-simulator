@@ -62,21 +62,25 @@ $chip-height-toolbox: 50px;
         flex-direction: column;
         left: -$pinWidthHalfed;
         height: 90%;
+        width: $pinWidth;
     }
     .pins-right {
         flex-direction: column;
         right: -$pinWidthHalfed;
         height: 90%;
+        width: $pinWidth;
     }
     .pins-top {
         flex-direction: row;
         top: -$pinWidthHalfed;
         width: 90%;
+        height: $pinWidth;
     }
     .pins-bottom {
         flex-direction: row;
         bottom: -$pinWidthHalfed;
         width: 90%;
+        height: $pinWidth;
     }
 }
 
