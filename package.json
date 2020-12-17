@@ -5,6 +5,7 @@
   "dependencies": {
     "@types/react-color": "^3.0.4",
     "draggable": "^4.2.0",
+    "express": "^4.17.1",
     "react": "^17.0.1",
     "react-color": "^2.19.3",
     "react-dom": "^17.0.1",
@@ -17,7 +18,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "git push heroku master"
   },
   "eslintConfig": {
     "extends": [
