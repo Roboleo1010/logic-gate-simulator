@@ -1,8 +1,8 @@
 import Draggable from 'react-draggable';
-import Graph from '../../../utilities/graph/graph';
-import Modal from '../../modal/modal';
+import Graph from '../../../../utilities/graph/graph';
+import Modal from '../../modal';
 import React, { Component } from 'react';
-import { ChipCategory, Gate, PinSide } from '../../../model/circuit-builder.types';
+import { ChipCategory, Gate, PinSide } from '../../../../model/circuit-builder.types';
 import { SliderPicker } from 'react-color';
 import './package-chip-modal.scss';
 

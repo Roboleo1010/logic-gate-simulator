@@ -1,6 +1,6 @@
-import Constants from '../../../constants';
-import Modal from '../../modal/modal';
-import NotificationManager, { NotificationType } from '../../../manager/notification-manager';
+import Constants from '../../../../constants';
+import Modal from '../../modal';
+import NotificationManager, { NotificationType } from '../../../../manager/notification-manager';
 import React, { Component } from 'react';
 import './load-save-modal.scss';
 
