@@ -1,5 +1,5 @@
 import Graph from '../utilities/graph/graph';
-import { GateType, TriState } from '../simulation/simulator.types';
+import { GateType } from '../simulation/simulator.types';
 
 export enum Tool {
     Move = "Move",
@@ -41,13 +41,13 @@ export enum PinSide {
 export interface WireModel {
     fromId: string;
     toId: string;
-    state: TriState;
+    state: boolean;
 }
 
 export interface Gate {
     id: string;
     name?: string;
-    state: TriState;
+    state: boolean;
     type: GateType;
     signalDirection?: SignalDirection;
     pinSide?: PinSide;

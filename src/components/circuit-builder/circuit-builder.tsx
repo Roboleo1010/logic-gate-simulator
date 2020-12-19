@@ -18,7 +18,7 @@ import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
 import Toolbox from '../toolbox/toolbox';
 import WelcomeMoal from '../modal/modals/welcome-modal/welcome-modal';
 import { BlueprintSaveData, BlueprintType, ChipBlueprint, ChipCategory, CircuitBuilderContext, Gate, GateRole, PinSide, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
-import { Gate as SimulationGate, GateType, SimulationState, TriState } from '../../simulation/simulator.types';
+import { Gate as SimulationGate, GateType, SimulationState } from '../../simulation/simulator.types';
 import './circuit-builder.scss';
 import 'react-notifications-component/dist/theme.css';
 
@@ -117,9 +117,9 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
         let newWires = this.state.wires;
 
         if (gate.signalDirection === SignalDirection.In)
-            newWires.push({ fromId: this.state.lastClickedPin.id, toId: gate.id, state: TriState.Floating });
+            newWires.push({ fromId: this.state.lastClickedPin.id, toId: gate.id, state: false });
         else
-            newWires.push({ fromId: gate.id, toId: this.state.lastClickedPin.id, state: TriState.Floating });
+            newWires.push({ fromId: gate.id, toId: this.state.lastClickedPin.id, state: false });
 
         this.setState({ wires: newWires, lastClickedPin: undefined })
     }
@@ -167,7 +167,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
             });
 
             chip.graph.edges.forEach(edge => {
-                allWires.push({ fromId: edge.from, toId: edge.to, state: TriState.Floating });
+                allWires.push({ fromId: edge.from, toId: edge.to, state: false });
             });
         });
 
@@ -281,7 +281,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     simulate() {
         this.state.chips.forEach(chip => {
             chip.graph.nodes.filter(gate => gate.role === GateRole.Clock && gate.isFirstLayer).forEach(clock => {
-                clock.state = clock.state === TriState.False ? TriState.True : TriState.False;
+                clock.state = clock.state ? false : true;
                 console.log(clock.id);
             });
         });
@@ -319,7 +319,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                 gates.push({ id: gate.id, state: gate.state, type: gate.type, inputs: [] });
             });
             chip.graph.edges.forEach(wire => {
-                wires.push({ fromId: wire.from, toId: wire.to, state: TriState.Floating });
+                wires.push({ fromId: wire.from, toId: wire.to, state: false });
             });
         });
 
@@ -338,7 +338,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
         this.state.chips.forEach(chip => {
             allGates.push(...chip.graph.nodes);
             chip.graph.edges.forEach(edge => {
-                allWires.push({ fromId: edge.from, toId: edge.to, state: TriState.Floating });
+                allWires.push({ fromId: edge.from, toId: edge.to, state: false });
             });
         });
 

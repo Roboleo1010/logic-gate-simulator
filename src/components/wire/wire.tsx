@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { CircuitBuilderContext, Tool, WireModel } from '../../model/circuit-builder.types';
-import { TriState } from '../../simulation/simulator.types';
 import './wire.scss';
 
 interface WireProps {
@@ -21,14 +20,10 @@ class Wire extends Component<WireProps> {
 
         let clickEvent = () => { };
         if (this.props.context.isSimulationRunning) {
-            switch (this.props.wire.state) {
-                case TriState.True:
-                    className += 'wire-true ';
-                    break;
-                case TriState.False:
-                    className += 'wire-false ';
-                    break;
-            }
+            if (this.props.wire.state)
+                className += 'wire-true ';
+            else
+                className += 'wire-false ';
         }
         else {
             if (this.props.context.activeTool === Tool.Delete) {

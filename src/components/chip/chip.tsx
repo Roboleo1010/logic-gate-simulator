@@ -2,7 +2,6 @@ import ChipInstance from '../../model/chip-instance';
 import Draggable from 'react-draggable';
 import React, { Component } from 'react';
 import { CircuitBuilderContext, Gate, GateRole, PinSide, Tool } from '../../model/circuit-builder.types';
-import { TriState } from '../../simulation/simulator.types';
 import './chip.scss';
 
 interface ChipProps {
@@ -50,14 +49,10 @@ class Chip extends Component<ChipProps, ChipState> {
                         className += "pin-error ";
 
                     if (this.props.context.isSimulationRunning) {
-                        switch (gate.state) {
-                            case TriState.True:
-                                className += 'pin-true ';
-                                break;
-                            case TriState.False:
-                                className += 'pin-false ';
-                                break;
-                        }
+                        if (gate.state === true)
+                            className += 'pin-true ';
+                        else
+                            className += 'pin-false ';
                     }
 
                     let clickEvent = () => { };
@@ -102,7 +97,7 @@ class Chip extends Component<ChipProps, ChipState> {
         if (this.props.context.isSimulationRunning) {
             if (this.state.switch !== undefined) {
                 className += "chip-role-switch";
-                clickEvent = () => { this.state.switch!.state = this.state.switch!.state === TriState.True ? TriState.False : TriState.True };
+                clickEvent = () => { this.state.switch!.state = this.state.switch!.state ? false : true };
             }
         }
         else {
