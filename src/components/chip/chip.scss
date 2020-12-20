@@ -65,8 +65,12 @@ $pinWidthHalfed: $pinWidth / 2;
     }
 }
 
+.chip-move-inactive,
+.chip-move-active {
+    cursor: move;
+}
+
 .chip-on-board {
-    position: fixed;
     display: inline-flex;
 
     .pin-side {
@@ -83,14 +87,12 @@ $pinWidthHalfed: $pinWidth / 2;
             background-color: var(--text);
 
             box-sizing: border-box;
+
+            cursor: pointer;
         }
 
         .pin-tool-rename {
             cursor: text;
-        }
-
-        .pin-tool-move {
-            cursor: pointer;
         }
 
         .pin-true {

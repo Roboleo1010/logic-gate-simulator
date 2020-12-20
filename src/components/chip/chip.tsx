@@ -1,6 +1,7 @@
 import ChipInstance from '../../model/chip-instance';
+import Draggable from '../draggable/draggable';
 import React, { Component } from 'react';
-import { ChipRole, CircuitBuilderContext, Gate, GateRole, PinSide, Tool, Vector2 } from '../../model/circuit-builder.types';
+import { ChipRole, CircuitBuilderContext, Gate, GateRole, PinSide, Tool } from '../../model/circuit-builder.types';
 import './chip.scss';
 
 interface ChipProps {
@@ -11,17 +12,7 @@ interface ChipProps {
     onPinClicked: (gate: Gate) => void;
 }
 
-interface ChipState {
-    position: Vector2;
-}
-
-class Chip extends Component<ChipProps, ChipState> {
-    constructor(props: ChipProps) {
-        super(props);
-
-        this.state = { position: { x: this.props.chip.startPosition.x - this.props.context.boardTranslation.x, y: this.props.chip.startPosition.y - this.props.context.boardTranslation.y } };
-    }
-
+class Chip extends Component<ChipProps> {
     renamePin(gate: Gate) {
         let name = window.prompt("Pin name:", gate.name);
 
@@ -77,7 +68,6 @@ class Chip extends Component<ChipProps, ChipState> {
             backgroundColor: this.props.chip.blueprint.color,
             minWidth: minXSize >= 100 ? minXSize : 100,
             minHeight: minYSize >= 50 ? minYSize : 50,
-            transform: `translate(${this.state.position.x}px, ${this.state.position.y}px)`
         };
 
         let className = 'chip chip-on-board ';
@@ -92,9 +82,7 @@ class Chip extends Component<ChipProps, ChipState> {
             }
         }
         else {
-            if (this.props.context.activeTool === Tool.Move)
-                className += 'chip-tool-move ';
-            else if (this.props.context.activeTool === Tool.Delete) {
+            if (this.props.context.activeTool === Tool.Delete) {
                 className += 'chip-tool-delete ';
                 clickEvent = () => { this.props.onChipDelete(this.props.chip) };
             }
@@ -142,17 +130,17 @@ class Chip extends Component<ChipProps, ChipState> {
         }
 
         return (
-            // <Draggable grid={[5, 5]} position={startPos} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.props.context.activeTool !== Tool.Move || this.props.context.isSimulationRunning} >
-            <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
-                <span className="title">{this.props.chip.blueprint.name}</span>
-                {binaryDisplay}
-                {binaryInput}
-                {this.getPinElementsForSide(PinSide.Top)}
-                {this.getPinElementsForSide(PinSide.Left)}
-                {this.getPinElementsForSide(PinSide.Bottom)}
-                {this.getPinElementsForSide(PinSide.Right)}
-            </div>
-            // </Draggable >
+            <Draggable confine='parent' className="absolute" classNameDragging='chip-move-active' classNameEnabled='chip-move-inactive' enabled={this.props.context.activeTool === Tool.Move && !this.props.context.isSimulationRunning} onDragEnd={this.props.redraw} startPosition={{ x: this.props.chip.startPosition.x - this.props.context.boardTranslation.x, y: this.props.chip.startPosition.y - this.props.context.boardTranslation.y }}>
+                <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
+                    <span className="title">{this.props.chip.blueprint.name}</span>
+                    {binaryDisplay}
+                    {binaryInput}
+                    {this.getPinElementsForSide(PinSide.Top)}
+                    {this.getPinElementsForSide(PinSide.Left)}
+                    {this.getPinElementsForSide(PinSide.Bottom)}
+                    {this.getPinElementsForSide(PinSide.Right)}
+                </div>
+            </Draggable>
         );
     }
 }

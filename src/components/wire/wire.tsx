@@ -8,26 +8,18 @@ interface WireProps {
     onWireDelete: (wire: WireModel) => void;
 }
 
-interface WireState {
-    start: Vector2;
-    end: Vector2;
-}
+class Wire extends Component<WireProps> {
 
-class Wire extends Component<WireProps, WireState> {
-    constructor(props: WireProps) {
-        super(props);
-
+    render() {
         let startElement = document.querySelector(`[data-gateid='${this.props.wire.fromId}']`)?.getBoundingClientRect();
         let endElement = document.querySelector(`[data-gateid='${this.props.wire.toId}']`)?.getBoundingClientRect();
 
-        if (startElement && endElement)
-            this.state = {
-                start: { x: startElement.left - this.props.context.boardTranslation.x + startElement.width / 2, y: startElement.top - this.props.context.boardTranslation.y + startElement.height / 2 },
-                end: { x: endElement.left - this.props.context.boardTranslation.x + startElement.width / 2, y: endElement.top - this.props.context.boardTranslation.y + endElement.height / 2 }
-            };
-    }
+        if (!startElement || !endElement)
+            return;
 
-    render() {
+        let start: Vector2 = { x: startElement.left - this.props.context.boardTranslation.x + startElement.width / 2, y: startElement.top - this.props.context.boardTranslation.y + startElement.height / 2 };
+        let end: Vector2 = { x: endElement.left - this.props.context.boardTranslation.x + startElement.width / 2, y: endElement.top - this.props.context.boardTranslation.y + endElement.height / 2 };
+
         let className = 'wire ';
 
         let clickEvent = () => { };
@@ -46,7 +38,7 @@ class Wire extends Component<WireProps, WireState> {
 
         return (
             <svg className="wire-canvas">
-                <line className={className} x1={this.state.start.x} y1={this.state.start.y} x2={this.state.end.x} y2={this.state.end.y} onClick={(clickEvent)} />
+                <line className={className} x1={start.x} y1={start.y} x2={end.x} y2={end.y} onClick={(clickEvent)} />
             </svg>
         );
     }

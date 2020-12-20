@@ -50,18 +50,16 @@ class Board extends Component<BoardProps, BoardState>{
     }
 
     render() {
-        // const style = { transform: `scale(${this.state.scale})` }; //onWheel={(e) => this.scroll(e)}
+        //  const style = { transform: `scale(${this.state.scale})` }; //onWheel={(e) => this.scroll(e)}
 
         return (
             <Draggable className="board" confine='fullscreen' classNameDragging="board-pan-active" classNameEnabled="board-pan-inactive" enabled={this.props.context.activeTool === Tool.Pan} onDrag={this.onDrag.bind(this)}>
-                <div >
-                    {this.props.chips.map(chip => {
-                        return <Chip context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw} ></Chip>
-                    })}
-                    {this.props.wires.map(wire => {
-                        return <Wire context={this.props.context} key={`${wire.fromId}_${wire.toId}`} wire={wire} onWireDelete={this.props.onWireDelete} ></Wire>
-                    })}
-                </div >
+                {this.props.chips.map(chip => {
+                    return <Chip context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw} ></Chip>
+                })}
+                {this.props.wires.map(wire => {
+                    return <Wire context={this.props.context} key={`${wire.fromId}_${wire.toId}`} wire={wire} onWireDelete={this.props.onWireDelete} ></Wire>
+                })}
             </Draggable>
         );
     }

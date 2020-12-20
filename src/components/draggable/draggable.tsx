@@ -8,7 +8,10 @@ interface DraggableProps {
     classNameEnabled?: string;
     classNameDragging?: string;
     confine: 'parent' | 'fullscreen' | string;
+    startPosition?: Vector2;
+    onDragStart?: () => void;
     onDrag?: (translation: Vector2) => void;
+    onDragEnd?: () => void;
 }
 
 interface DraggableState {
@@ -23,7 +26,12 @@ class Draggable extends Component<DraggableProps, DraggableState>{
     constructor(props: DraggableProps) {
         super(props);
 
-        this.state = { translation: { x: 0, y: 0 }, isDragged: false, initial: { x: 0, y: 0 }, draggableRef: React.createRef() };
+        let startPos = { x: 0, y: 0 };
+
+        if (this.props.startPosition !== undefined)
+            startPos = this.props.startPosition;
+
+        this.state = { translation: startPos, isDragged: false, initial: startPos, draggableRef: React.createRef() };
     }
 
     componentDidMount() {
@@ -52,6 +60,9 @@ class Draggable extends Component<DraggableProps, DraggableState>{
             clientPos = { x: e.clientX, y: e.clientY };
 
         this.setState({ initial: { x: clientPos.x - this.state.translation.x, y: clientPos.y - this.state.translation.y }, isDragged: true });
+
+        if (this.props.onDragStart)
+            this.props.onDragStart();
     }
 
     drag(e: any) {
@@ -97,17 +108,27 @@ class Draggable extends Component<DraggableProps, DraggableState>{
             }
 
             //check bounds
-            if (translation.y < confineRect.top)
+            if (translation.y < confineRect.top) {
                 translation.y = confineRect.top;
+                console.error("top");
 
-            if (translation.y > confineRect.bottom - dragggableRect.height)
+            }
+
+            if (translation.y > confineRect.bottom - dragggableRect.height) {
                 translation.y = confineRect.bottom - dragggableRect.height;
+                console.error("bottom");
+            }
 
-            if (translation.x < confineRect.left)
+            if (translation.x < confineRect.left) {
                 translation.x = confineRect.left;
+                console.error("left");
 
-            if (translation.x > confineRect.right - dragggableRect.width)
+            }
+
+            if (translation.x > confineRect.right - dragggableRect.width) {
                 translation.x = confineRect.right - dragggableRect.width;
+                console.error("right");
+            }
         }
 
         this.setState({ translation: translation });
@@ -118,17 +139,23 @@ class Draggable extends Component<DraggableProps, DraggableState>{
 
     dragEnd(e: any) {
         this.setState({ initial: { x: this.state.translation.x, y: this.state.translation.y }, isDragged: false });
+
+
+        if (this.props.onDragEnd)
+            this.props.onDragEnd();
     }
 
-
     render() {
-        const style = { transform: `translate(${this.state.translation.x}px, ${this.state.translation.y}px)` };
+        const style = { transform: `translate(${this.state.translation.x}px, ${this.state.translation.y}px)`, display: 'inline-block' };
 
-        let className = this.props.className;
+        let className = '';
 
-        if (this.props.enabled)
+        if (this.props.className)
+            className = this.props.className;
+
+        if (this.props.enabled && this.props.classNameEnabled)
             className += " " + this.props.classNameEnabled;
-        else
+        else if (!this.props.enabled && this.props.classNameDisabled)
             className += " " + this.props.classNameDisabled;
 
         if (this.state.isDragged)
