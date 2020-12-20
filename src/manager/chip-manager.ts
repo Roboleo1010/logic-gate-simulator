@@ -1,5 +1,5 @@
 import Graph from '../utilities/graph/graph';
-import { BlueprintType, ChipBlueprint, ChipCategory, Gate, GateRole, PinSide, SignalDirection } from '../model/circuit-builder.types';
+import { BlueprintType, ChipBlueprint, ChipCategory, ChipRole, Gate, GateRole, PinSide, SignalDirection } from '../model/circuit-builder.types';
 import { GateType } from '../simulation/simulator.types';
 
 class ChipManager {
@@ -12,13 +12,14 @@ class ChipManager {
         this.blueprints = [];
         this.chipIds = new Map();
 
-        //TODO: Modes
+        //IO
         this.addInputBlueprint();
         this.addOutputBlueprint();
         this.addClockBlueprint();
         this.addConstantOnBlueprint();
         this.addConstantOffBlueprint();
 
+        //Logic
         this.AddNOTBlueprint();
 
         this.addANDBlueprint();
@@ -28,6 +29,12 @@ class ChipManager {
         this.addNANDBlueprint();
         this.addNORBlueprint();
         this.addXNORBlueprint();
+
+        //Arethmetic
+        this.addBinaryInputBlueprint(4);
+        this.addBinaryInputBlueprint(8);
+        this.addBinaryDisplayBlueprint(4);
+        this.addBinaryDisplayBlueprint(8);
     }
 
     public static getInstance() {
@@ -62,7 +69,7 @@ class ChipManager {
         let graph = new Graph<Gate>();
         graph.addNodes([{ id: "switch", type: GateType.Controlled, state: false, signalDirection: SignalDirection.Out, role: GateRole.Switch, name: 'In', isFirstLayer: true, pinSide: PinSide.Right }]);
 
-        this.blueprints.push({ name: "Input", color: "#fd7e14", category: ChipCategory.Io, graph: graph, type: BlueprintType.Builtin, description: "Click this switch to toggle it's state. Gets converted to Chip Input after Packaging" });
+        this.blueprints.push({ name: "Switch", color: "#fd7e14", category: ChipCategory.Io, graph: graph, type: BlueprintType.Builtin, role: ChipRole.Switch, description: "Click this switch to toggle it's state. Gets converted to Chip Input after Packaging" });
     }
 
     private addOutputBlueprint() {
@@ -93,6 +100,26 @@ class ChipManager {
             { id: "out", type: GateType.Controlled, state: false, signalDirection: SignalDirection.Out, name: 'Out', isFirstLayer: true, pinSide: PinSide.Right }]);
 
         this.blueprints.push({ name: "Constant Off", color: "#F42B03", category: ChipCategory.Io, type: BlueprintType.Builtin, graph: graph });
+    }
+
+    private addBinaryInputBlueprint(bits: number) {
+        let graph = new Graph<Gate>();
+
+        for (let i = 0; i < bits; i++) {
+            graph.addNode({ id: `out${i}`, type: GateType.Controlled, state: false, signalDirection: SignalDirection.Out, name: `Out (${Math.pow(2, i)})`, data: `${Math.pow(2, i)}`, isFirstLayer: true, pinSide: PinSide.Right });
+        }
+
+        this.blueprints.push({ name: `Binary Input ${bits}-Bit`, color: "#7B3E19", category: ChipCategory.Arithmetic, role: ChipRole.BinaryInput, type: BlueprintType.Builtin, graph: graph });
+    }
+
+    private addBinaryDisplayBlueprint(bits: number) {
+        let graph = new Graph<Gate>();
+
+        for (let i = 0; i < bits; i++) {
+            graph.addNode({ id: `in${i}`, type: GateType.Relay, state: false, signalDirection: SignalDirection.In, name: `In (${Math.pow(2, i)})`, data: `${Math.pow(2, i)}`, isFirstLayer: true, pinSide: PinSide.Left });
+        }
+
+        this.blueprints.push({ name: `Binary Display ${bits}-Bit`, color: "#7B3E19", category: ChipCategory.Arithmetic, role: ChipRole.BinaryDisplay, type: BlueprintType.Builtin, graph: graph });
     }
 
     // 1 Input

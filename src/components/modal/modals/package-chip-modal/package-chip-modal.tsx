@@ -89,7 +89,7 @@ class PackageChipModal extends Component<PackageChipModalProps, PackageChipModal
                     <span id="pin-sorting-info">To modify the positions of the pins just drag them to any Pin side.</span>
                     <div className="pin-sorting-wrapper" id="pin-sorting">
                         <div className="chip chip-on-board" style={style}>
-                            <span>{this.state.name}</span>
+                            <span className="title">{this.state.name}</span>
                             {this.getPinElementsForSide(PinSide.Top)}
                             {this.getPinElementsForSide(PinSide.Left)}
                             {this.getPinElementsForSide(PinSide.Bottom)}

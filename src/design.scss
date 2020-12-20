@@ -1,3 +1,9 @@
+@font-face {
+    font-family: "DSEG7-Classic";
+    src: url("./assets/fonts/dseg/DSEG7Classic-Regular.woff2") format("woff2");
+    src: url("./assets/fonts/dseg/DSEG7Classic-Regular.woff") format("woff");
+}
+
 $themes: (
     //https://material.io/resources/color/#!/?view.left=0&view.right=0&primary.color=121212&secondary.color=ff9100
     dark:

@@ -18,9 +18,15 @@ export enum GateRole {
     Clock = "Clock"
 }
 
+export enum ChipRole {
+    Switch = "Switch",
+    BinaryInput = "BinaryInput",
+    BinaryDisplay = "BinaryDisplay"
+}
+
 export enum ChipCategory {
-    Logic = "Logic",
     Io = "Io",
+    Logic = "Logic",
     Arithmetic = "Arithmetic",
     Memory = "Memory",
     Other = "Other"
@@ -55,6 +61,7 @@ export interface Gate {
     isFirstLayer: boolean;
     error?: boolean;
     hidden?: boolean;
+    data?: string
 }
 
 export interface ChipBlueprint {
@@ -64,6 +71,7 @@ export interface ChipBlueprint {
     category: ChipCategory;
     description?: string;
     type: BlueprintType;
+    role?: ChipRole;
 }
 
 

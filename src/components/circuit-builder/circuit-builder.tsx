@@ -347,11 +347,12 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                 missingInputs.push(gate);
         })
 
-        if (highlight && missingInputs.length > 0) {
-            this.resetPinError();
+        this.resetPinError();
+
+        if (highlight && missingInputs.length > 0)
             this.setPinError(missingInputs);
-            this.forceUpdate();
-        }
+
+        this.forceUpdate();
 
         return missingInputs;
     }

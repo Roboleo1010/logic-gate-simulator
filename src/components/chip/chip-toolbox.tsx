@@ -25,17 +25,13 @@ class ChipToolbox extends Component<ChipToolboxProps> {
             <div className="chip-on-toolbox-wrapper">
                 <Draggable grid={[5, 5]} onStop={this.onStop.bind(this)} position={{ x: 0, y: 0 }} >
                     <div className="chip chip-on-toolbox" style={style} title={this.props.blueprint.description} >
-                        <span>
-                            {this.props.blueprint.name}
-                        </span>
+                        <span className="title">{this.props.blueprint.name}</span>
                     </div>
                 </Draggable>
 
                 {/* Fake Chip */}
                 <div className="chip chip-on-toolbox chip-on-toolbox-fake" style={style} >
-                    <span>
-                        {this.props.blueprint.name}
-                    </span>
+                    <span className="title">{this.props.blueprint.name}</span>
                 </div>
             </div>
         );

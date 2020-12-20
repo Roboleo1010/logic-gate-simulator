@@ -19,7 +19,7 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
     constructor(props: ToolboxProps) {
         super(props);
 
-        this.state = { selectedTab: 'Logic' };
+        this.state = { selectedTab: ChipCategory.Io };
     }
 
     setSelected(tab: TabData) {

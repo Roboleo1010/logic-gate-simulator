@@ -1,23 +1,24 @@
 @import "../../design.scss";
 
-$chip-height-toolbox: 50px;
+$chip-height: 50px;
 
 $pinWidth: 16px;
 $pinWidthHalfed: $pinWidth / 2;
 
 .chip {
-    padding: 15px 0;
+    padding: 5px 10px;
     text-align: center;
-    width: 125px;
-    min-width: 125px;
+    min-width: 100px;
+    min-height: $chip-height;
     box-sizing: border-box;
     border-radius: 3px;
 
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 
-    > span {
+    > * {
         color: white;
         font-weight: bold;
         font-size: 16px;
@@ -28,14 +29,27 @@ $pinWidthHalfed: $pinWidth / 2;
         -moz-user-select: none; /* Firefox */
         -ms-user-select: none; /* IE10+/Edge */
         user-select: none; /* Standard */
+
+        line-height: 2em;
+    }
+
+    .title {
+    }
+
+    .binary-display {
+        font-family: "DSEG7-Classic";
+    }
+
+    .binary-input {
+        width: 45px;
     }
 }
 
 .chip-on-toolbox-wrapper {
-    height: $chip-height-toolbox;
+    height: $chip-height;
 
     .chip-on-toolbox {
-        height: $chip-height-toolbox;
+        height: $chip-height;
         position: relative;
         margin-left: 10px;
 
@@ -43,8 +57,8 @@ $pinWidthHalfed: $pinWidth / 2;
     }
 
     .chip-on-toolbox-fake {
-        height: $chip-height-toolbox;
-        top: -$chip-height-toolbox;
+        height: $chip-height;
+        top: -$chip-height;
 
         pointer-events: none;
         touch-action: none;
