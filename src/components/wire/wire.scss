@@ -1,7 +1,8 @@
 @import "../../design.scss";
 
 .wire-canvas {
-    position: absolute;
+    position: fixed;
+    display: inline;
     left: 0;
     top: 0;
 

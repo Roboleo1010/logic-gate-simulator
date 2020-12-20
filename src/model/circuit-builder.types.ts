@@ -79,6 +79,7 @@ export interface ChipBlueprint {
 export interface CircuitBuilderContext {
     isSimulationRunning: boolean;
     activeTool: Tool;
+    boardTranslation: Vector2;
 }
 
 export interface BlueprintSaveData {

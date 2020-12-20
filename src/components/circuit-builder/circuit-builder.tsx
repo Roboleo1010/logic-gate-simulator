@@ -50,7 +50,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
             chips: [],
             wires: [],
             chipBlueprints: ChipManager.getBlueprints(),
-            context: { activeTool: Tool.Move, isSimulationRunning: false },
+            context: { activeTool: Tool.Move, isSimulationRunning: false, boardTranslation: { x: 0, y: 0 } },
             showPackageChipModal: false,
             showSaveLoadModal: false,
             showWelcomeModal: showWelcomeModal

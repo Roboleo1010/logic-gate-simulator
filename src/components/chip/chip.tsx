@@ -19,7 +19,7 @@ class Chip extends Component<ChipProps, ChipState> {
     constructor(props: ChipProps) {
         super(props);
 
-        this.state = { position: this.props.chip.startPosition }
+        this.state = { position: { x: this.props.chip.startPosition.x - this.props.context.boardTranslation.x, y: this.props.chip.startPosition.y - this.props.context.boardTranslation.y } };
     }
 
     renamePin(gate: Gate) {

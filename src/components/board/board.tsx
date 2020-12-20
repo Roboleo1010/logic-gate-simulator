@@ -3,7 +3,7 @@ import ChipInstance from '../../model/chip-instance';
 import Draggable from '../draggable/draggable';
 import React, { Component } from 'react';
 import Wire from '../wire/wire';
-import { CircuitBuilderContext, Gate, Tool, WireModel } from '../../model/circuit-builder.types';
+import { CircuitBuilderContext, Gate, Tool, Vector2, WireModel } from '../../model/circuit-builder.types';
 import './board.scss';
 
 interface BoardProps {
@@ -18,13 +18,14 @@ interface BoardProps {
 
 interface BoardState {
     scale: number;
+    translation: Vector2;
 }
 
 class Board extends Component<BoardProps, BoardState>{
     constructor(props: BoardProps) {
         super(props);
 
-        this.state = { scale: 1 };
+        this.state = { scale: 1, translation: { x: 0, y: 0 } };
     }
 
     scroll(e: any) {
@@ -43,11 +44,16 @@ class Board extends Component<BoardProps, BoardState>{
         this.setState({ scale: newScale });
     }
 
+    onDrag(translation: Vector2) {
+        this.setState({ translation: translation });
+        this.props.context.boardTranslation = translation;
+    }
+
     render() {
         // const style = { transform: `scale(${this.state.scale})` }; //onWheel={(e) => this.scroll(e)}
 
         return (
-            <Draggable className="board" confine='fullscreen' classNameDragging="board-pan-active" classNameEnabled="board-pan-inactive" enabled={this.props.context.activeTool === Tool.Pan}>
+            <Draggable className="board" confine='fullscreen' classNameDragging="board-pan-active" classNameEnabled="board-pan-inactive" enabled={this.props.context.activeTool === Tool.Pan} onDrag={this.onDrag.bind(this)}>
                 <div >
                     {this.props.chips.map(chip => {
                         return <Chip context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw} ></Chip>

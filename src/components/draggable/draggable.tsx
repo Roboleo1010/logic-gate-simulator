@@ -8,6 +8,7 @@ interface DraggableProps {
     classNameEnabled?: string;
     classNameDragging?: string;
     confine: 'parent' | 'fullscreen' | string;
+    onDrag?: (translation: Vector2) => void;
 }
 
 interface DraggableState {
@@ -40,6 +41,8 @@ class Draggable extends Component<DraggableProps, DraggableState>{
     dragStart(e: any) {
         if (!this.props.enabled)
             return;
+
+        e.preventDefault();
 
         let clientPos: Vector2;
 
@@ -108,6 +111,9 @@ class Draggable extends Component<DraggableProps, DraggableState>{
         }
 
         this.setState({ translation: translation });
+
+        if (this.props.onDrag)
+            this.props.onDrag(translation);
     }
 
     dragEnd(e: any) {
