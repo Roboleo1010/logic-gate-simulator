@@ -25,13 +25,25 @@ class Draggable extends Component<DraggableProps, DraggableState>{
         this.state = { translation: { x: 0, y: 0 }, isDragged: false, initial: { x: 0, y: 0 }, draggableRef: React.createRef() };
     }
 
+    componentDidMount() {
+        this.state.draggableRef.current.addEventListener('touchstart', this.dragStart.bind(this), { passive: false });
+        this.state.draggableRef.current.addEventListener('touchmove', this.drag.bind(this), { passive: false });
+        this.state.draggableRef.current.addEventListener('touchend', this.dragEnd.bind(this), { passive: false });
+    }
+
+    componentWillUnmount() {
+        this.state.draggableRef.current.removeEventListener('touchstart', this.dragStart.bind(this),);
+        this.state.draggableRef.current.removeEventListener('touchmove', this.drag.bind(this));
+        this.state.draggableRef.current.removeEventListener('touchend', this.dragEnd.bind(this));
+    }
+
     dragStart(e: any) {
         if (!this.props.enabled)
             return;
 
         let clientPos: Vector2;
 
-        if (e.type === "touchmove")
+        if (e.type === "touchstart")
             clientPos = { x: e.touches[0].clientX, y: e.touches[0].clientY }
         else
             clientPos = { x: e.clientX, y: e.clientY };
@@ -116,10 +128,11 @@ class Draggable extends Component<DraggableProps, DraggableState>{
         if (this.state.isDragged)
             className += " " + this.props.classNameDragging;
 
+
         return (
-            <div ref={this.state.draggableRef} style={style} className={className} onTouchStart={(e) => this.dragStart(e)} onMouseDown={(e) => this.dragStart(e)} onTouchEnd={(e) => this.dragEnd(e)} onMouseUp={(e) => this.dragEnd(e)} onTouchMove={(e) => this.drag(e)} onMouseMove={(e) => this.drag(e)} draggable={this.props.enabled} >
-                {this.props.children}
-            </div>);
+            <div ref={this.state.draggableRef} style={style} className={className} draggable={this.props.enabled} onMouseDown={(e) => this.dragStart(e)} onMouseMove={(e) => this.drag(e)} onMouseUp={(e) => this.dragEnd(e)} >
+                { this.props.children}
+            </div >);
     }
 }
 
