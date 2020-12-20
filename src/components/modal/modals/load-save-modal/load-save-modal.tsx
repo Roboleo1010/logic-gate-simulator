@@ -50,7 +50,7 @@ class LoadSaveModal extends Component<LoadSaveModalProps>{
                     <textarea rows={15} name="save" id='save' value={this.props.saveData} readOnly />
 
                     <button onClick={this.onLoad.bind(this)} id='button-load'>Load</button>
-                    <button onClick={this.onSave.bind(this)} id='button-save'>Copy</button>
+                    <button onClick={this.onSave.bind(this)} id='button-save'>Save (Copy to clipboard)</button>
                 </div>
             </Modal >
         );

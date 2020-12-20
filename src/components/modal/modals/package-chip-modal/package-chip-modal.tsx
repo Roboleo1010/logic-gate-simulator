@@ -71,12 +71,19 @@ class PackageChipModal extends Component<PackageChipModalProps, PackageChipModal
     }
 
     render() {
-        const style = { backgroundColor: this.state.color, height: Math.max(this.getGatesForPinSide(PinSide.Left).length, this.getGatesForPinSide(PinSide.Right).length) * 16 + 25, width: Math.max(this.getGatesForPinSide(PinSide.Top).length, this.getGatesForPinSide(PinSide.Bottom).length) * 16 + 40 };
+        const minYSize = Math.max(this.getGatesForPinSide(PinSide.Left).length, this.getGatesForPinSide(PinSide.Right).length) * 20;
+        const minXSize = Math.max(this.getGatesForPinSide(PinSide.Top).length, this.getGatesForPinSide(PinSide.Bottom).length) * 20;
+
+        const style = {
+            backgroundColor: this.state.color,
+            minWidth: minXSize >= 100 ? minXSize : 100,
+            minHeight: minYSize >= 50 ? minYSize : 50
+        };
 
         return (
             <Modal title="Package Chip" onClose={this.props.onCloseCallback}>
                 <div className="package-chip-wrapper">
-                    <input type="text" placeholder="Name" name="name" id='name' onChange={(e) => this.setState({ name: e.currentTarget.value !== '' ? e.currentTarget.value : this.props.defaultName })} autoFocus />
+                    <input type="text" placeholder="Name" name="name" maxLength={35} id='name' onChange={(e) => this.setState({ name: e.currentTarget.value !== '' ? e.currentTarget.value : this.props.defaultName })} autoFocus />
                     <select id='category' defaultValue={ChipCategory.Other}>
                         {Object.keys(ChipCategory).map(category => {
                             return <option key={category} value={category}>{`Chips (${category})`}</option>

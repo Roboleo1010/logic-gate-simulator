@@ -57,11 +57,6 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
         };
     }
 
-    componentDidMount() {
-        if (localStorage.getItem(Constants.BlueprintSaveKey))
-            this.loadBlueprints(localStorage.getItem(Constants.BlueprintSaveKey)!);
-    }
-
     //#region Chip & Wire Events
     addChipToBoard(blueprint: ChipBlueprint, position: { x: number, y: number } | undefined = undefined) {
         let newChips = this.state.chips;
@@ -144,10 +139,12 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
             NotificationManager.addNotification("Pin Error", "Please connect all unconnected inputs.", NotificationType.Error);
             return;
         }
+        //check Inputs
         if (this.getGatesByRole(GateRole.Switch, true).length === 0 && this.getGatesByRole(GateRole.Clock, true).length === 0) {
             NotificationManager.addNotification("Package Error", "A Chip should include at least one Input (Switch or Clock)", NotificationType.Error);
             return;
         }
+        //Check Outputs
         if (this.getGatesByRole(GateRole.Output, true).length === 0) {
             NotificationManager.addNotification("Package Error", "A Chip should include at least one Output", NotificationType.Error);
             return;
@@ -195,7 +192,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
             else if (allWires.filter(wire => wire.fromId === gate.id).length === 0)
                 gate.hidden = true;
 
-            gate.isFirstLayer = false;
+            gate.firstLayer = false;
         });
 
         graph.addNodes(allGates);
@@ -225,7 +222,6 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     //#endregion
 
     //#region Loading/ Saving
-
     getBlueprintSaveJSON(): string {
         return JSON.stringify({ version: Constants.SaveVersion, blueprints: this.state.chipBlueprints.filter(blueprint => blueprint.type === BlueprintType.Custom) });
     }
@@ -280,7 +276,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
 
     simulate() {
         this.state.chips.forEach(chip => {
-            chip.graph.nodes.filter(gate => gate.role === GateRole.Clock && gate.isFirstLayer).forEach(clock => {
+            chip.graph.nodes.filter(gate => gate.role === GateRole.Clock && gate.firstLayer).forEach(clock => {
                 clock.state = clock.state ? false : true;
                 console.log(clock.id);
             });
@@ -392,7 +388,6 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     //#endregion
 
     //#region Helpers
-
     getGateById(id: string): Gate | undefined {
         let result = undefined;
 
@@ -420,17 +415,13 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
         let result: Gate[] = [];
 
         this.state.chips.forEach(chip => {
-            result.push(...chip.graph.nodes.filter(gate => gate.role === role && gate.isFirstLayer === true));
+            result.push(...chip.graph.nodes.filter(gate => gate.role === role && gate.firstLayer === true));
         });
 
         return result;
     }
 
     //#endregion
-
-    installPWA() {
-
-    }
 
     render() {
         return (

@@ -58,7 +58,7 @@ export interface Gate {
     signalDirection?: SignalDirection;
     pinSide?: PinSide;
     role?: GateRole;
-    isFirstLayer: boolean;
+    firstLayer: boolean;
     error?: boolean;
     hidden?: boolean;
     data?: string
