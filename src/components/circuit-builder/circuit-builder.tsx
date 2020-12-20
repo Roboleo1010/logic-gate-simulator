@@ -17,7 +17,7 @@ import ToolbarButtonToggle from '../toolbar/toolbar-button-toggle/toolbar-button
 import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
 import Toolbox from '../toolbox/toolbox';
 import WelcomeMoal from '../modal/modals/welcome-modal/welcome-modal';
-import { BlueprintSaveData, BlueprintType, ChipBlueprint, ChipCategory, CircuitBuilderContext, Gate, GateRole, PinSide, SignalDirection, Tool, WireModel } from '../../model/circuit-builder.types';
+import { BlueprintSaveData, BlueprintType, ChipBlueprint, ChipCategory, CircuitBuilderContext, Gate, GateRole, PinSide, SignalDirection, Tool, Vector2, WireModel } from '../../model/circuit-builder.types';
 import { Gate as SimulationGate, GateType, SimulationState } from '../../simulation/simulator.types';
 import './circuit-builder.scss';
 import 'react-notifications-component/dist/theme.css';
@@ -58,7 +58,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     }
 
     //#region Chip & Wire Events
-    addChipToBoard(blueprint: ChipBlueprint, position: { x: number, y: number } | undefined = undefined) {
+    addChipToBoard(blueprint: ChipBlueprint, position: Vector2) {
         let newChips = this.state.chips;
         newChips.push(new ChipInstance(blueprint, position));
         this.setState({ chips: newChips })
@@ -432,6 +432,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                 <div className="toolbar-container">
                     <Toolbar>
                         <ToolbarGroup>
+                            <ToolbarButtonMulti icon={Icons.iconPan} text="Pan" onClick={() => this.setTool(Tool.Pan)} isActive={this.state.context.activeTool === Tool.Pan}></ToolbarButtonMulti>
                             <ToolbarButtonMulti icon={Icons.iconMove} text="Move" onClick={() => this.setTool(Tool.Move)} isActive={this.state.context.activeTool === Tool.Move}></ToolbarButtonMulti>
                             <ToolbarButtonMulti icon={Icons.iconDelete} text="Delete" onClick={() => this.setTool(Tool.Delete)} isActive={this.state.context.activeTool === Tool.Delete}></ToolbarButtonMulti>
                             <ToolbarButtonMulti icon={Icons.iconRename} text="Rename" onClick={() => this.setTool(Tool.Rename)} isActive={this.state.context.activeTool === Tool.Rename}></ToolbarButtonMulti>

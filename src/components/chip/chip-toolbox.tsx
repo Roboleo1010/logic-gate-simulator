@@ -1,11 +1,11 @@
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import React, { Component } from 'react';
-import { ChipBlueprint } from '../../model/circuit-builder.types';
+import { ChipBlueprint, Vector2 } from '../../model/circuit-builder.types';
 import './chip.scss';
 
 interface ChipToolboxProps {
     blueprint: ChipBlueprint;
-    onChipClicked: (chip: ChipBlueprint, position: { x: number, y: number }) => void;
+    onChipClicked: (chip: ChipBlueprint, position: Vector2) => void;
 }
 
 class ChipToolbox extends Component<ChipToolboxProps> {

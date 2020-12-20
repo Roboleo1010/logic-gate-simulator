@@ -66,7 +66,8 @@ $pinWidthHalfed: $pinWidth / 2;
 }
 
 .chip-on-board {
-    position: absolute;
+    position: fixed;
+    display: inline-flex;
 
     .pin-side {
         display: flex;

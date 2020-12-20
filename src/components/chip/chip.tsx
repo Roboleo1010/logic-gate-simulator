@@ -1,7 +1,6 @@
 import ChipInstance from '../../model/chip-instance';
-import Draggable from 'react-draggable';
 import React, { Component } from 'react';
-import { ChipRole, CircuitBuilderContext, Gate, GateRole, PinSide, Tool } from '../../model/circuit-builder.types';
+import { ChipRole, CircuitBuilderContext, Gate, GateRole, PinSide, Tool, Vector2 } from '../../model/circuit-builder.types';
 import './chip.scss';
 
 interface ChipProps {
@@ -12,7 +11,17 @@ interface ChipProps {
     onPinClicked: (gate: Gate) => void;
 }
 
-class Chip extends Component<ChipProps> {
+interface ChipState {
+    position: Vector2;
+}
+
+class Chip extends Component<ChipProps, ChipState> {
+    constructor(props: ChipProps) {
+        super(props);
+
+        this.state = { position: this.props.chip.startPosition }
+    }
+
     renamePin(gate: Gate) {
         let name = window.prompt("Pin name:", gate.name);
 
@@ -61,17 +70,14 @@ class Chip extends Component<ChipProps> {
     }
 
     render() {
-        let startPos = this.props.chip.startPosition;
-        if (startPos)
-            this.props.chip.startPosition = undefined;
-
         const minYSize = Math.max(this.getGatesForPinSide(PinSide.Left).length, this.getGatesForPinSide(PinSide.Right).length) * 20;
         const minXSize = Math.max(this.getGatesForPinSide(PinSide.Top).length, this.getGatesForPinSide(PinSide.Bottom).length) * 20;
 
         const style = {
             backgroundColor: this.props.chip.blueprint.color,
             minWidth: minXSize >= 100 ? minXSize : 100,
-            minHeight: minYSize >= 50 ? minYSize : 50
+            minHeight: minYSize >= 50 ? minYSize : 50,
+            transform: `translate(${this.state.position.x}px, ${this.state.position.y}px)`
         };
 
         let className = 'chip chip-on-board ';
@@ -136,17 +142,17 @@ class Chip extends Component<ChipProps> {
         }
 
         return (
-            <Draggable grid={[5, 5]} position={startPos} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.props.context.activeTool !== Tool.Move || this.props.context.isSimulationRunning} >
-                <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
-                    <span className="title">{this.props.chip.blueprint.name}</span>
-                    {binaryDisplay}
-                    {binaryInput}
-                    {this.getPinElementsForSide(PinSide.Top)}
-                    {this.getPinElementsForSide(PinSide.Left)}
-                    {this.getPinElementsForSide(PinSide.Bottom)}
-                    {this.getPinElementsForSide(PinSide.Right)}
-                </div>
-            </Draggable >
+            // <Draggable grid={[5, 5]} position={startPos} bounds={"parent"} cancel={".pin"} onStop={this.props.redraw} disabled={this.props.context.activeTool !== Tool.Move || this.props.context.isSimulationRunning} >
+            <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
+                <span className="title">{this.props.chip.blueprint.name}</span>
+                {binaryDisplay}
+                {binaryInput}
+                {this.getPinElementsForSide(PinSide.Top)}
+                {this.getPinElementsForSide(PinSide.Left)}
+                {this.getPinElementsForSide(PinSide.Bottom)}
+                {this.getPinElementsForSide(PinSide.Right)}
+            </div>
+            // </Draggable >
         );
     }
 }

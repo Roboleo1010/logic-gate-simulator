@@ -1,14 +1,14 @@
 import ChipManager from '../manager/chip-manager';
 import Graph from '../utilities/graph/graph';
-import { ChipBlueprint, Gate } from './circuit-builder.types';
+import { ChipBlueprint, Gate, Vector2 } from './circuit-builder.types';
 
 class ChipInstance {
     public blueprint: ChipBlueprint;
     public id: string;
-    public startPosition?: { x: number, y: number };
+    public startPosition: Vector2;
     public graph: Graph<Gate>;
 
-    constructor(blueprint: ChipBlueprint, startPosition: { x: number, y: number } | undefined) {
+    constructor(blueprint: ChipBlueprint, startPosition: Vector2) {
         this.blueprint = blueprint;
         this.startPosition = startPosition;
         this.id = `${blueprint.name}_${ChipManager.getChipId(blueprint.name)}`;

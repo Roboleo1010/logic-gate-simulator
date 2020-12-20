@@ -2,6 +2,7 @@ import Graph from '../utilities/graph/graph';
 import { GateType } from '../simulation/simulator.types';
 
 export enum Tool {
+    Pan = "Pan",
     Move = "Move",
     Delete = "Delete",
     Rename = "Rename"
@@ -83,4 +84,9 @@ export interface CircuitBuilderContext {
 export interface BlueprintSaveData {
     version: number;
     blueprints: ChipBlueprint[];
+}
+
+export interface Vector2 {
+    x: number;
+    y: number;
 }

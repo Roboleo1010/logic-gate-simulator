@@ -2,7 +2,7 @@ import ChipToolbox from '../chip/chip-toolbox';
 import React, { Component } from 'react';
 import Tab from '../tabs/tab/tab';
 import TabNav from '../tabs/tabnav/tabnav';
-import { ChipBlueprint, ChipCategory } from '../../model/circuit-builder.types';
+import { ChipBlueprint, ChipCategory, Vector2 } from '../../model/circuit-builder.types';
 import { TabData } from '../tabs/tab.types';
 import './toolbox.scss';
 
@@ -11,7 +11,7 @@ interface ToolboxState {
 }
 
 interface ToolboxProps {
-    onChipClicked: (chip: ChipBlueprint, position: { x: number, y: number }) => void;
+    onChipClicked: (chip: ChipBlueprint, position: Vector2) => void;
     blueprints: ChipBlueprint[]
 }
 
