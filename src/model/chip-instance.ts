@@ -5,12 +5,14 @@ import { ChipBlueprint, Gate, Vector2 } from './circuit-builder.types';
 class ChipInstance {
     public blueprint: ChipBlueprint;
     public id: string;
-    public startPosition: Vector2;
     public graph: Graph<Gate>;
+
+    public position: Vector2;
+    public size: Vector2 = { x: 0, y: 0 };
 
     constructor(blueprint: ChipBlueprint, startPosition: Vector2) {
         this.blueprint = blueprint;
-        this.startPosition = startPosition;
+        this.position = startPosition;
         this.id = `${blueprint.name}_${ChipManager.getChipId(blueprint.name)}`;
 
         let graph = new Graph<Gate>();

@@ -3,7 +3,7 @@ import ChipInstance from '../../model/chip-instance';
 import Draggable from '../draggable/draggable';
 import React, { Component } from 'react';
 import Wire from '../wire/wire';
-import { CircuitBuilderContext, Gate, Rect, Tool, Vector2, WireModel } from '../../model/circuit-builder.types';
+import { CircuitBuilderContext, Gate, Tool, Vector2, WireModel } from '../../model/circuit-builder.types';
 import './board.scss';
 
 interface BoardProps {
@@ -70,17 +70,27 @@ class Board extends Component<BoardProps, BoardState>{
 
         this.setState({ isSelecting: false });
     }
+
+    isInSelection(chip: ChipInstance, top: number, bottom: number, left: number, right: number): boolean {
+        if (chip.position.y + chip.size.y > top && chip.position.y < bottom &&
+            chip.position.x + chip.size.x > left && chip.position.x < right)
+            return true;
+        else
+            return false;
+    }
+
     //#endregion
 
     render() {
-        let selectionRect: Rect;
+        const top = Math.min(this.state.selectionStart.y, this.state.selectionEnd.y)
+        const bottom = Math.max(this.state.selectionStart.y, this.state.selectionEnd.y)
+        const left = Math.min(this.state.selectionStart.x, this.state.selectionEnd.x)
+        const right = Math.max(this.state.selectionStart.x, this.state.selectionEnd.x)
 
-        if (this.state.isSelecting)
-            selectionRect = { start: this.state.selectionStart, end: this.state.selectionEnd };
 
         return (
             <Draggable className="board-size" confine='fullscreen' classNameDragging="board-pan-active" classNameEnabled="board-pan-inactive" enabled={this.props.context.activeTool === Tool.Pan} onDrag={this.onDrag.bind(this)} >
-                <div className="board board-size" onMouseDown={this.onSelectionStart.bind(this)} onMouseMove={this.onSelectionDrag.bind(this)} onMouseUp={this.onSelectionEnd.bind(this)}>
+                <div className="board board-size" onMouseDown={this.onSelectionStart.bind(this)} onMouseMove={this.onSelectionDrag.bind(this)} onMouseUp={this.onSelectionEnd.bind(this)} onContextMenuCapture={(e) => { this.setState({ selectionStart: { x: 0, y: 0 }, selectionEnd: { x: 0, y: 0 } }); e.preventDefault(); return false; }}>
                     {
                         this.state.isSelecting &&
                         <svg className='selection-box'>
@@ -92,7 +102,7 @@ class Board extends Component<BoardProps, BoardState>{
                     }
                     {
                         this.props.chips.map(chip => {
-                            return <Chip selectionRect={selectionRect} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw} ></Chip>
+                            return <Chip isSelected={this.isInSelection(chip, top, bottom, left, right)} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw} ></Chip>
                         })
                     }
                     {

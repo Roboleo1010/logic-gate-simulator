@@ -92,8 +92,3 @@ export interface Vector2 {
     x: number;
     y: number;
 }
-
-export interface Rect {
-    start: Vector2,
-    end: Vector2
-}

@@ -107,18 +107,23 @@ class Draggable extends Component<DraggableProps, DraggableState>{
                 return;
             }
 
+            console.log(confineRect)
+
             //check bounds
             if (translation.y < confineRect.top)
                 translation.y = confineRect.top;
 
-            if (translation.y > confineRect.bottom - dragggableRect.height)
-                translation.y = confineRect.bottom - dragggableRect.height;
+            if (translation.y > confineRect.height + dragggableRect.height) {
+                translation.y = confineRect.height + dragggableRect.height;
+                console.error("bottom");
+
+            }
 
             if (translation.x < confineRect.left)
                 translation.x = confineRect.left;
 
-            if (translation.x > confineRect.right - dragggableRect.width)
-                translation.x = confineRect.right - dragggableRect.width;
+            if (translation.x > confineRect.width - dragggableRect.width)
+                translation.x = confineRect.width - dragggableRect.width;
         }
 
         this.setState({ translation: translation });
@@ -153,7 +158,7 @@ class Draggable extends Component<DraggableProps, DraggableState>{
 
 
         return (
-            <div ref={this.state.draggableRef} style={style} className={className} draggable={this.props.enabled} onMouseDown={(e) => this.dragStart(e)} onMouseMove={(e) => this.drag(e)} onMouseUp={(e) => this.dragEnd(e)} >
+            <div ref={this.state.draggableRef} style={style} className={className} draggable={this.props.enabled} onMouseDown={(e) => this.dragStart(e)} onMouseMove={(e) => this.drag(e)} onMouseUp={(e) => this.dragEnd(e)} onMouseLeave={(e) => this.dragEnd(e)} >
                 { this.props.children}
             </div >);
     }

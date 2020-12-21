@@ -60,7 +60,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     //#region Chip & Wire Events
     addChipToBoard(blueprint: ChipBlueprint, position: Vector2) {
         let newChips = this.state.chips;
-        newChips.push(new ChipInstance(blueprint, position));
+        newChips.push(new ChipInstance(blueprint, { x: position.x - this.state.context.boardTranslation.x, y: position.y - this.state.context.boardTranslation.y }));
         this.setState({ chips: newChips })
     }
 

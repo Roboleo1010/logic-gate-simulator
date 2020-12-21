@@ -1,30 +1,26 @@
 import ChipInstance from '../../model/chip-instance';
 import Draggable from '../draggable/draggable';
 import React, { Component } from 'react';
-import { ChipRole, CircuitBuilderContext, Gate, GateRole, PinSide, Rect, Tool, Vector2 } from '../../model/circuit-builder.types';
+import { ChipRole, CircuitBuilderContext, Gate, GateRole, PinSide, Tool } from '../../model/circuit-builder.types';
 import './chip.scss';
 
 interface ChipProps {
     chip: ChipInstance;
     context: CircuitBuilderContext;
+    isSelected: boolean,
     onChipDelete: (chip: ChipInstance) => void;
     redraw: () => void;
     onPinClicked: (gate: Gate) => void;
-
-    selectionRect?: Rect;
 }
 
 interface ChipState {
     chipRef: React.RefObject<HTMLDivElement>;
-    position: Vector2;
-    size: Vector2;
 }
 
 class Chip extends Component<ChipProps, ChipState> {
     constructor(props: ChipProps) {
         super(props);
-
-        this.state = { chipRef: React.createRef(), position: { x: this.props.chip.startPosition.x - this.props.context.boardTranslation.x, y: this.props.chip.startPosition.y - this.props.context.boardTranslation.y }, size: { x: 0, y: 0 } };
+        this.state = { chipRef: React.createRef() };
     }
 
     renamePin(gate: Gate) {
@@ -149,27 +145,16 @@ class Chip extends Component<ChipProps, ChipState> {
                 className += 'chip-tool-delete ';
                 clickEvent = () => { this.props.onChipDelete(this.props.chip) };
             }
-
-            if (this.props.selectionRect) {
-                const top = Math.min(this.props.selectionRect.start.y, this.props.selectionRect.end.y)
-                const bottom = Math.max(this.props.selectionRect.start.y, this.props.selectionRect.end.y)
-                const left = Math.min(this.props.selectionRect.start.x, this.props.selectionRect.end.x)
-                const right = Math.max(this.props.selectionRect.start.x, this.props.selectionRect.end.x)
-
-                if (this.state.position.y + this.state.size.y > top && this.state.position.y < bottom &&
-                    this.state.position.x + this.state.size.x > left && this.state.position.x < right) {
-                    className += 'selected ';
-
-                }
-            }
+            if (this.props.isSelected)
+                className += 'selected ';
         }
 
         //property determination
-        const startPos: Vector2 = { x: this.props.chip.startPosition.x - this.props.context.boardTranslation.x, y: this.props.chip.startPosition.y - this.props.context.boardTranslation.y };
+        // const startPos: Vector2 = { x: this.props.chip.position.x - this.props.context.boardTranslation.x, y: this.props.chip.position.y - this.props.context.boardTranslation.y };
         const dragEnabled = this.props.context.activeTool === Tool.Move && !this.props.context.isSimulationRunning;
 
         return (
-            <Draggable confine='parent' className="absolute" classNameDragging='chip-move-active' classNameEnabled='chip-move-inactive' enabled={dragEnabled} startPosition={startPos} onDrag={(translate) => this.setState({ position: translate })}>
+            <Draggable confine='parent' className="absolute" classNameDragging='chip-move-active' classNameEnabled='chip-move-inactive' enabled={dragEnabled} startPosition={this.props.chip.position} onDrag={(translation) => this.props.chip.position = translation}>
                 <div ref={this.state.chipRef} data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
                     <span>{this.props.chip.blueprint.name}</span>
                     {this.getBinaryDisplay()}
@@ -185,7 +170,7 @@ class Chip extends Component<ChipProps, ChipState> {
 
     componentDidMount() {
         const rect = this.state.chipRef.current!.getBoundingClientRect();
-        this.setState({ size: { x: rect.width, y: rect.height } });
+        this.props.chip.size = { x: rect.width, y: rect.height }; //FIXME: just once
     }
 }
 
