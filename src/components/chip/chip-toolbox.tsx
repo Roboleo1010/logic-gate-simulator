@@ -1,4 +1,4 @@
-import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
+import Draggable from '../draggable/draggable';
 import React, { Component } from 'react';
 import { ChipBlueprint, Vector2 } from '../../model/circuit-builder.types';
 import './chip.scss';
@@ -8,14 +8,22 @@ interface ChipToolboxProps {
     onChipClicked: (chip: ChipBlueprint, position: Vector2) => void;
 }
 
-class ChipToolbox extends Component<ChipToolboxProps> {
-    onStop(e: DraggableEvent, ui: DraggableData) {
-        if (ui.lastY < -75) {
-            let rect = ui.node.getBoundingClientRect();
-            this.props.onChipClicked(this.props.blueprint, { x: rect.x, y: rect.y });
-        }
+interface ChipToolboxState {
+    chipRef: React.RefObject<HTMLDivElement>;
+}
 
-        this.forceUpdate(); //To reset position
+class ChipToolbox extends Component<ChipToolboxProps, ChipToolboxState> {
+    constructor(props: ChipToolboxProps) {
+        super(props);
+
+        this.state = { chipRef: React.createRef() };
+    }
+
+    onStop(translation: Vector2) {
+        const rect = this.state.chipRef.current!.getBoundingClientRect();
+
+        if (translation.y < -100)
+            this.props.onChipClicked(this.props.blueprint, { x: rect.x, y: rect.y });
     }
 
     render() {
@@ -23,8 +31,8 @@ class ChipToolbox extends Component<ChipToolboxProps> {
 
         return (
             <div className="chip-on-toolbox-wrapper">
-                <Draggable grid={[5, 5]} onStop={this.onStop.bind(this)} position={{ x: 0, y: 0 }} >
-                    <div className="chip chip-on-toolbox" style={style} title={this.props.blueprint.description} >
+                <Draggable enabled={true} resetAfterStop={true} onDragEnd={this.onStop.bind(this)} startPosition={{ x: 0, y: 0 }}>
+                    <div ref={this.state.chipRef} className="chip chip-on-toolbox" style={style} title={this.props.blueprint.description} >
                         <span className="title">{this.props.blueprint.name}</span>
                     </div>
                 </Draggable>

@@ -7,11 +7,12 @@ interface DraggableProps {
     classNameDisabled?: string;
     classNameEnabled?: string;
     classNameDragging?: string;
-    confine: 'parent' | 'fullscreen' | string;
+    confine?: 'parent' | 'fullscreen' | string;
     startPosition?: Vector2;
-    onDragStart?: () => void;
+    resetAfterStop?: boolean;
+    onDragStart?: (translation: Vector2) => void;
     onDrag?: (translation: Vector2) => void;
-    onDragEnd?: () => void;
+    onDragEnd?: (translation: Vector2) => void;
 }
 
 interface DraggableState {
@@ -62,7 +63,7 @@ class Draggable extends Component<DraggableProps, DraggableState>{
         this.setState({ initial: { x: clientPos.x - this.state.translation.x, y: clientPos.y - this.state.translation.y }, isDragged: true });
 
         if (this.props.onDragStart)
-            this.props.onDragStart();
+            this.props.onDragStart(this.state.translation);
     }
 
     drag(e: any) {
@@ -82,7 +83,8 @@ class Draggable extends Component<DraggableProps, DraggableState>{
 
         const dragggableRect: DOMRect = this.state.draggableRef.current.getBoundingClientRect();
 
-        if (this.props.confine === 'fullscreen') {
+        if (this.props.confine === undefined) { }
+        else if (this.props.confine === 'fullscreen') {
             if (translation.x > 0) //top
                 translation.x = 0;
 
@@ -106,8 +108,6 @@ class Draggable extends Component<DraggableProps, DraggableState>{
                 console.error("No element with id " + this.props.confine + " can be found");
                 return;
             }
-
-            console.log(confineRect)
 
             //check bounds
             if (translation.y < confineRect.top)
@@ -133,11 +133,16 @@ class Draggable extends Component<DraggableProps, DraggableState>{
     }
 
     dragEnd(e: any) {
-        this.setState({ initial: { x: this.state.translation.x, y: this.state.translation.y }, isDragged: false });
+        if (!this.state.isDragged)
+            return;
 
+        if (this.props.resetAfterStop && this.props.startPosition)
+            this.setState({ initial: this.props.startPosition, translation: this.props.startPosition, isDragged: false });
+        else
+            this.setState({ initial: { x: this.state.translation.x, y: this.state.translation.y }, isDragged: false });
 
         if (this.props.onDragEnd)
-            this.props.onDragEnd();
+            this.props.onDragEnd(this.state.translation);
     }
 
     render() {
@@ -161,6 +166,7 @@ class Draggable extends Component<DraggableProps, DraggableState>{
             <div ref={this.state.draggableRef} style={style} className={className} draggable={this.props.enabled} onMouseDown={(e) => this.dragStart(e)} onMouseMove={(e) => this.drag(e)} onMouseUp={(e) => this.dragEnd(e)} onMouseLeave={(e) => this.dragEnd(e)} >
                 { this.props.children}
             </div >);
+
     }
 }
 
