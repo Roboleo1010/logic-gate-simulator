@@ -108,27 +108,17 @@ class Draggable extends Component<DraggableProps, DraggableState>{
             }
 
             //check bounds
-            if (translation.y < confineRect.top) {
+            if (translation.y < confineRect.top)
                 translation.y = confineRect.top;
-                console.error("top");
 
-            }
-
-            if (translation.y > confineRect.bottom - dragggableRect.height) {
+            if (translation.y > confineRect.bottom - dragggableRect.height)
                 translation.y = confineRect.bottom - dragggableRect.height;
-                console.error("bottom");
-            }
 
-            if (translation.x < confineRect.left) {
+            if (translation.x < confineRect.left)
                 translation.x = confineRect.left;
-                console.error("left");
 
-            }
-
-            if (translation.x > confineRect.right - dragggableRect.width) {
+            if (translation.x > confineRect.right - dragggableRect.width)
                 translation.x = confineRect.right - dragggableRect.width;
-                console.error("right");
-            }
         }
 
         this.setState({ translation: translation });

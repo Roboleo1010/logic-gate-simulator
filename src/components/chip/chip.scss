@@ -32,17 +32,6 @@ $pinWidthHalfed: $pinWidth / 2;
 
         line-height: 2em;
     }
-
-    .title {
-    }
-
-    .binary-display {
-        font-family: "DSEG7-Classic";
-    }
-
-    .binary-input {
-        width: 45px;
-    }
 }
 
 .chip-on-toolbox-wrapper {
@@ -65,13 +54,16 @@ $pinWidthHalfed: $pinWidth / 2;
     }
 }
 
-.chip-move-inactive,
-.chip-move-active {
-    cursor: move;
-}
-
 .chip-on-board {
     display: inline-flex;
+
+    .binary-display {
+        font-family: "DSEG7-Classic";
+    }
+
+    .binary-input {
+        width: 45px;
+    }
 
     .pin-side {
         display: flex;
@@ -114,18 +106,21 @@ $pinWidthHalfed: $pinWidth / 2;
         height: 90%;
         width: $pinWidth;
     }
+
     .pins-right {
         flex-direction: column;
         right: -$pinWidthHalfed;
         height: 90%;
         width: $pinWidth;
     }
+
     .pins-top {
         flex-direction: row;
         top: -$pinWidthHalfed;
         width: 90%;
         height: $pinWidth;
     }
+
     .pins-bottom {
         flex-direction: row;
         bottom: -$pinWidthHalfed;
@@ -134,22 +129,22 @@ $pinWidthHalfed: $pinWidth / 2;
     }
 }
 
-.chip-tool-move {
-    cursor: move;
-}
-
 .chip-tool-delete {
     cursor: not-allowed;
+}
+
+.chip-move-inactive,
+.chip-move-active {
+    cursor: move;
 }
 
 .chip-role-switch {
     cursor: pointer;
 }
 
-.chip-true {
-    background-color: $color-true !important;
-}
-
-.chip-false {
-    background-color: $color-false !important;
+.selected {
+    border-color: var(--secondary);
+    -webkit-box-shadow: 0 0 5px 3px var(--secondary);
+    -moz-box-shadow: 0 0 5px 3px var(--secondary);
+    box-shadow: 0 0 5px 3px var(--secondary);
 }

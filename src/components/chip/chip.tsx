@@ -1,7 +1,7 @@
 import ChipInstance from '../../model/chip-instance';
 import Draggable from '../draggable/draggable';
 import React, { Component } from 'react';
-import { ChipRole, CircuitBuilderContext, Gate, GateRole, PinSide, Tool } from '../../model/circuit-builder.types';
+import { ChipRole, CircuitBuilderContext, Gate, GateRole, PinSide, Rect, Tool, Vector2 } from '../../model/circuit-builder.types';
 import './chip.scss';
 
 interface ChipProps {
@@ -10,9 +10,23 @@ interface ChipProps {
     onChipDelete: (chip: ChipInstance) => void;
     redraw: () => void;
     onPinClicked: (gate: Gate) => void;
+
+    selectionRect?: Rect;
 }
 
-class Chip extends Component<ChipProps> {
+interface ChipState {
+    chipRef: React.RefObject<HTMLDivElement>;
+    position: Vector2;
+    size: Vector2;
+}
+
+class Chip extends Component<ChipProps, ChipState> {
+    constructor(props: ChipProps) {
+        super(props);
+
+        this.state = { chipRef: React.createRef(), position: { x: this.props.chip.startPosition.x - this.props.context.boardTranslation.x, y: this.props.chip.startPosition.y - this.props.context.boardTranslation.y }, size: { x: 0, y: 0 } };
+    }
+
     renamePin(gate: Gate) {
         let name = window.prompt("Pin name:", gate.name);
 
@@ -23,6 +37,7 @@ class Chip extends Component<ChipProps> {
         this.forceUpdate();
     }
 
+    //#region render helper
     getGatesForPinSide(side: PinSide) {
         return this.props.chip.graph.nodes.filter(gate => gate.pinSide === side && !(gate.hidden === true) && (this.props.chip.graph.edges.filter(wire => gate.id === wire.to).length === 0 || this.props.chip.graph.edges.filter(wire => gate.id === wire.from).length === 0)); // later part for only getting exposed pins
     }
@@ -60,35 +75,7 @@ class Chip extends Component<ChipProps> {
         );
     }
 
-    render() {
-        const minYSize = Math.max(this.getGatesForPinSide(PinSide.Left).length, this.getGatesForPinSide(PinSide.Right).length) * 20;
-        const minXSize = Math.max(this.getGatesForPinSide(PinSide.Top).length, this.getGatesForPinSide(PinSide.Bottom).length) * 20;
-
-        const style = {
-            backgroundColor: this.props.chip.blueprint.color,
-            minWidth: minXSize >= 100 ? minXSize : 100,
-            minHeight: minYSize >= 50 ? minYSize : 50,
-        };
-
-        let className = 'chip chip-on-board ';
-        let clickEvent = () => { };
-
-        if (this.props.context.isSimulationRunning) {
-            if (this.props.chip.blueprint.role === ChipRole.Switch) {
-                className += "chip-role-switch";
-
-                let switchGate = this.props.chip.graph.nodes.find(gate => gate.role === GateRole.Switch && gate.firstLayer);
-                clickEvent = () => { switchGate!.state = switchGate!.state ? false : true };
-            }
-        }
-        else {
-            if (this.props.context.activeTool === Tool.Delete) {
-                className += 'chip-tool-delete ';
-                clickEvent = () => { this.props.onChipDelete(this.props.chip) };
-            }
-        }
-
-        let binaryDisplay: JSX.Element = <></>;
+    getBinaryDisplay(): JSX.Element {
         if (this.props.chip.blueprint.role === ChipRole.BinaryDisplay && this.props.context.isSimulationRunning) {
             let result = 0;
 
@@ -96,10 +83,13 @@ class Chip extends Component<ChipProps> {
                 if (gate.state) result += Number(gate.data!);
             });
 
-            binaryDisplay = <span className="binary-display">{result}</span>
+            return <span className="binary-display">{result}</span>
         }
+        else
+            return <></>
+    }
 
-        let binaryInput: JSX.Element = <></>;
+    getBinaryInput(): JSX.Element {
         if (this.props.chip.blueprint.role === ChipRole.BinaryInput) {
             const maxValue = Math.pow(2, this.props.chip.graph.nodes.length) - 1;
 
@@ -126,22 +116,76 @@ class Chip extends Component<ChipProps> {
                 });
             };
 
-            binaryInput = <div><input type="number" max={maxValue} min={0} defaultValue={0} onChange={(e) => { checkValidity(e); setOutputs(e) }} className="binary-input"></input></div >
+            return <div><input type="number" max={maxValue} min={0} defaultValue={0} onChange={(e) => { checkValidity(e); setOutputs(e) }} className="binary-input"></input></div >
+        }
+        else
+            return <></>;
+    }
+    //#endregion
+
+    render() {
+        const minYSize = Math.max(this.getGatesForPinSide(PinSide.Left).length, this.getGatesForPinSide(PinSide.Right).length) * 20;
+        const minXSize = Math.max(this.getGatesForPinSide(PinSide.Top).length, this.getGatesForPinSide(PinSide.Bottom).length) * 20;
+
+        const style = {
+            backgroundColor: this.props.chip.blueprint.color,
+            minWidth: minXSize >= 100 ? minXSize : 100,
+            minHeight: minYSize >= 50 ? minYSize : 50,
+        };
+
+        let className = 'chip chip-on-board ';
+        let clickEvent = () => { };
+
+        if (this.props.context.isSimulationRunning) {
+            if (this.props.chip.blueprint.role === ChipRole.Switch) {
+                className += "chip-role-switch";
+
+                let switchGate = this.props.chip.graph.nodes.find(gate => gate.role === GateRole.Switch && gate.firstLayer);
+                clickEvent = () => { switchGate!.state = switchGate!.state ? false : true };
+            }
+        }
+        else {
+            if (this.props.context.activeTool === Tool.Delete) {
+                className += 'chip-tool-delete ';
+                clickEvent = () => { this.props.onChipDelete(this.props.chip) };
+            }
+
+            if (this.props.selectionRect) {
+                const top = Math.min(this.props.selectionRect.start.y, this.props.selectionRect.end.y)
+                const bottom = Math.max(this.props.selectionRect.start.y, this.props.selectionRect.end.y)
+                const left = Math.min(this.props.selectionRect.start.x, this.props.selectionRect.end.x)
+                const right = Math.max(this.props.selectionRect.start.x, this.props.selectionRect.end.x)
+
+                if (this.state.position.y + this.state.size.y > top && this.state.position.y < bottom &&
+                    this.state.position.x + this.state.size.x > left && this.state.position.x < right) {
+                    className += 'selected ';
+
+                }
+            }
         }
 
+        //property determination
+        const startPos: Vector2 = { x: this.props.chip.startPosition.x - this.props.context.boardTranslation.x, y: this.props.chip.startPosition.y - this.props.context.boardTranslation.y };
+        const dragEnabled = this.props.context.activeTool === Tool.Move && !this.props.context.isSimulationRunning;
+
         return (
-            <Draggable confine='parent' className="absolute" classNameDragging='chip-move-active' classNameEnabled='chip-move-inactive' enabled={this.props.context.activeTool === Tool.Move && !this.props.context.isSimulationRunning} onDragEnd={this.props.redraw} startPosition={{ x: this.props.chip.startPosition.x - this.props.context.boardTranslation.x, y: this.props.chip.startPosition.y - this.props.context.boardTranslation.y }}>
-                <div data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
-                    <span className="title">{this.props.chip.blueprint.name}</span>
-                    {binaryDisplay}
-                    {binaryInput}
+            <Draggable confine='parent' className="absolute" classNameDragging='chip-move-active' classNameEnabled='chip-move-inactive' enabled={dragEnabled} startPosition={startPos} onDrag={(translate) => this.setState({ position: translate })}>
+                <div ref={this.state.chipRef} data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
+                    <span>{this.props.chip.blueprint.name}</span>
+                    {this.getBinaryDisplay()}
+                    {this.getBinaryInput()}
                     {this.getPinElementsForSide(PinSide.Top)}
                     {this.getPinElementsForSide(PinSide.Left)}
                     {this.getPinElementsForSide(PinSide.Bottom)}
                     {this.getPinElementsForSide(PinSide.Right)}
                 </div>
-            </Draggable>
+            </Draggable >
         );
+    }
+
+    componentDidMount() {
+        const rect = this.state.chipRef.current!.getBoundingClientRect();
+        this.setState({ size: { x: rect.width, y: rect.height } });
     }
 }
 

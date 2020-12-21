@@ -278,7 +278,6 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
         this.state.chips.forEach(chip => {
             chip.graph.nodes.filter(gate => gate.role === GateRole.Clock && gate.firstLayer).forEach(clock => {
                 clock.state = clock.state ? false : true;
-                console.log(clock.id);
             });
         });
 
@@ -433,6 +432,11 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                     <Toolbar>
                         <ToolbarGroup>
                             <ToolbarButtonMulti icon={Icons.iconPan} text="Pan" onClick={() => this.setTool(Tool.Pan)} isActive={this.state.context.activeTool === Tool.Pan}></ToolbarButtonMulti>
+                            <ToolbarButtonMulti icon={Icons.iconSelect} text="Select" onClick={() => this.setTool(Tool.Select)} isActive={this.state.context.activeTool === Tool.Select}></ToolbarButtonMulti>
+                            {/* <ToolbarButton icon={Icons.iconZoomIn} text="Zoom In" onClick={() => { }} ></ToolbarButton>
+                            <ToolbarButton icon={Icons.iconZoomOut} text="Zoom Out" onClick={() => { }} ></ToolbarButton> */}
+                        </ToolbarGroup>
+                        <ToolbarGroup>
                             <ToolbarButtonMulti icon={Icons.iconMove} text="Move" onClick={() => this.setTool(Tool.Move)} isActive={this.state.context.activeTool === Tool.Move}></ToolbarButtonMulti>
                             <ToolbarButtonMulti icon={Icons.iconDelete} text="Delete" onClick={() => this.setTool(Tool.Delete)} isActive={this.state.context.activeTool === Tool.Delete}></ToolbarButtonMulti>
                             <ToolbarButtonMulti icon={Icons.iconRename} text="Rename" onClick={() => this.setTool(Tool.Rename)} isActive={this.state.context.activeTool === Tool.Rename}></ToolbarButtonMulti>

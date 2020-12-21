@@ -3,7 +3,7 @@ import ChipInstance from '../../model/chip-instance';
 import Draggable from '../draggable/draggable';
 import React, { Component } from 'react';
 import Wire from '../wire/wire';
-import { CircuitBuilderContext, Gate, Tool, Vector2, WireModel } from '../../model/circuit-builder.types';
+import { CircuitBuilderContext, Gate, Rect, Tool, Vector2, WireModel } from '../../model/circuit-builder.types';
 import './board.scss';
 
 interface BoardProps {
@@ -19,48 +19,89 @@ interface BoardProps {
 interface BoardState {
     scale: number;
     translation: Vector2;
+
+    isSelecting: boolean;
+    selectionStart: Vector2;
+    selectionEnd: Vector2;
 }
 
 class Board extends Component<BoardProps, BoardState>{
     constructor(props: BoardProps) {
         super(props);
 
-        this.state = { scale: 1, translation: { x: 0, y: 0 } };
+        this.state = { isSelecting: false, scale: 1, translation: { x: 0, y: 0 }, selectionStart: { x: 0, y: 0 }, selectionEnd: { x: 0, y: 0 } };
     }
 
-    scroll(e: any) {
-        let newScale = this.state.scale;
+    // scroll(e: any) {
+    //     let newScale = this.state.scale;
 
-        if (e.deltaY > 0) //up
-            newScale = newScale - 0.05;
-        else
-            newScale = newScale + 0.05;
+    //     if (e.deltaY > 0) newScale = newScale - 0.05;
+    //     else newScale = newScale + 0.05;
 
-        if (newScale < 0.4)
-            newScale = 0.4;
-        else if (newScale > 1.4)
-            newScale = 1.4;
+    //     if (newScale < 0.4) newScale = 0.4;
+    //     else if (newScale > 1.4) newScale = 1.4;
 
-        this.setState({ scale: newScale });
-    }
+    //     this.setState({ scale: newScale });
+    // }
 
     onDrag(translation: Vector2) {
         this.setState({ translation: translation });
         this.props.context.boardTranslation = translation;
     }
 
+    //#region Selection box
+    onSelectionStart(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        if (this.props.context.activeTool === Tool.Select) {
+            const startPos: Vector2 = { x: e.clientX - this.props.context.boardTranslation.x, y: e.clientY - this.props.context.boardTranslation.y }
+            this.setState({ selectionStart: startPos, selectionEnd: startPos, isSelecting: true });
+        }
+    }
+
+    onSelectionDrag(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        if (!this.state.isSelecting)
+            return;
+
+        this.setState({ selectionEnd: { x: e.clientX - this.props.context.boardTranslation.x, y: e.clientY - this.props.context.boardTranslation.y } });
+    }
+
+    onSelectionEnd(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        if (!this.state.isSelecting)
+            return;
+
+        this.setState({ isSelecting: false });
+    }
+    //#endregion
+
     render() {
-        //  const style = { transform: `scale(${this.state.scale})` }; //onWheel={(e) => this.scroll(e)}
+        let selectionRect: Rect;
+
+        if (this.state.isSelecting)
+            selectionRect = { start: this.state.selectionStart, end: this.state.selectionEnd };
 
         return (
-            <Draggable className="board" confine='fullscreen' classNameDragging="board-pan-active" classNameEnabled="board-pan-inactive" enabled={this.props.context.activeTool === Tool.Pan} onDrag={this.onDrag.bind(this)}>
-                {this.props.chips.map(chip => {
-                    return <Chip context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw} ></Chip>
-                })}
-                {this.props.wires.map(wire => {
-                    return <Wire context={this.props.context} key={`${wire.fromId}_${wire.toId}`} wire={wire} onWireDelete={this.props.onWireDelete} ></Wire>
-                })}
-            </Draggable>
+            <Draggable className="board-size" confine='fullscreen' classNameDragging="board-pan-active" classNameEnabled="board-pan-inactive" enabled={this.props.context.activeTool === Tool.Pan} onDrag={this.onDrag.bind(this)} >
+                <div className="board board-size" onMouseDown={this.onSelectionStart.bind(this)} onMouseMove={this.onSelectionDrag.bind(this)} onMouseUp={this.onSelectionEnd.bind(this)}>
+                    {
+                        this.state.isSelecting &&
+                        <svg className='selection-box'>
+                            <rect x={Math.min(this.state.selectionStart.x, this.state.selectionEnd.x)}
+                                y={Math.min(this.state.selectionStart.y, this.state.selectionEnd.y)}
+                                width={Math.abs(this.state.selectionStart.x - this.state.selectionEnd.x)}
+                                height={Math.abs(this.state.selectionStart.y - this.state.selectionEnd.y)}></rect>
+                        </svg>
+                    }
+                    {
+                        this.props.chips.map(chip => {
+                            return <Chip selectionRect={selectionRect} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw} ></Chip>
+                        })
+                    }
+                    {
+                        this.props.wires.map(wire => {
+                            return <Wire context={this.props.context} key={`${wire.fromId}_${wire.toId}`} wire={wire} onWireDelete={this.props.onWireDelete} ></Wire>
+                        })
+                    }
+                </div>
+            </Draggable >
         );
     }
 }

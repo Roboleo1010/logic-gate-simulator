@@ -5,7 +5,8 @@ export enum Tool {
     Pan = "Pan",
     Move = "Move",
     Delete = "Delete",
-    Rename = "Rename"
+    Rename = "Rename",
+    Select = "Seclect"
 }
 
 export enum SignalDirection {
@@ -90,4 +91,9 @@ export interface BlueprintSaveData {
 export interface Vector2 {
     x: number;
     y: number;
+}
+
+export interface Rect {
+    start: Vector2,
+    end: Vector2
 }

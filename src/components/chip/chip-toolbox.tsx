@@ -31,7 +31,7 @@ class ChipToolbox extends Component<ChipToolboxProps> {
 
                 {/* Fake Chip */}
                 <div className="chip chip-on-toolbox chip-on-toolbox-fake" style={style} >
-                    <span className="title">{this.props.blueprint.name}</span>
+                    <span>{this.props.blueprint.name}</span>
                 </div>
             </div>
         );
