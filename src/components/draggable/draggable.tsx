@@ -12,40 +12,59 @@ interface DraggableProps {
     startPosition?: Vector2;
     resetAfterStop?: boolean;
 
+    delta?: Vector2;
+
     onDragStart?: (translation: Vector2) => void;
-    onDrag?: (translation: Vector2) => void;
+    onDragCallback?: (translation: Vector2) => void;
     onDragEnd?: (translation: Vector2) => void;
 }
 
 interface DraggableState {
     translation: Vector2; //distance from origin
-    initial: Vector2;
+    origin: Vector2; //satrting pos in screen space
+    offset: Vector2; //mouse offset
 
     isDragged: boolean;
-    draggableRef: any;
+    draggableRef: React.RefObject<HTMLDivElement>;
+
+    deltaMoveOccured: boolean;
 }
 
 class Draggable extends Component<DraggableProps, DraggableState>{
     constructor(props: DraggableProps) {
         super(props);
 
-        const startPos = this.props.startPosition === undefined ? { x: 0, y: 0 } : this.props.startPosition;
+        const translation: Vector2 = this.props.startPosition === undefined ? { x: 0, y: 0 } : this.props.startPosition;
 
-        this.state = { translation: startPos, isDragged: false, initial: startPos, draggableRef: React.createRef() };
+        this.state = { origin: { x: 0, y: 0 }, offset: { x: 0, y: 0 }, translation: translation, isDragged: false, draggableRef: React.createRef(), deltaMoveOccured: false };
     }
 
+    //#region add/ remove EventListener
     componentDidMount() {
-        this.state.draggableRef.current.addEventListener('touchstart', this.dragStart.bind(this), { passive: false });
-        this.state.draggableRef.current.addEventListener('touchmove', this.drag.bind(this), { passive: false });
-        this.state.draggableRef.current.addEventListener('touchend', this.dragEnd.bind(this), { passive: false });
+        if (this.state.draggableRef.current) {
+            this.state.draggableRef.current.addEventListener('touchstart', this.dragStart.bind(this), { passive: false });
+            this.state.draggableRef.current.addEventListener('touchmove', this.drag.bind(this), { passive: false });
+            this.state.draggableRef.current.addEventListener('touchend', this.dragEnd.bind(this), { passive: false });
+
+            const dragggableRect: DOMRect = this.state.draggableRef.current.getBoundingClientRect()
+            this.setState({ origin: { x: dragggableRect.x, y: dragggableRect.y } });
+        }
+        else
+            console.error("draggable ref is undefined");
     }
 
     componentWillUnmount() {
-        this.state.draggableRef.current.removeEventListener('touchstart', this.dragStart.bind(this),);
-        this.state.draggableRef.current.removeEventListener('touchmove', this.drag.bind(this));
-        this.state.draggableRef.current.removeEventListener('touchend', this.dragEnd.bind(this));
+        if (this.state.draggableRef.current) {
+            this.state.draggableRef.current.removeEventListener('touchstart', this.dragStart.bind(this),);
+            this.state.draggableRef.current.removeEventListener('touchmove', this.drag.bind(this));
+            this.state.draggableRef.current.removeEventListener('touchend', this.dragEnd.bind(this));
+        }
+        else
+            console.error("draggable ref is undefined");
     }
+    //#endregion
 
+    //#region draggable events
     dragStart(e: any) {
         if (!this.props.enabled)
             return;
@@ -59,7 +78,7 @@ class Draggable extends Component<DraggableProps, DraggableState>{
         else
             clientPos = { x: e.clientX, y: e.clientY };
 
-        this.setState({ initial: { x: clientPos.x - this.state.translation.x, y: clientPos.y - this.state.translation.y }, isDragged: true });
+        this.setState({ offset: { x: clientPos.x - this.state.translation.x, y: clientPos.y - this.state.translation.y }, isDragged: true });
 
         if (this.props.onDragStart)
             this.props.onDragStart(this.state.translation);
@@ -78,12 +97,41 @@ class Draggable extends Component<DraggableProps, DraggableState>{
         else
             clientPos = { x: e.clientX, y: e.clientY };
 
-        let translation = { x: clientPos.x - this.state.initial.x, y: clientPos.y - this.state.initial.y };
+        const translation = this.checkBounds({ x: clientPos.x - this.state.offset.x, y: clientPos.y - this.state.offset.y });
+
+        if (this.props.onDragCallback)
+            this.props.onDragCallback(translation);
+
+        this.setState({ translation: translation });
+    }
+
+    dragEnd(e: any) {
+        if (!this.state.isDragged)
+            return;
+
+        if (this.props.resetAfterStop)
+            this.setState({ translation: { x: 0, y: 0 }, isDragged: false });
+        else
+            this.setState({ isDragged: false });
+
+        if (this.props.onDragEnd)
+            this.props.onDragEnd(this.state.translation);
+    }
+    //#endregion
+
+    //#region bound checking
+    checkBounds(translation: Vector2): Vector2 {
+        if (!this.state.draggableRef.current) {
+            console.error("Draggable ref is undefined");
+            return translation;
+        }
+
+        if (this.props.confine === undefined)
+            return translation;
 
         const dragggableRect: DOMRect = this.state.draggableRef.current.getBoundingClientRect();
 
-        if (this.props.confine === undefined) { }
-        else if (this.props.confine === 'fullscreen') {
+        if (this.props.confine === 'fullscreen') {
             if (translation.x > 0) //top
                 translation.x = 0;
 
@@ -95,53 +143,50 @@ class Draggable extends Component<DraggableProps, DraggableState>{
 
             if (translation.y < -dragggableRect.height + document.body.clientHeight) //bottom
                 translation.y = -dragggableRect.height + document.body.clientHeight;
+
+            return translation;
+        }
+
+        let confineRect: DOMRect;
+
+        if (this.props.confine === 'parent') {
+            const element = this.state.draggableRef.current.parentElement;
+            if (element)
+                confineRect = element.getBoundingClientRect();
+            else {
+                console.error("No parent found.");
+                return translation;
+            }
         }
         else {
-            let confineRect: DOMRect;
-
-            if (this.props.confine === 'parent')
-                confineRect = this.state.draggableRef.current.parentElement.getBoundingClientRect();
-            else if (document.getElementById(this.props.confine))
-                confineRect = document.getElementById(this.props.confine)!.getBoundingClientRect();
+            const element = document.getElementById(this.props.confine);
+            if (element)
+                confineRect = element.getBoundingClientRect();
             else {
-                console.error("No element with id " + this.props.confine + " can be found");
-                return;
+                console.error(`No confine element with id ${this.props.confine} found.`);
+                return translation;
             }
-
-            //check bounds
-            if (translation.y < confineRect.top)
-                translation.y = confineRect.top;
-
-            if (translation.y > confineRect.height + dragggableRect.height) {
-                translation.y = confineRect.height + dragggableRect.height;
-                console.error("bottom");
-
-            }
-
-            if (translation.x < confineRect.left)
-                translation.x = confineRect.left;
-
-            if (translation.x > confineRect.width - dragggableRect.width)
-                translation.x = confineRect.width - dragggableRect.width;
         }
 
-        this.setState({ translation: translation });
+        //check bounds
+        if (translation.y < confineRect.top)
+            translation.y = confineRect.top;
 
-        if (this.props.onDrag)
-            this.props.onDrag(translation);
+        if (translation.y > confineRect.height + dragggableRect.height)
+            translation.y = confineRect.height + dragggableRect.height;
+
+        if (translation.x < confineRect.left)
+            translation.x = confineRect.left;
+
+        if (translation.x > confineRect.width - dragggableRect.width)
+            translation.x = confineRect.width - dragggableRect.width;
+
+        return translation;
     }
+    //#endregion
 
-    dragEnd(e: any) {
-        if (!this.state.isDragged)
-            return;
-
-        if (this.props.resetAfterStop && this.props.startPosition)
-            this.setState({ initial: this.props.startPosition, translation: this.props.startPosition, isDragged: false });
-        else
-            this.setState({ initial: { x: this.state.translation.x, y: this.state.translation.y }, isDragged: false });
-
-        if (this.props.onDragEnd)
-            this.props.onDragEnd(this.state.translation);
+    translate(delta: Vector2) {
+        this.setState({ translation: this.checkBounds({ x: this.state.translation.x + delta.x, y: this.state.translation.y + delta.y }) });
     }
 
     render() {
@@ -149,9 +194,21 @@ class Draggable extends Component<DraggableProps, DraggableState>{
         const className = this.props.className === undefined ? '' : this.props.className;
 
         return (
-            <div ref={this.state.draggableRef} style={style} className={className} draggable={this.props.enabled} onMouseDown={(e) => this.dragStart(e)} onMouseMove={(e) => this.drag(e)} onMouseUp={(e) => this.dragEnd(e)}>
-                {this.props.children}
-            </div>);
+            <div ref={this.state.draggableRef} style={style} className={className} draggable={this.props.enabled} onMouseDown={(e) => this.dragStart(e)
+            } onMouseMove={(e) => this.drag(e)} onMouseUp={(e) => this.dragEnd(e)}>
+                { this.props.children}
+            </div >);
+    }
+
+    componentDidUpdate() {
+        if (this.props.delta) {
+            this.translate(this.props.delta);
+            this.setState({ deltaMoveOccured: !this.state.deltaMoveOccured });
+        }
+    }
+
+    shouldComponentUpdate(nextProps: DraggableProps, nextState: DraggableState) {
+        return (nextState.deltaMoveOccured === this.state.deltaMoveOccured);
     }
 }
 

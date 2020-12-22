@@ -25,6 +25,8 @@ interface BoardState {
     selectionEnd: Vector2;
 
     selectedChips: ChipInstance[];
+    selectedDragChipId?: string;
+    selectedDragDelta?: Vector2;
 }
 
 class Board extends Component<BoardProps, BoardState>{
@@ -76,8 +78,8 @@ class Board extends Component<BoardProps, BoardState>{
     }
 
     isInSelection(chip: ChipInstance, top: number, bottom: number, left: number, right: number): boolean {
-        if (chip.startPosition.y + chip.size.y > top && chip.startPosition.y < bottom &&
-            chip.startPosition.x + chip.size.x > left && chip.startPosition.x < right)
+        if (chip.position.y + chip.size.y > top && chip.position.y < bottom &&
+            chip.position.x + chip.size.x > left && chip.position.x < right)
             return true;
         else
             return false;
@@ -99,17 +101,27 @@ class Board extends Component<BoardProps, BoardState>{
     }
     //#endregion
 
+    getDetla(position: Vector2, translation: Vector2): Vector2 {
+        return { x: translation.x - position.x, y: translation.y - position.y };
+    }
+
     render() {
         return (
-            <Draggable className="board-size" confine='fullscreen' classNameDragging="board-pan-active" classNameEnabled="board-pan-inactive" enabled={this.props.context.activeTool === Tool.Pan} onDrag={this.onDragCallback.bind(this)} >
-                <div className="board board-size" onMouseDown={this.onSelectionStart.bind(this)} onMouseMove={this.onSelectionDrag.bind(this)} onMouseUp={this.onSelectionEnd.bind(this)} onContextMenuCapture={(e) => { this.setState({ selectionStart: { x: 0, y: 0 }, selectionEnd: { x: 0, y: 0 } }); e.preventDefault(); return false; }}>
+            <Draggable className="board-size" confine='fullscreen' enabled={this.props.context.activeTool === Tool.Pan} onDragCallback={this.onDragCallback.bind(this)}>
+                <div className="board board-size" onMouseDown={this.onSelectionStart.bind(this)} onMouseMove={this.onSelectionDrag.bind(this)} onMouseUp={this.onSelectionEnd.bind(this)} onContextMenuCapture={(e) => { this.setState({ selectionStart: { x: 0, y: 0 }, selectionEnd: { x: 0, y: 0 }, selectedChips: [] }); e.preventDefault(); return false; }}>
                     {this.getSelectionBox()}
                     {this.props.wires.map(wire => { return (<Wire context={this.props.context} key={`${wire.fromId}_${wire.toId}`} wire={wire} onWireDelete={this.props.onWireDelete} ></Wire>) })}
                     {
                         this.props.chips.map(chip => {
+                            const isSelected = this.state.selectedChips.includes(chip);
+                            let delta = undefined;
+
+                            if (isSelected && this.state.selectedDragChipId !== chip.id)
+                                delta = this.state.selectedDragDelta;
+
                             return (
-                                <Draggable confine='parent' className="absolute" enabled={this.props.context.activeTool === Tool.Move && !this.props.context.isSimulationRunning}>
-                                    <Chip isSelected={this.state.selectedChips.includes(chip)} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} ></Chip>
+                                <Draggable key={chip.id} confine='parent' delta={delta} className="absolute" enabled={this.props.context.activeTool === Tool.Move && !this.props.context.isSimulationRunning} startPosition={chip.position} onDragCallback={(translation) => { this.setState({ selectedDragDelta: this.getDetla(chip.position, translation), selectedDragChipId: chip.id }); chip.position = translation }} onDragEnd={() => this.setState({ selectedDragDelta: undefined, selectedDragChipId: undefined })}>
+                                    <Chip isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}></Chip>
                                 </Draggable>)
                         })
                     }

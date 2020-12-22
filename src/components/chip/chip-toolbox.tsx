@@ -31,7 +31,7 @@ class ChipToolbox extends Component<ChipToolboxProps, ChipToolboxState> {
 
         return (
             <div className="chip-on-toolbox-wrapper">
-                <Draggable enabled={true} resetAfterStop={true} onDragEnd={this.onStop.bind(this)} startPosition={{ x: 0, y: 0 }}>
+                <Draggable enabled={true} resetAfterStop={true} onDragEnd={this.onStop.bind(this)}>
                     <div ref={this.state.chipRef} className="chip chip-on-toolbox" style={style} title={this.props.blueprint.description} >
                         <span className="title">{this.props.blueprint.name}</span>
                     </div>
