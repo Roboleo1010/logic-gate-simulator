@@ -41,8 +41,12 @@ class Draggable extends Component<DraggableProps, DraggableState>{
     componentDidMount() {
         if (this.state.draggableRef.current) {
             this.state.draggableRef.current.addEventListener('touchstart', this.dragStart.bind(this), { passive: false });
-            this.state.draggableRef.current.addEventListener('touchmove', this.drag.bind(this), { passive: false });
+            document.addEventListener('touchmove', this.drag.bind(this), { passive: false });
             this.state.draggableRef.current.addEventListener('touchend', this.dragEnd.bind(this), { passive: false });
+
+            this.state.draggableRef.current.addEventListener('mousedown', this.dragStart.bind(this), { passive: false });
+            document.addEventListener('mousemove', this.drag.bind(this), { passive: false });
+            this.state.draggableRef.current.addEventListener('mouseup', this.dragEnd.bind(this), { passive: false });
 
             const dragggableRect: DOMRect = this.state.draggableRef.current.getBoundingClientRect()
             this.setState({ origin: { x: dragggableRect.x, y: dragggableRect.y } });
@@ -54,8 +58,12 @@ class Draggable extends Component<DraggableProps, DraggableState>{
     componentWillUnmount() {
         if (this.state.draggableRef.current) {
             this.state.draggableRef.current.removeEventListener('touchstart', this.dragStart.bind(this),);
-            this.state.draggableRef.current.removeEventListener('touchmove', this.drag.bind(this));
+            document.removeEventListener('touchmove', this.drag.bind(this));
             this.state.draggableRef.current.removeEventListener('touchend', this.dragEnd.bind(this));
+
+            this.state.draggableRef.current.removeEventListener('mousedown', this.dragStart.bind(this));
+            document.removeEventListener('mousemove', this.drag.bind(this));
+            this.state.draggableRef.current.removeEventListener('mouseup', this.dragEnd.bind(this));
         }
         else
             console.error("draggable ref is undefined");
@@ -106,7 +114,6 @@ class Draggable extends Component<DraggableProps, DraggableState>{
     }
     //#endregion
 
-    //#region bound checking
     checkBounds(translation: Vector2): Vector2 {
         if (!this.state.draggableRef.current) {
             console.error("Draggable ref is undefined");
@@ -170,7 +177,6 @@ class Draggable extends Component<DraggableProps, DraggableState>{
 
         return translation;
     }
-    //#endregion
 
     translate(delta: Vector2) {
         this.setState({ translation: this.checkBounds({ x: this.state.translation.x + delta.x, y: this.state.translation.y + delta.y }) });
@@ -181,8 +187,7 @@ class Draggable extends Component<DraggableProps, DraggableState>{
         const className = this.props.className === undefined ? '' : this.props.className;
 
         return (
-            <div ref={this.state.draggableRef} style={style} className={className} draggable={this.props.enabled} onMouseDown={(e) => this.dragStart(e)
-            } onMouseMove={(e) => this.drag(e)} onMouseUp={(e) => this.dragEnd(e)}>
+            <div ref={this.state.draggableRef} style={style} className={className} draggable={this.props.enabled}>
                 { this.props.children}
             </div >);
     }

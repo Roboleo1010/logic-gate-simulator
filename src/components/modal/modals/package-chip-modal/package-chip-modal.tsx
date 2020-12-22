@@ -16,13 +16,12 @@ interface PackageChipModalProps {
 interface PackageChipModalState {
     color: string;
     name: string;
-    triggerRedraw: boolean;
 }
 
 class PackageChipModal extends Component<PackageChipModalProps, PackageChipModalState>{
     constructor(props: PackageChipModalProps) {
         super(props);
-        this.state = { color: "#006400", name: props.defaultName, triggerRedraw: false };
+        this.state = { color: "#006400", name: props.defaultName };
     }
 
     onSubmit() {
@@ -49,7 +48,7 @@ class PackageChipModal extends Component<PackageChipModalProps, PackageChipModal
         else if (elementsUnderMouse.filter(elem => elem.classList.contains('pins-left')).length === 1)
             gate.pinSide = PinSide.Left;
 
-        this.setState({ triggerRedraw: !this.state.triggerRedraw });
+        this.forceUpdate();
     }
 
     getGatesForPinSide(side: PinSide) {
