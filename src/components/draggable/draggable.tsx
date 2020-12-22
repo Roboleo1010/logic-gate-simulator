@@ -2,14 +2,16 @@ import React, { Component } from 'react';
 import { Vector2 } from '../../model/circuit-builder.types';
 
 interface DraggableProps {
-    enabled: boolean;
     className?: string;
     classNameDisabled?: string;
     classNameEnabled?: string;
     classNameDragging?: string;
+
+    enabled: boolean;
     confine?: 'parent' | 'fullscreen' | string;
     startPosition?: Vector2;
     resetAfterStop?: boolean;
+
     onDragStart?: (translation: Vector2) => void;
     onDrag?: (translation: Vector2) => void;
     onDragEnd?: (translation: Vector2) => void;
@@ -27,10 +29,7 @@ class Draggable extends Component<DraggableProps, DraggableState>{
     constructor(props: DraggableProps) {
         super(props);
 
-        let startPos = { x: 0, y: 0 };
-
-        if (this.props.startPosition !== undefined)
-            startPos = this.props.startPosition;
+        const startPos = this.props.startPosition === undefined ? { x: 0, y: 0 } : this.props.startPosition;
 
         this.state = { translation: startPos, isDragged: false, initial: startPos, draggableRef: React.createRef() };
     }
@@ -147,26 +146,12 @@ class Draggable extends Component<DraggableProps, DraggableState>{
 
     render() {
         const style = { transform: `translate(${this.state.translation.x}px, ${this.state.translation.y}px)`, display: 'inline-block' };
-
-        let className = '';
-
-        if (this.props.className)
-            className = this.props.className;
-
-        if (this.props.enabled && this.props.classNameEnabled)
-            className += " " + this.props.classNameEnabled;
-        else if (!this.props.enabled && this.props.classNameDisabled)
-            className += " " + this.props.classNameDisabled;
-
-        if (this.state.isDragged)
-            className += " " + this.props.classNameDragging;
-
+        const className = this.props.className === undefined ? '' : this.props.className;
 
         return (
-            <div ref={this.state.draggableRef} style={style} className={className} draggable={this.props.enabled} onMouseDown={(e) => this.dragStart(e)} onMouseMove={(e) => this.drag(e)} onMouseUp={(e) => this.dragEnd(e)} onMouseLeave={(e) => this.dragEnd(e)} >
-                { this.props.children}
-            </div >);
-
+            <div ref={this.state.draggableRef} style={style} className={className} draggable={this.props.enabled} onMouseDown={(e) => this.dragStart(e)} onMouseMove={(e) => this.drag(e)} onMouseUp={(e) => this.dragEnd(e)}>
+                {this.props.children}
+            </div>);
     }
 }
 

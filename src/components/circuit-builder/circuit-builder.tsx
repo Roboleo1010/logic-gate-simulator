@@ -426,7 +426,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
         return (
             <div className="circuit-builder" >
                 <ReactNotification />
-                <Board context={this.state.context} chips={this.state.chips} wires={this.state.wires} redraw={() => this.forceUpdate()} onChipDelete={this.removeChipFromBoard.bind(this)} onPinClicked={this.addWireToBoard.bind(this)} onWireDelete={this.removeWireFromBoard.bind(this)} ></Board>
+                <Board context={this.state.context} chips={this.state.chips} wires={this.state.wires} onChipDelete={this.removeChipFromBoard.bind(this)} onPinClicked={this.addWireToBoard.bind(this)} onWireDelete={this.removeWireFromBoard.bind(this)} ></Board>
                 <Toolbox blueprints={this.state.chipBlueprints} onChipClicked={(this.addChipToBoard.bind(this))}></Toolbox>
                 <div className="toolbar-container">
                     <Toolbar>

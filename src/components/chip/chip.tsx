@@ -1,5 +1,4 @@
 import ChipInstance from '../../model/chip-instance';
-import Draggable from '../draggable/draggable';
 import React, { Component } from 'react';
 import { ChipRole, CircuitBuilderContext, Gate, GateRole, PinSide, Tool } from '../../model/circuit-builder.types';
 import './chip.scss';
@@ -8,19 +7,17 @@ interface ChipProps {
     chip: ChipInstance;
     context: CircuitBuilderContext;
     isSelected: boolean,
+
     onChipDelete: (chip: ChipInstance) => void;
-    redraw: () => void;
     onPinClicked: (gate: Gate) => void;
 }
 
-interface ChipState {
-    chipRef: React.RefObject<HTMLDivElement>;
-}
+class Chip extends Component<ChipProps> {
+    private chipRef: React.RefObject<HTMLDivElement> = React.createRef();
 
-class Chip extends Component<ChipProps, ChipState> {
-    constructor(props: ChipProps) {
-        super(props);
-        this.state = { chipRef: React.createRef() };
+    componentDidMount() {
+        const rect = this.chipRef.current!.getBoundingClientRect();
+        this.props.chip.size = { x: rect.width, y: rect.height };
     }
 
     renamePin(gate: Gate) {
@@ -149,28 +146,17 @@ class Chip extends Component<ChipProps, ChipState> {
                 className += 'selected ';
         }
 
-        //property determination
-        // const startPos: Vector2 = { x: this.props.chip.position.x - this.props.context.boardTranslation.x, y: this.props.chip.position.y - this.props.context.boardTranslation.y };
-        const dragEnabled = this.props.context.activeTool === Tool.Move && !this.props.context.isSimulationRunning;
-
         return (
-            <Draggable confine='parent' className="absolute" classNameDragging='chip-move-active' classNameEnabled='chip-move-inactive' enabled={dragEnabled} startPosition={this.props.chip.position} onDrag={(translation) => this.props.chip.position = translation}>
-                <div ref={this.state.chipRef} data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
-                    <span>{this.props.chip.blueprint.name}</span>
-                    {this.getBinaryDisplay()}
-                    {this.getBinaryInput()}
-                    {this.getPinElementsForSide(PinSide.Top)}
-                    {this.getPinElementsForSide(PinSide.Left)}
-                    {this.getPinElementsForSide(PinSide.Bottom)}
-                    {this.getPinElementsForSide(PinSide.Right)}
-                </div>
-            </Draggable >
+            <div ref={this.chipRef} data-chipid={this.props.chip.id} className={className} style={style} onClick={clickEvent}>
+                <span>{this.props.chip.blueprint.name}</span>
+                {this.getBinaryDisplay()}
+                {this.getBinaryInput()}
+                {this.getPinElementsForSide(PinSide.Top)}
+                {this.getPinElementsForSide(PinSide.Left)}
+                {this.getPinElementsForSide(PinSide.Bottom)}
+                {this.getPinElementsForSide(PinSide.Right)}
+            </div>
         );
-    }
-
-    componentDidMount() {
-        const rect = this.state.chipRef.current!.getBoundingClientRect();
-        this.props.chip.size = { x: rect.width, y: rect.height }; //FIXME: just once
     }
 }
 

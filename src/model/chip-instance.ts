@@ -7,12 +7,13 @@ class ChipInstance {
     public id: string;
     public graph: Graph<Gate>;
 
-    public position: Vector2;
-    public size: Vector2 = { x: 0, y: 0 };
+    public startPosition: Vector2;
+    public size: Vector2;
 
     constructor(blueprint: ChipBlueprint, startPosition: Vector2) {
         this.blueprint = blueprint;
-        this.position = startPosition;
+        this.startPosition = startPosition;
+        this.size = { x: 0, y: 0 };
         this.id = `${blueprint.name}_${ChipManager.getChipId(blueprint.name)}`;
 
         let graph = new Graph<Gate>();
