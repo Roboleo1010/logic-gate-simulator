@@ -54,6 +54,8 @@
         justify-content: center;
 
         .chip-on-board {
+            position: absolute;
+
             .pin-side {
                 border: 1px dashed var(--text-reverse);
                 border-radius: 10px;

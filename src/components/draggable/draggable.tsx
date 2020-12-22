@@ -4,9 +4,6 @@ import { Vector2 } from '../../model/circuit-builder.types';
 
 interface DraggableProps {
     className?: string;
-    classNameDisabled?: string;
-    classNameEnabled?: string;
-    classNameDragging?: string;
 
     enabled: boolean;
     confine?: 'parent' | 'fullscreen' | string;

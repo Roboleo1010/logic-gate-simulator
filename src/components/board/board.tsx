@@ -134,9 +134,14 @@ class Board extends Component<BoardProps, BoardState>{
     }
 
     render() {
+        let className = "board board-size ";
+
+        if (this.props.context.activeTool === Tool.Pan)
+            className += "board-tool-pan "
+
         return (
             <Draggable className="board-size" confine='fullscreen' enabled={this.props.context.activeTool === Tool.Pan} onDragCallback={this.onDragCallback.bind(this)}>
-                <div ref={this.state.borardRef} className="board board-size" onMouseDown={this.onSelectionStart.bind(this)} onMouseMove={this.onSelectionDrag.bind(this)} onMouseUp={this.onSelectionEnd.bind(this)} onContextMenuCapture={(e) => { this.setState({ selectionStart: { x: 0, y: 0 }, selectionEnd: { x: 0, y: 0 }, selectedChips: [] }); e.preventDefault(); return false; }}>
+                <div ref={this.state.borardRef} className={className} onMouseDown={this.onSelectionStart.bind(this)} onMouseMove={this.onSelectionDrag.bind(this)} onMouseUp={this.onSelectionEnd.bind(this)} onContextMenuCapture={(e) => { this.setState({ selectionStart: { x: 0, y: 0 }, selectionEnd: { x: 0, y: 0 }, selectedChips: [] }); e.preventDefault(); return false; }}>
                     {this.getSelectionBox()}
                     {this.props.wires.map(wire => { return (<Wire context={this.props.context} key={`${wire.fromId}_${wire.toId}`} wire={wire} onWireDelete={this.props.onWireDelete} ></Wire>) })}
                     {

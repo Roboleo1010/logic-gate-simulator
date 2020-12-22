@@ -53,10 +53,8 @@ class Chip extends Component<ChipProps> {
 
                     let clickEvent = () => { };
 
-                    if (this.props.context.activeTool === Tool.Move) {
+                    if (this.props.context.activeTool === Tool.Move)
                         clickEvent = () => this.props.onPinClicked(gate);
-                        className += "pin-tool-move ";
-                    }
                     else if (this.props.context.activeTool === Tool.Rename) {
                         clickEvent = () => this.renamePin(gate);
                         className += "pin-tool-rename ";
@@ -142,6 +140,9 @@ class Chip extends Component<ChipProps> {
                 className += 'chip-tool-delete ';
                 clickEvent = () => { this.props.onChipDelete(this.props.chip) };
             }
+            else if (this.props.context.activeTool === Tool.Move)
+                className += 'chip-tool-move ';
+
             if (this.props.isSelected)
                 className += 'selected ';
         }
