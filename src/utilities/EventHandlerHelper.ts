@@ -1,4 +1,4 @@
-import { Vector2 } from '../../model/circuit-builder.types';
+import { Vector2 } from '../model/circuit-builder.types';
 
 class EventHandlerHelper {
     public static GetEventClientPos(e: any, touchEventType: "touchstart" | "touchmove" | "touchend"): Vector2 {

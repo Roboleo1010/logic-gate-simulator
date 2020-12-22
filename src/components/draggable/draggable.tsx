@@ -1,4 +1,4 @@
-import EventHandlerHelper from '../../utilities/graph/EventHandlerHelper';
+import EventHandlerHelper from '../../utilities/EventHandlerHelper';
 import React, { Component } from 'react';
 import { Vector2 } from '../../model/circuit-builder.types';
 
@@ -73,7 +73,6 @@ class Draggable extends Component<DraggableProps, DraggableState>{
         e.preventDefault();
 
         const clientPos = EventHandlerHelper.GetEventClientPos(e, "touchstart");
-
         this.setState({ offset: { x: clientPos.x - this.state.translation.x, y: clientPos.y - this.state.translation.y }, isDragged: true });
 
         if (this.props.onDragStart)
@@ -89,6 +88,7 @@ class Draggable extends Component<DraggableProps, DraggableState>{
         const clientPos = EventHandlerHelper.GetEventClientPos(e, "touchmove");
         const translation = this.checkBounds({ x: clientPos.x - this.state.offset.x, y: clientPos.y - this.state.offset.y });
 
+
         if (this.props.onDragCallback)
             this.props.onDragCallback(translation);
 
@@ -99,13 +99,13 @@ class Draggable extends Component<DraggableProps, DraggableState>{
         if (!this.state.isDragged)
             return;
 
+        if (this.props.onDragEnd)
+            this.props.onDragEnd(this.state.translation);
+
         if (this.props.resetAfterStop)
             this.setState({ translation: { x: 0, y: 0 }, isDragged: false });
         else
             this.setState({ isDragged: false });
-
-        if (this.props.onDragEnd)
-            this.props.onDragEnd(this.state.translation);
     }
     //#endregion
 
@@ -122,10 +122,10 @@ class Draggable extends Component<DraggableProps, DraggableState>{
         const dragggableRect: DOMRect = this.state.draggableRef.current.getBoundingClientRect();
 
         if (this.props.confine === 'fullscreen') {
-            if (translation.x > 0) //top
+            if (translation.x > 0) //left
                 translation.x = 0;
 
-            if (translation.y > 0) //left
+            if (translation.y > 0) //top
                 translation.y = 0;
 
             if (translation.x < -dragggableRect.width + document.body.clientWidth) //right

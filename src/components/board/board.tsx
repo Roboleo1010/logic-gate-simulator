@@ -1,7 +1,7 @@
 import Chip from '../chip/chip';
 import ChipInstance from '../../model/chip-instance';
 import Draggable from '../draggable/draggable';
-import EventHandlerHelper from '../../utilities/graph/EventHandlerHelper';
+import EventHandlerHelper from '../../utilities/EventHandlerHelper';
 import React, { Component } from 'react';
 import Wire from '../wire/wire';
 import { CircuitBuilderContext, Gate, Tool, Vector2, WireModel } from '../../model/circuit-builder.types';
