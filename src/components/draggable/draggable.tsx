@@ -1,3 +1,4 @@
+import EventHandlerHelper from '../../utilities/graph/EventHandlerHelper';
 import React, { Component } from 'react';
 import { Vector2 } from '../../model/circuit-builder.types';
 
@@ -71,12 +72,7 @@ class Draggable extends Component<DraggableProps, DraggableState>{
 
         e.preventDefault();
 
-        let clientPos: Vector2;
-
-        if (e.type === "touchstart")
-            clientPos = { x: e.touches[0].clientX, y: e.touches[0].clientY }
-        else
-            clientPos = { x: e.clientX, y: e.clientY };
+        const clientPos = EventHandlerHelper.GetEventClientPos(e, "touchstart");
 
         this.setState({ offset: { x: clientPos.x - this.state.translation.x, y: clientPos.y - this.state.translation.y }, isDragged: true });
 
@@ -90,13 +86,7 @@ class Draggable extends Component<DraggableProps, DraggableState>{
 
         e.preventDefault();
 
-        let clientPos: Vector2;
-
-        if (e.type === "touchmove")
-            clientPos = { x: e.touches[0].clientX, y: e.touches[0].clientY }
-        else
-            clientPos = { x: e.clientX, y: e.clientY };
-
+        const clientPos = EventHandlerHelper.GetEventClientPos(e, "touchmove");
         const translation = this.checkBounds({ x: clientPos.x - this.state.offset.x, y: clientPos.y - this.state.offset.y });
 
         if (this.props.onDragCallback)

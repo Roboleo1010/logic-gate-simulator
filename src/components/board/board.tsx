@@ -1,6 +1,7 @@
 import Chip from '../chip/chip';
 import ChipInstance from '../../model/chip-instance';
 import Draggable from '../draggable/draggable';
+import EventHandlerHelper from '../../utilities/graph/EventHandlerHelper';
 import React, { Component } from 'react';
 import Wire from '../wire/wire';
 import { CircuitBuilderContext, Gate, Tool, Vector2, WireModel } from '../../model/circuit-builder.types';
@@ -27,14 +28,38 @@ interface BoardState {
     selectedChips: ChipInstance[];
     selectedDragChipId?: string;
     selectedDragDelta?: Vector2;
+
+    borardRef: React.RefObject<HTMLDivElement>;
 }
 
 class Board extends Component<BoardProps, BoardState>{
     constructor(props: BoardProps) {
         super(props);
 
-        this.state = { isSelecting: false, scale: 1, translation: { x: 0, y: 0 }, selectionStart: { x: 0, y: 0 }, selectionEnd: { x: 0, y: 0 }, selectedChips: [] };
+        this.state = { isSelecting: false, scale: 1, translation: { x: 0, y: 0 }, selectionStart: { x: 0, y: 0 }, selectionEnd: { x: 0, y: 0 }, selectedChips: [], borardRef: React.createRef() };
     }
+
+    //#region add/ remove EventListener
+    componentDidMount() {
+        if (this.state.borardRef.current) {
+            this.state.borardRef.current.addEventListener('touchstart', this.onSelectionStart.bind(this), { passive: false });
+            this.state.borardRef.current.addEventListener('touchmove', this.onSelectionDrag.bind(this), { passive: false });
+            this.state.borardRef.current.addEventListener('touchend', this.onSelectionEnd.bind(this), { passive: false });
+        }
+        else
+            console.error("board ref is undefined");
+    }
+
+    componentWillUnmount() {
+        if (this.state.borardRef.current) {
+            this.state.borardRef.current.removeEventListener('touchstart', this.onSelectionStart.bind(this),);
+            this.state.borardRef.current.removeEventListener('touchmove', this.onSelectionDrag.bind(this));
+            this.state.borardRef.current.removeEventListener('touchend', this.onSelectionEnd.bind(this));
+        }
+        else
+            console.error("board ref is undefined");
+    }
+    //#endregion
 
     onDragCallback(translation: Vector2) {
         this.setState({ translation: translation });
@@ -42,18 +67,21 @@ class Board extends Component<BoardProps, BoardState>{
     }
 
     //#region Selection box
-    onSelectionStart(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    onSelectionStart(e: any) {
         if (this.props.context.activeTool === Tool.Select) {
-            const startPos: Vector2 = { x: e.clientX - this.props.context.boardTranslation.x, y: e.clientY - this.props.context.boardTranslation.y }
+            const clientPos = EventHandlerHelper.GetEventClientPos(e, "touchstart");
+
+            const startPos: Vector2 = { x: clientPos.x - this.props.context.boardTranslation.x, y: clientPos.y - this.props.context.boardTranslation.y }
             this.setState({ selectionStart: startPos, selectionEnd: startPos, isSelecting: true });
         }
     }
 
-    onSelectionDrag(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    onSelectionDrag(e: any) {
         if (!this.state.isSelecting)
             return;
 
-        const selectionEnd: Vector2 = { x: e.clientX - this.props.context.boardTranslation.x, y: e.clientY - this.props.context.boardTranslation.y };
+        const clientPos = EventHandlerHelper.GetEventClientPos(e, "touchmove");
+        const selectionEnd: Vector2 = { x: clientPos.x - this.props.context.boardTranslation.x, y: clientPos.y - this.props.context.boardTranslation.y };
 
         const top = Math.min(this.state.selectionStart.y, selectionEnd.y)
         const bottom = Math.max(this.state.selectionStart.y, selectionEnd.y)
@@ -70,7 +98,7 @@ class Board extends Component<BoardProps, BoardState>{
         this.setState({ selectionEnd: selectionEnd, selectedChips: selectedChips });
     }
 
-    onSelectionEnd(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    onSelectionEnd(e: any) {
         if (!this.state.isSelecting)
             return;
 
@@ -108,7 +136,7 @@ class Board extends Component<BoardProps, BoardState>{
     render() {
         return (
             <Draggable className="board-size" confine='fullscreen' enabled={this.props.context.activeTool === Tool.Pan} onDragCallback={this.onDragCallback.bind(this)}>
-                <div className="board board-size" onMouseDown={this.onSelectionStart.bind(this)} onMouseMove={this.onSelectionDrag.bind(this)} onMouseUp={this.onSelectionEnd.bind(this)} onContextMenuCapture={(e) => { this.setState({ selectionStart: { x: 0, y: 0 }, selectionEnd: { x: 0, y: 0 }, selectedChips: [] }); e.preventDefault(); return false; }}>
+                <div ref={this.state.borardRef} className="board board-size" onMouseDown={this.onSelectionStart.bind(this)} onMouseMove={this.onSelectionDrag.bind(this)} onMouseUp={this.onSelectionEnd.bind(this)} onContextMenuCapture={(e) => { this.setState({ selectionStart: { x: 0, y: 0 }, selectionEnd: { x: 0, y: 0 }, selectedChips: [] }); e.preventDefault(); return false; }}>
                     {this.getSelectionBox()}
                     {this.props.wires.map(wire => { return (<Wire context={this.props.context} key={`${wire.fromId}_${wire.toId}`} wire={wire} onWireDelete={this.props.onWireDelete} ></Wire>) })}
                     {
