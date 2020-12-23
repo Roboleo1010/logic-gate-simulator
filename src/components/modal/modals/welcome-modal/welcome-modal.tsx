@@ -48,7 +48,11 @@ class WelcomeMoal extends Component<WelcomeMoalProps> {
                         <br />
                         <b>Switch Theme: </b><span>This button toggles between a dark and a light theme.</span>
                     </div>
-                    <span id="thanks">Thank you for using this simulator! Have fun!</span>
+                    <div id="thanks">
+                        <span>Please give me feedback or feature suggestions here: </span><a href="https://github.com/Roboleo1010/logic-gate-simulator-suggestions/discussions" target="_blank" rel="noreferrer">Github Discussion</a><span>.</span>
+                        <br />
+                        <span>Thank you for using this simulator and have fun!</span>
+                    </div>
                     <button onClick={this.props.onCloseCallback} id='close'>Close</button>
                 </div>
             </Modal >
