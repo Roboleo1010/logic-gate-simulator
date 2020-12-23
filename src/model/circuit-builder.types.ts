@@ -76,6 +76,12 @@ export interface ChipBlueprint {
     description?: string;
     type: BlueprintType;
     role?: ChipRole;
+    growableData?: GrowableData
+}
+
+export interface GrowableData {
+    gate: Gate;
+    startIndex: number;
 }
 
 

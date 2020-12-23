@@ -20,7 +20,7 @@ class ChipOutput extends Chip {
                 className += "chip-role-output-false";
         }
 
-        return <Chip chip={this.props.chip} context={this.props.context} isSelected={this.props.isSelected} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} extraClassName={className}></Chip>;
+        return <Chip chip={this.props.chip} context={this.props.context} isSelected={this.props.isSelected} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} extraClassName={className} redraw={this.props.redraw}></Chip>;
     }
 }
 

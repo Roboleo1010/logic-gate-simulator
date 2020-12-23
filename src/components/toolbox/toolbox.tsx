@@ -1,4 +1,4 @@
-import ChipToolbox from '../chip/toolbox/chip-toolbox';
+import ChipToolbox from '../chip/chip-toolbox/chip-toolbox';
 import React, { Component } from 'react';
 import Tab from '../tabs/tab/tab';
 import TabNav from '../tabs/tabnav/tabnav';

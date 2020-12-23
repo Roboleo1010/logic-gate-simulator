@@ -1,8 +1,8 @@
-import Chip from '../chip';
+import ChipGrowable from '../chip-growable/chip-growable';
 import React from 'react';
 import './chip-binary-input.scss';
 
-class ChipBinaryInput extends Chip {
+class ChipBinaryInput extends ChipGrowable {
     componentDidMount() {
         super.componentDidMount();
     }
@@ -37,9 +37,10 @@ class ChipBinaryInput extends Chip {
     }
 
     render() {
-        return <Chip chip={this.props.chip} context={this.props.context} isSelected={this.props.isSelected} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}>
-            {this.getBinaryInput()}
-        </Chip>
+        return (
+            <ChipGrowable chip={this.props.chip} context={this.props.context} isSelected={this.props.isSelected} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw}>
+                {this.getBinaryInput()}
+            </ChipGrowable>);
     }
 }
 

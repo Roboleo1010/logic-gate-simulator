@@ -1,9 +1,9 @@
 import Chip from '../chip/chip';
-import ChipBinaryDisplay from '../chip/binary-display/chip-binary-display';
-import ChipBinaryInput from '../chip/binary-input/chip-binary-input';
+import ChipBinaryDisplay from '../chip/chip-binary-display/chip-binary-display';
+import ChipBinaryInput from '../chip/chip-binary-input/chip-binary-input';
 import ChipInstance from '../../model/chip-instance';
-import ChipOutput from '../chip/output/chip-output';
-import ChipSwitch from '../chip/switch/chip-switch';
+import ChipOutput from '../chip/chip-output/chip-output';
+import ChipSwitch from '../chip/chip-switch/chip-switch';
 import Draggable from '../draggable/draggable';
 import EventHandlerHelper from '../../utilities/EventHandlerHelper';
 import React, { Component } from 'react';
@@ -19,6 +19,8 @@ interface BoardProps {
     onPinClicked: (gate: Gate) => void;
     onChipDelete: (chip: ChipInstance) => void;
     onWireDelete: (id: WireModel) => void;
+
+    redraw: () => void;
 }
 
 interface BoardState {
@@ -138,16 +140,15 @@ class Board extends Component<BoardProps, BoardState>{
 
     getChipComponent(chip: ChipInstance, isSelected: boolean): JSX.Element {
         if (chip.blueprint.role === ChipRole.BinaryDisplay)
-            return <ChipBinaryDisplay isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}></ChipBinaryDisplay>;
+            return <ChipBinaryDisplay isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw}></ChipBinaryDisplay>;
         else if (chip.blueprint.role === ChipRole.BinaryInput)
-            return <ChipBinaryInput isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}></ChipBinaryInput>;
+            return <ChipBinaryInput isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw}></ChipBinaryInput>;
         if (chip.blueprint.role === ChipRole.Switch)
-            return <ChipSwitch isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}></ChipSwitch>;
+            return <ChipSwitch isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw}></ChipSwitch>;
         else if (chip.blueprint.role === ChipRole.Output)
-            return <ChipOutput isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}></ChipOutput>;
+            return <ChipOutput isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw}></ChipOutput>;
 
-
-        return <Chip isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}></Chip>;;
+        return <Chip isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} redraw={this.props.redraw}></Chip>;
     }
 
 

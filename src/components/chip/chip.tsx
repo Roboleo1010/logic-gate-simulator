@@ -12,12 +12,24 @@ interface ChipProps {
 
     onChipDelete: (chip: ChipInstance) => void;
     onPinClicked: (gate: Gate) => void;
+    redraw: () => void;
 
     extraClassName?: string;
     extraClickEvent?: () => void;
 }
 
-class Chip extends Component<ChipProps> {
+interface ChipState {
+    growableIndex: number;
+}
+
+class Chip extends Component<ChipProps, ChipState> {
+    constructor(props: ChipProps) {
+        super(props);
+
+        let startIndex = this.props.chip.blueprint.growableData ? this.props.chip.blueprint.growableData.startIndex : 0;
+        this.state = { growableIndex: startIndex };
+    }
+
     private chipRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     componentDidMount() {

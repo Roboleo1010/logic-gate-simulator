@@ -1,5 +1,5 @@
 import Graph from '../utilities/graph/graph';
-import { BlueprintType, ChipBlueprint, ChipCategory, ChipRole, Gate, GateRole, PinSide, SignalDirection } from '../model/circuit-builder.types';
+import { BlueprintType, ChipBlueprint, ChipCategory, ChipRole, Gate, GateRole, GrowableData, PinSide, SignalDirection } from '../model/circuit-builder.types';
 import { GateType } from '../simulation/simulator.types';
 
 class ChipManager {
@@ -31,10 +31,8 @@ class ChipManager {
         this.addXNORBlueprint();
 
         //Arethmetic
-        this.addBinaryInputBlueprint(1);
-        // this.addBinaryInputBlueprint(8);
-        this.addBinaryDisplayBlueprint(1);
-        // this.addBinaryDisplayBlueprint(8);
+        this.addBinaryInputBlueprint();
+        this.addBinaryDisplayBlueprint();;
     }
 
     public static getInstance() {
@@ -102,24 +100,26 @@ class ChipManager {
         this.blueprints.push({ name: "Constant Off", color: "#F42B03", category: ChipCategory.Io, type: BlueprintType.Builtin, graph: graph });
     }
 
-    private addBinaryInputBlueprint(bits: number) {
+    private addBinaryInputBlueprint() {
         let graph = new Graph<Gate>();
 
-        for (let i = bits - 1; i >= 0; i--) {
+        for (let i = 0; i < 2; i++)
             graph.addNode({ id: `out${i}`, type: GateType.Controlled, state: false, error: false, signalDirection: SignalDirection.Out, role: GateRole.Switch, name: `In (${Math.pow(2, i)})`, data: `${Math.pow(2, i)}`, firstLayer: true, pinSide: PinSide.Right });
-        }
 
-        this.blueprints.push({ name: `Binary Input ${bits}-Bit`, color: "#7B3E19", category: ChipCategory.Arithmetic, role: ChipRole.BinaryInput, type: BlueprintType.Builtin, graph: graph });
+        const growableData: GrowableData = { gate: { id: 'out[pow:2,i]', type: GateType.Controlled, state: false, error: false, signalDirection: SignalDirection.Out, role: GateRole.Switch, name: 'In ([pow:2,i])', data: '[pow:2,i]', firstLayer: true, pinSide: PinSide.Right }, startIndex: 2 }
+
+        this.blueprints.push({ name: `Binary Input`, color: "#7B3E19", category: ChipCategory.Arithmetic, role: ChipRole.BinaryInput, type: BlueprintType.Builtin, graph: graph, growableData: growableData });
     }
 
-    private addBinaryDisplayBlueprint(bits: number) {
+    private addBinaryDisplayBlueprint() {
         let graph = new Graph<Gate>();
 
-        for (let i = bits - 1; i >= 0; i--) {
+        for (let i = 0; i < 2; i++)
             graph.addNode({ id: `in${i}`, type: GateType.Relay, state: false, error: false, signalDirection: SignalDirection.In, role: GateRole.Output, name: `Out (${Math.pow(2, i)})`, data: `${Math.pow(2, i)}`, firstLayer: true, pinSide: PinSide.Left });
-        }
 
-        this.blueprints.push({ name: `Binary Display ${bits}-Bit`, color: "#7B3E19", category: ChipCategory.Arithmetic, role: ChipRole.BinaryDisplay, type: BlueprintType.Builtin, graph: graph });
+        const growableData: GrowableData = { gate: { id: 'in[pow:2,i]', type: GateType.Relay, state: false, error: false, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out ([pow:2,i])', data: '[pow:2,i]', firstLayer: true, pinSide: PinSide.Left }, startIndex: 2 }
+
+        this.blueprints.push({ name: `Binary Display`, color: "#7B3E19", category: ChipCategory.Arithmetic, role: ChipRole.BinaryDisplay, type: BlueprintType.Builtin, graph: graph, growableData: growableData });
     }
 
     // 1 Input

@@ -19,7 +19,7 @@ class ChipSwitch extends Chip {
             clickEvent = () => { switchGate!.state = switchGate!.state ? false : true };
         }
 
-        return <Chip chip={this.props.chip} context={this.props.context} isSelected={this.props.isSelected} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} extraClassName={className} extraClickEvent={clickEvent}></Chip>;
+        return <Chip chip={this.props.chip} context={this.props.context} isSelected={this.props.isSelected} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked} extraClassName={className} extraClickEvent={clickEvent} redraw={this.props.redraw}></Chip>;
     }
 }
 
