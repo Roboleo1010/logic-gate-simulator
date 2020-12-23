@@ -30,7 +30,7 @@ class Toolbox extends Component<ToolboxProps, ToolboxState> {
         let tabs: TabData[] = [];
 
         Object.keys(ChipCategory).forEach(category =>
-            tabs.push({ id: category, name: `Chips (${category})` })
+            tabs.push({ id: category, name: category })
         );
 
         return (
