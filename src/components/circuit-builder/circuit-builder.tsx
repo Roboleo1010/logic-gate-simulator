@@ -431,13 +431,12 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                         <ToolbarGroup>
                             <ToolbarButtonMulti icon={Icons.iconPan} text="Pan" onClick={() => this.setTool(Tool.Pan)} isActive={this.state.context.activeTool === Tool.Pan}></ToolbarButtonMulti>
                             <ToolbarButtonMulti icon={Icons.iconSelect} text="Select" onClick={() => this.setTool(Tool.Select)} isActive={this.state.context.activeTool === Tool.Select}></ToolbarButtonMulti>
-                            {/* <ToolbarButton icon={Icons.iconZoomIn} text="Zoom In" onClick={() => { }} ></ToolbarButton>
-                            <ToolbarButton icon={Icons.iconZoomOut} text="Zoom Out" onClick={() => { }} ></ToolbarButton> */}
                         </ToolbarGroup>
                         <ToolbarGroup>
                             <ToolbarButtonMulti icon={Icons.iconMove} text="Move" onClick={() => this.setTool(Tool.Move)} isActive={this.state.context.activeTool === Tool.Move}></ToolbarButtonMulti>
                             <ToolbarButtonMulti icon={Icons.iconDelete} text="Delete" onClick={() => this.setTool(Tool.Delete)} isActive={this.state.context.activeTool === Tool.Delete}></ToolbarButtonMulti>
                             <ToolbarButtonMulti icon={Icons.iconRename} text="Rename" onClick={() => this.setTool(Tool.Rename)} isActive={this.state.context.activeTool === Tool.Rename}></ToolbarButtonMulti>
+                            <ToolbarButtonMulti icon={Icons.iconWire} text="Wire Tool" onClick={() => this.setTool(Tool.Wire)} isActive={this.state.context.activeTool === Tool.Wire}></ToolbarButtonMulti>
                         </ToolbarGroup>
                         <ToolbarGroup>
                             <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.state.context.isSimulationRunning} onClick={this.state.context.isSimulationRunning ? this.stopSimulation.bind(this) : this.startSimulation.bind(this)}></ToolbarButtonToggle>

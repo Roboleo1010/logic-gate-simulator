@@ -53,7 +53,7 @@ class Chip extends Component<ChipProps> {
 
                     let clickEvent = () => { };
 
-                    if (this.props.context.activeTool === Tool.Move)
+                    if (this.props.context.activeTool === Tool.Wire)
                         clickEvent = () => this.props.onPinClicked(gate);
                     else if (this.props.context.activeTool === Tool.Rename) {
                         clickEvent = () => this.renamePin(gate);

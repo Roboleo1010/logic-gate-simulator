@@ -6,7 +6,8 @@ export enum Tool {
     Move = "Move",
     Delete = "Delete",
     Rename = "Rename",
-    Select = "Seclect"
+    Select = "Seclect",
+    Wire = "Wire"
 }
 
 export enum SignalDirection {

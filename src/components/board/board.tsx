@@ -18,7 +18,6 @@ interface BoardProps {
 }
 
 interface BoardState {
-    scale: number;
     translation: Vector2;
 
     isSelecting: boolean;
@@ -36,7 +35,7 @@ class Board extends Component<BoardProps, BoardState>{
     constructor(props: BoardProps) {
         super(props);
 
-        this.state = { isSelecting: false, scale: 1, translation: { x: 0, y: 0 }, selectionStart: { x: 0, y: 0 }, selectionEnd: { x: 0, y: 0 }, selectedChips: [], borardRef: React.createRef() };
+        this.state = { isSelecting: false, translation: { x: 0, y: 0 }, selectionStart: { x: 0, y: 0 }, selectionEnd: { x: 0, y: 0 }, selectedChips: [], borardRef: React.createRef() };
     }
 
     //#region add/ remove EventListener
