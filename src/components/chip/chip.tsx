@@ -1,4 +1,5 @@
 import ChipInstance from '../../model/chip-instance';
+import NotificationManager, { NotificationType } from '../../manager/notification-manager';
 import React, { Component } from 'react';
 import { ChipRole, CircuitBuilderContext, Gate, GateRole, PinSide, Tool } from '../../model/circuit-builder.types';
 import './chip.scss';
@@ -60,7 +61,7 @@ class Chip extends Component<ChipProps> {
                         className += "pin-tool-rename ";
                     }
 
-                    return (<div data-gateid={gate.id} key={gate.id} className={className} title={gate.name} onClick={clickEvent}></div>);
+                    return (<div data-gateid={gate.id} key={gate.id} className={className} title={gate.name} onClick={clickEvent} onTouchStart={() => { if (gate.name) NotificationManager.addNotification(gate.name, " ", NotificationType.Default, 2000) }}></div>);
                 })}
             </div>
         );
