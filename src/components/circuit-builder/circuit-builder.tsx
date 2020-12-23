@@ -136,7 +136,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     onPackageChip() {
         //Check for validity
         if (this.checkValidity().length > 0) {
-            NotificationManager.addNotification("Pin Error", "Please connect all unconnected inputs.", NotificationType.Error);
+            NotificationManager.addNotification("Some inputs are not connected", "Unconnected inputs have to be connected if you want to package this Chip.", NotificationType.Error, 5000);
             return;
         }
         //check Inputs
@@ -257,12 +257,10 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     startSimulation() {
         console.log('%cStarting Simulation', 'background-color:green');
 
-        let missingInputs = this.checkValidity();
+        let missingInputs = this.checkValidity(false);
 
-        if (missingInputs.length > 0) {
-            NotificationManager.addNotification("Pin Error", "Please connect all unconnected inputs.", NotificationType.Error);
-            return;
-        }
+        if (missingInputs.length > 0)
+            NotificationManager.addNotification("Some inputs are not connected", "These Pins will be treated as OFF for the Simulation", NotificationType.Warning, 5000);
 
         let context = this.state.context;
         context.isSimulationRunning = true;

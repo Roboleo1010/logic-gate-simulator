@@ -3,6 +3,7 @@ import { Gate, GateType, SimulationResult } from './simulator.types';
 class Simulation {
     private gates: Gate[] = [];
     private result: SimulationResult;
+    private valueForUncennectedInputs = false;
 
     evalsPerTick: number = 100;
 
@@ -34,42 +35,50 @@ class Simulation {
                 return;
 
             //1 Inputs
-            const inputA: boolean = this.getGateById(gate.inputs[0]).state;
+            const inputA = this.getGateById(gate.inputs[0]);
+            let stateA = this.valueForUncennectedInputs;
+
+            if (inputA !== undefined)
+                stateA = inputA.state;
 
             if (gate.type === GateType.Relay) {
-                gate.state = inputA;
+                gate.state = stateA;
                 return;
             }
             if (gate.type === GateType.NOT) {
-                gate.state = !inputA;
+                gate.state = !stateA;
                 return;
             }
 
             //2 Inputs
-            const inputB: boolean = this.getGateById(gate.inputs[1]).state;
+            const inputB = this.getGateById(gate.inputs[1]);
+            let stateB = this.valueForUncennectedInputs;
+
+            if (inputB !== undefined)
+                stateB = inputB.state;
 
             if (gate.type === GateType.AND) {
-                gate.state = inputA && inputB;
+                gate.state = stateA && stateB;
                 return;
             }
             if (gate.type === GateType.NAND) {
-                gate.state = !(inputA && inputB);
+                gate.state = !(stateA && stateB);
                 return;
             }
             if (gate.type === GateType.OR) {
-                gate.state = inputA || inputB;
+                gate.state = stateA || stateB;
                 return;
             }
             if (gate.type === GateType.NOR) {
-                gate.state = !(inputA || inputB);
+                gate.state = !(stateA || stateB);
                 return;
             }
             if (gate.type === GateType.XOR) {
-                gate.state = inputA !== inputB;
+                gate.state = stateA !== stateB;
                 return;
             }
             if (gate.type === GateType.XNOR) {
-                gate.state = !(inputA !== inputB);
+                gate.state = !(stateA !== stateB);
                 return;
             }
         });
