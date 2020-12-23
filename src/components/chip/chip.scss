@@ -141,6 +141,14 @@ $pinWidthHalfed: $pinWidth / 2;
     cursor: pointer;
 }
 
+.chip-role-output-true {
+    background-color: $color-true !important;
+}
+
+.chip-role-output-false {
+    background-color: $color-false !important;
+}
+
 .selected {
     border-color: var(--secondary);
     -webkit-box-shadow: 0 0 5px 3px var(--secondary);

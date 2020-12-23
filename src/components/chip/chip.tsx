@@ -134,6 +134,14 @@ class Chip extends Component<ChipProps> {
                 let switchGate = this.props.chip.graph.nodes.find(gate => gate.role === GateRole.Switch && gate.firstLayer);
                 clickEvent = () => { switchGate!.state = switchGate!.state ? false : true };
             }
+            else if (this.props.chip.blueprint.role === ChipRole.Output) {
+                let outputGate = this.props.chip.graph.nodes.find(gate => gate.role === GateRole.Output && gate.firstLayer);
+
+                if (outputGate?.state)
+                    className += "chip-role-output-true";
+                else
+                    className += "chip-role-output-false";
+            }
         }
         else {
             if (this.props.context.activeTool === Tool.Delete) {

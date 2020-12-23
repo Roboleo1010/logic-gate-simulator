@@ -22,6 +22,7 @@ export enum GateRole {
 
 export enum ChipRole {
     Switch = "Switch",
+    Output = "Output",
     BinaryInput = "BinaryInput",
     BinaryDisplay = "BinaryDisplay"
 }

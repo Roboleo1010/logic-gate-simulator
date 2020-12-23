@@ -76,7 +76,7 @@ class ChipManager {
         let graph = new Graph<Gate>();
         graph.addNodes([{ id: "out", type: GateType.Relay, state: false, signalDirection: SignalDirection.In, role: GateRole.Output, name: 'Out', firstLayer: true, pinSide: PinSide.Left }]);
 
-        this.blueprints.push({ name: "Output", color: "#fd7e14", category: ChipCategory.Io, graph: graph, type: BlueprintType.Builtin, description: "Gets converted to Chip Output after Packaging" });
+        this.blueprints.push({ name: "Output", color: "#fd7e14", category: ChipCategory.Io, graph: graph, type: BlueprintType.Builtin, role: ChipRole.Output, description: "Gets converted to Chip Output after Packaging" });
     }
 
     private addClockBlueprint() {
@@ -105,8 +105,8 @@ class ChipManager {
     private addBinaryInputBlueprint(bits: number) {
         let graph = new Graph<Gate>();
 
-        for (let i = 0; i < bits; i++) {
-            graph.addNode({ id: `out${i}`, type: GateType.Controlled, state: false, signalDirection: SignalDirection.Out, role: GateRole.Switch, name: `Out (${Math.pow(2, i)})`, data: `${Math.pow(2, i)}`, firstLayer: true, pinSide: PinSide.Right });
+        for (let i = bits - 1; i >= 0; i--) {
+            graph.addNode({ id: `out${i}`, type: GateType.Controlled, state: false, signalDirection: SignalDirection.Out, role: GateRole.Switch, name: `In (${Math.pow(2, i)})`, data: `${Math.pow(2, i)}`, firstLayer: true, pinSide: PinSide.Right });
         }
 
         this.blueprints.push({ name: `Binary Input ${bits}-Bit`, color: "#7B3E19", category: ChipCategory.Arithmetic, role: ChipRole.BinaryInput, type: BlueprintType.Builtin, graph: graph });
@@ -115,8 +115,8 @@ class ChipManager {
     private addBinaryDisplayBlueprint(bits: number) {
         let graph = new Graph<Gate>();
 
-        for (let i = 0; i < bits; i++) {
-            graph.addNode({ id: `in${i}`, type: GateType.Relay, state: false, signalDirection: SignalDirection.In, role: GateRole.Output, name: `In (${Math.pow(2, i)})`, data: `${Math.pow(2, i)}`, firstLayer: true, pinSide: PinSide.Left });
+        for (let i = bits - 1; i >= 0; i--) {
+            graph.addNode({ id: `in${i}`, type: GateType.Relay, state: false, signalDirection: SignalDirection.In, role: GateRole.Output, name: `Out (${Math.pow(2, i)})`, data: `${Math.pow(2, i)}`, firstLayer: true, pinSide: PinSide.Left });
         }
 
         this.blueprints.push({ name: `Binary Display ${bits}-Bit`, color: "#7B3E19", category: ChipCategory.Arithmetic, role: ChipRole.BinaryDisplay, type: BlueprintType.Builtin, graph: graph });
