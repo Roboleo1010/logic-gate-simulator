@@ -1,10 +1,14 @@
 import Chip from '../chip/chip';
+import ChipBinaryDisplay from '../chip/binary-display/chip-binary-display';
+import ChipBinaryInput from '../chip/binary-input/chip-binary-input';
 import ChipInstance from '../../model/chip-instance';
+import ChipOutput from '../chip/output/chip-output';
+import ChipSwitch from '../chip/switch/chip-switch';
 import Draggable from '../draggable/draggable';
 import EventHandlerHelper from '../../utilities/EventHandlerHelper';
 import React, { Component } from 'react';
 import Wire from '../wire/wire';
-import { CircuitBuilderContext, Gate, Tool, Vector2, WireModel } from '../../model/circuit-builder.types';
+import { ChipRole, CircuitBuilderContext, Gate, Tool, Vector2, WireModel } from '../../model/circuit-builder.types';
 import './board.scss';
 
 interface BoardProps {
@@ -132,11 +136,29 @@ class Board extends Component<BoardProps, BoardState>{
         return { x: translation.x - position.x, y: translation.y - position.y };
     }
 
+    getChipComponent(chip: ChipInstance, isSelected: boolean): JSX.Element {
+        if (chip.blueprint.role === ChipRole.BinaryDisplay)
+            return <ChipBinaryDisplay isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}></ChipBinaryDisplay>;
+        else if (chip.blueprint.role === ChipRole.BinaryInput)
+            return <ChipBinaryInput isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}></ChipBinaryInput>;
+        if (chip.blueprint.role === ChipRole.Switch)
+            return <ChipSwitch isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}></ChipSwitch>;
+        else if (chip.blueprint.role === ChipRole.Output)
+            return <ChipOutput isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}></ChipOutput>;
+
+
+        return <Chip isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}></Chip>;;
+    }
+
+
     render() {
         let className = "board board-size ";
 
         if (this.props.context.activeTool === Tool.Pan)
             className += "board-tool-pan "
+
+
+
 
         return (
             <Draggable className="board-size" confine='fullscreen' enabled={this.props.context.activeTool === Tool.Pan} onDragCallback={this.onDragCallback.bind(this)}>
@@ -153,7 +175,7 @@ class Board extends Component<BoardProps, BoardState>{
 
                             return (
                                 <Draggable key={chip.id} confine='parent' delta={delta} className="absolute" enabled={this.props.context.activeTool === Tool.Move && !this.props.context.isSimulationRunning} startPosition={chip.position} onDragCallback={(translation) => { this.setState({ selectedDragDelta: this.getDetla(chip.position, translation), selectedDragChipId: chip.id }); chip.position = translation }} onDragEnd={() => this.setState({ selectedDragDelta: undefined, selectedDragChipId: undefined })}>
-                                    <Chip isSelected={isSelected} context={this.props.context} key={chip.id} chip={chip} onChipDelete={this.props.onChipDelete} onPinClicked={this.props.onPinClicked}></Chip>
+                                    {this.getChipComponent(chip, isSelected)}
                                 </Draggable>)
                         })
                     }

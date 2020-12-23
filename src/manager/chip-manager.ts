@@ -31,10 +31,10 @@ class ChipManager {
         this.addXNORBlueprint();
 
         //Arethmetic
-        this.addBinaryInputBlueprint(4);
-        this.addBinaryInputBlueprint(8);
-        this.addBinaryDisplayBlueprint(4);
-        this.addBinaryDisplayBlueprint(8);
+        this.addBinaryInputBlueprint(1);
+        // this.addBinaryInputBlueprint(8);
+        this.addBinaryDisplayBlueprint(1);
+        // this.addBinaryDisplayBlueprint(8);
     }
 
     public static getInstance() {

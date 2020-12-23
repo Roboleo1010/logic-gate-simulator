@@ -57,14 +57,6 @@ $pinWidthHalfed: $pinWidth / 2;
 .chip-on-board {
     display: inline-flex;
 
-    .binary-display {
-        font-family: "DSEG7-Classic";
-    }
-
-    .binary-input {
-        width: 45px;
-    }
-
     .pin-side {
         display: flex;
         position: absolute;
@@ -135,18 +127,6 @@ $pinWidthHalfed: $pinWidth / 2;
 
 .chip-tool-move {
     cursor: move;
-}
-
-.chip-role-switch {
-    cursor: pointer;
-}
-
-.chip-role-output-true {
-    background-color: $color-true !important;
-}
-
-.chip-role-output-false {
-    background-color: $color-false !important;
 }
 
 .selected {
