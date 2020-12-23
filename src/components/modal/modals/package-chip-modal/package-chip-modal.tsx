@@ -1,8 +1,8 @@
-import Draggable from 'react-draggable';
 import Graph from '../../../../utilities/graph/graph';
 import Modal from '../../modal';
 import React, { Component } from 'react';
 import { ChipCategory, Gate, PinSide } from '../../../../model/circuit-builder.types';
+import { ReactSortable } from 'react-sortablejs';
 import { SliderPicker } from 'react-color';
 import './package-chip-modal.scss';
 
@@ -16,12 +16,29 @@ interface PackageChipModalProps {
 interface PackageChipModalState {
     color: string;
     name: string;
+
+    pinsLeft: Gate[];
+    pinsRight: Gate[];
+    pinsTop: Gate[];
+    pinsBottom: Gate[];
 }
 
 class PackageChipModal extends Component<PackageChipModalProps, PackageChipModalState>{
     constructor(props: PackageChipModalProps) {
         super(props);
-        this.state = { color: "#006400", name: props.defaultName };
+
+        this.state = {
+            color: "#006400",
+            name: props.defaultName,
+            pinsTop: this.getGatesForPinSide(PinSide.Top),
+            pinsBottom: this.getGatesForPinSide(PinSide.Bottom),
+            pinsLeft: this.getGatesForPinSide(PinSide.Left),
+            pinsRight: this.getGatesForPinSide(PinSide.Right)
+        };
+    }
+
+    getGatesForPinSide(side: PinSide) {
+        return this.props.graph.nodes.filter(gate => gate.pinSide === side && !(gate.hidden === true) && (this.props.graph.edges.filter(wire => gate.id === wire.to).length === 0 || this.props.graph.edges.filter(wire => gate.id === wire.from).length === 0)); // later part for only getting exposed pins
     }
 
     onSubmit() {
@@ -32,40 +49,57 @@ class PackageChipModal extends Component<PackageChipModalProps, PackageChipModal
         if (!name || name === '')
             name = this.props.defaultName;
 
-        this.props.onSubmitCallback(name, this.state.color, category as ChipCategory, this.props.graph, description);
+        //build graph with new gate position
+        let graph = this.props.graph;
+
+        graph.nodes.forEach(gate => {
+            if (this.state.pinsLeft!.find(pin => gate.id === pin.id))
+                gate.pinSide = PinSide.Left;
+            else if (this.state.pinsRight.find(pin => gate.id === pin.id))
+                gate.pinSide = PinSide.Right;
+            else if (this.state.pinsTop.find(pin => gate.id === pin.id))
+                gate.pinSide = PinSide.Top;
+            else if (this.state.pinsBottom.find(pin => gate.id === pin.id))
+                gate.pinSide = PinSide.Bottom;
+        });
+
+        this.props.onSubmitCallback(name, this.state.color, category as ChipCategory, graph, description);
         this.props.onCloseCallback();
     }
 
-    onPinDragStop(e: any, data: any, gate: Gate) {
-        const elementsUnderMouse = document.elementsFromPoint(e.x, e.y);
-
-        if (elementsUnderMouse.filter(elem => elem.classList.contains('pins-top')).length === 1)
-            gate.pinSide = PinSide.Top;
-        else if (elementsUnderMouse.filter(elem => elem.classList.contains('pins-right')).length === 1)
-            gate.pinSide = PinSide.Right;
-        else if (elementsUnderMouse.filter(elem => elem.classList.contains('pins-bottom')).length === 1)
-            gate.pinSide = PinSide.Bottom;
-        else if (elementsUnderMouse.filter(elem => elem.classList.contains('pins-left')).length === 1)
-            gate.pinSide = PinSide.Left;
-
-        this.forceUpdate();
-    }
-
-    getGatesForPinSide(side: PinSide) {
-        return this.props.graph.nodes.filter(gate => gate.pinSide === side && !(gate.hidden === true) && (this.props.graph.edges.filter(wire => gate.id === wire.to).length === 0 || this.props.graph.edges.filter(wire => gate.id === wire.from).length === 0)); // later part for only getting exposed pins
-    }
-
     getPinElementsForSide(side: PinSide): JSX.Element {
+        const calssName = `pin-side pins-${side.toLowerCase()}`;
         return (
-            <div className={`pin-side pins-${side.toLowerCase()}`}>
-                {this.getGatesForPinSide(side).map(gate => {
-                    return (
-                        <Draggable key={gate.id} onStop={(e, data) => this.onPinDragStop(e, data, gate)} position={{ x: 0, y: 0 }} >
-                            <div className="pin" title={gate.name}></div>
-                        </Draggable>
-                    );
-                })}
-            </div>
+            <>
+                {side === PinSide.Left &&
+                    <ReactSortable className={calssName} list={this.state.pinsLeft} setList={(newstate) => this.setState({ pinsLeft: newstate })} group="modal-package-chip-pins">
+                        {this.state.pinsLeft.map(gate => {
+                            return <div key={gate.id} className="pin" title={gate.name}></div>
+                        })}
+                    </ReactSortable>
+                }
+                {side === PinSide.Right &&
+                    <ReactSortable className={calssName} list={this.state.pinsRight} setList={(newstate) => this.setState({ pinsRight: newstate })} group="modal-package-chip-pins">
+                        {this.state.pinsRight.map(gate => {
+                            return <div key={gate.id} className="pin" title={gate.name}></div>
+                        })}
+                    </ReactSortable>
+                }
+                {side === PinSide.Top &&
+                    <ReactSortable className={calssName} list={this.state.pinsTop} setList={(newstate) => this.setState({ pinsTop: newstate })} group="modal-package-chip-pins">
+                        {this.state.pinsTop.map(gate => {
+                            return <div key={gate.id} className="pin" title={gate.name}></div>
+                        })}
+                    </ReactSortable>
+                }
+                {side === PinSide.Bottom &&
+                    <ReactSortable className={calssName} list={this.state.pinsBottom} setList={(newstate) => this.setState({ pinsBottom: newstate })} group="modal-package-chip-pins">
+                        {this.state.pinsBottom.map(gate => {
+                            return <div key={gate.id} className="pin" title={gate.name}></div>
+                        })}
+                    </ReactSortable>
+                }
+            </>
         );
     }
 
@@ -93,6 +127,7 @@ class PackageChipModal extends Component<PackageChipModalProps, PackageChipModal
                     </div>
                     <input type="text" placeholder="Description" name="descripton" id='description' />
                     <span id="pin-sorting-info">To modify the positions of the pins just drag them to any Pin side.</span>
+
                     <div className="pin-sorting-wrapper" id="pin-sorting">
                         <div className="chip chip-on-board" style={style}>
                             <span>{this.state.name}</span>
@@ -102,6 +137,7 @@ class PackageChipModal extends Component<PackageChipModalProps, PackageChipModal
                             {this.getPinElementsForSide(PinSide.Right)}
                         </div>
                     </div>
+
                     <button onClick={this.onSubmit.bind(this)} id='submit'>Add Blueprint</button>
                 </div>
             </Modal >

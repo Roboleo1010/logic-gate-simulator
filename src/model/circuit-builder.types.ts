@@ -62,7 +62,7 @@ export interface Gate {
     pinSide?: PinSide;
     role?: GateRole;
     firstLayer: boolean;
-    error?: boolean;
+    error: boolean;
     hidden?: boolean;
     data?: string
 }

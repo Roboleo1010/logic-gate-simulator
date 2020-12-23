@@ -370,7 +370,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     resetPinError() {
         this.state.chips.forEach(chip => {
             chip.graph.nodes.forEach(gate => {
-                gate.error = undefined;
+                gate.error = false;
             });
         });
     }
