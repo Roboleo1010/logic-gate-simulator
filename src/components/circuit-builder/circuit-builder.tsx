@@ -434,9 +434,9 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                         </ToolbarGroup>
                         <ToolbarGroup>
                             <ToolbarButtonMulti icon={Icons.iconMove} text="Move" onClick={() => this.setTool(Tool.Move)} isActive={this.state.context.activeTool === Tool.Move}></ToolbarButtonMulti>
+                            <ToolbarButtonMulti icon={Icons.iconWire} text="Wire Tool" onClick={() => this.setTool(Tool.Wire)} isActive={this.state.context.activeTool === Tool.Wire}></ToolbarButtonMulti>
                             <ToolbarButtonMulti icon={Icons.iconDelete} text="Delete" onClick={() => this.setTool(Tool.Delete)} isActive={this.state.context.activeTool === Tool.Delete}></ToolbarButtonMulti>
                             <ToolbarButtonMulti icon={Icons.iconRename} text="Rename" onClick={() => this.setTool(Tool.Rename)} isActive={this.state.context.activeTool === Tool.Rename}></ToolbarButtonMulti>
-                            <ToolbarButtonMulti icon={Icons.iconWire} text="Wire Tool" onClick={() => this.setTool(Tool.Wire)} isActive={this.state.context.activeTool === Tool.Wire}></ToolbarButtonMulti>
                         </ToolbarGroup>
                         <ToolbarGroup>
                             <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.state.context.isSimulationRunning} onClick={this.state.context.isSimulationRunning ? this.stopSimulation.bind(this) : this.startSimulation.bind(this)}></ToolbarButtonToggle>
