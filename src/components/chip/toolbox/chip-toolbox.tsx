@@ -1,7 +1,7 @@
-import Draggable from '../draggable/draggable';
+import Draggable from '../../draggable/draggable';
 import React, { Component } from 'react';
-import { ChipBlueprint, Vector2 } from '../../model/circuit-builder.types';
-import './chip.scss';
+import { ChipBlueprint, Vector2 } from '../../../model/circuit-builder.types';
+import './chip-toolbox.scss';
 
 interface ChipToolboxProps {
     blueprint: ChipBlueprint;

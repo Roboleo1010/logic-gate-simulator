@@ -1,3 +1,4 @@
+import GateHelper from '../../../../utilities/GateHelper';
 import Graph from '../../../../utilities/graph/graph';
 import Modal from '../../modal';
 import React, { Component } from 'react';
@@ -30,15 +31,11 @@ class PackageChipModal extends Component<PackageChipModalProps, PackageChipModal
         this.state = {
             color: "#006400",
             name: props.defaultName,
-            pinsTop: this.getGatesForPinSide(PinSide.Top),
-            pinsBottom: this.getGatesForPinSide(PinSide.Bottom),
-            pinsLeft: this.getGatesForPinSide(PinSide.Left),
-            pinsRight: this.getGatesForPinSide(PinSide.Right)
+            pinsTop: GateHelper.getGatesForPinSide(this.props.graph, PinSide.Top),
+            pinsBottom: GateHelper.getGatesForPinSide(this.props.graph, PinSide.Bottom),
+            pinsLeft: GateHelper.getGatesForPinSide(this.props.graph, PinSide.Left),
+            pinsRight: GateHelper.getGatesForPinSide(this.props.graph, PinSide.Right)
         };
-    }
-
-    getGatesForPinSide(side: PinSide) {
-        return this.props.graph.nodes.filter(gate => gate.pinSide === side && !(gate.hidden === true) && (this.props.graph.edges.filter(wire => gate.id === wire.to).length === 0 || this.props.graph.edges.filter(wire => gate.id === wire.from).length === 0)); // later part for only getting exposed pins
     }
 
     onSubmit() {
@@ -104,8 +101,8 @@ class PackageChipModal extends Component<PackageChipModalProps, PackageChipModal
     }
 
     render() {
-        const minYSize = Math.max(this.getGatesForPinSide(PinSide.Left).length, this.getGatesForPinSide(PinSide.Right).length) * 20;
-        const minXSize = Math.max(this.getGatesForPinSide(PinSide.Top).length, this.getGatesForPinSide(PinSide.Bottom).length) * 20;
+        const minYSize = Math.max(GateHelper.getGatesForPinSide(this.props.graph, PinSide.Left).length, GateHelper.getGatesForPinSide(this.props.graph, PinSide.Right).length) * 20;
+        const minXSize = Math.max(GateHelper.getGatesForPinSide(this.props.graph, PinSide.Top).length, GateHelper.getGatesForPinSide(this.props.graph, PinSide.Bottom).length) * 20;
 
         const style = {
             backgroundColor: this.state.color,

@@ -1,4 +1,5 @@
 import ChipInstance from '../../model/chip-instance';
+import GateHelper from '../../utilities/GateHelper';
 import NotificationManager, { NotificationType } from '../../manager/notification-manager';
 import React, { Component } from 'react';
 import { CircuitBuilderContext, Gate, PinSide, Tool } from '../../model/circuit-builder.types';
@@ -36,14 +37,10 @@ class Chip extends Component<ChipProps> {
         this.forceUpdate();
     }
 
-    getGatesForPinSide(side: PinSide) {
-        return this.props.chip.graph.nodes.filter(gate => gate.pinSide === side && !(gate.hidden === true) && (this.props.chip.graph.edges.filter(wire => gate.id === wire.to).length === 0 || this.props.chip.graph.edges.filter(wire => gate.id === wire.from).length === 0)); // later part for only getting exposed pins
-    }
-
     getPinElementsForSide(side: PinSide): JSX.Element {
         return (
             <div className={`pin-side pins-${side.toLowerCase()}`}>
-                {this.getGatesForPinSide(side).map((gate) => {
+                {GateHelper.getGatesForPinSide(this.props.chip.graph, side).map((gate) => {
                     let className = "pin ";
 
                     if (gate.error === true)
@@ -72,8 +69,8 @@ class Chip extends Component<ChipProps> {
     }
 
     render() {
-        const minYSize = Math.max(this.getGatesForPinSide(PinSide.Left).length, this.getGatesForPinSide(PinSide.Right).length) * 20;
-        const minXSize = Math.max(this.getGatesForPinSide(PinSide.Top).length, this.getGatesForPinSide(PinSide.Bottom).length) * 20;
+        const minYSize = Math.max(GateHelper.getGatesForPinSide(this.props.chip.graph, PinSide.Left).length, GateHelper.getGatesForPinSide(this.props.chip.graph, PinSide.Right).length) * 20;
+        const minXSize = Math.max(GateHelper.getGatesForPinSide(this.props.chip.graph, PinSide.Top).length, GateHelper.getGatesForPinSide(this.props.chip.graph, PinSide.Bottom).length) * 20;
 
         const style = {
             backgroundColor: this.props.chip.blueprint.color,

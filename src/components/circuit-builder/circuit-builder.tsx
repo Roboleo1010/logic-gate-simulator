@@ -2,6 +2,7 @@ import Board from '../board/board';
 import ChipInstance from '../../model/chip-instance';
 import ChipManager from '../../manager/chip-manager';
 import Constants from '../../constants';
+import GateHelper from '../../utilities/GateHelper';
 import Graph from '../../utilities/graph/graph';
 import Icons from '../../assets/icons/icons';
 import LoadSaveModal from '../modal/modals/load-save-modal/load-save-modal';
@@ -18,7 +19,7 @@ import ToolbarGroup from '../toolbar/toolbar-group/toolbar-group';
 import Toolbox from '../toolbox/toolbox';
 import WelcomeMoal from '../modal/modals/welcome-modal/welcome-modal';
 import { BlueprintSaveData, BlueprintType, ChipBlueprint, ChipCategory, CircuitBuilderContext, Gate, GateRole, PinSide, SignalDirection, Tool, Vector2, WireModel } from '../../model/circuit-builder.types';
-import { Gate as SimulationGate, GateType, SimulationState } from '../../simulation/simulator.types';
+import { GateType, SimulationState } from '../../simulation/simulator.types';
 import './circuit-builder.scss';
 import 'react-notifications-component/dist/theme.css';
 
@@ -135,17 +136,17 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     //#region Chip Packaging
     onPackageChip() {
         //Check for validity
-        if (this.checkValidity().length > 0) {
+        if (this.checkValidityAndHighlight().length > 0) {
             NotificationManager.addNotification("Some inputs are not connected", "Unconnected inputs have to be connected if you want to package this Chip.", NotificationType.Error, 5000);
             return;
         }
         //check Inputs
-        if (this.getGatesByRole(GateRole.Switch, true).length === 0 && this.getGatesByRole(GateRole.Clock, true).length === 0) {
+        if (GateHelper.getGatesByRole(this.state.chips, GateRole.Switch, true).length === 0 && GateHelper.getGatesByRole(this.state.chips, GateRole.Clock, true).length === 0) {
             NotificationManager.addNotification("Package Error", "A Chip should include at least one Input (Switch or Clock)", NotificationType.Error);
             return;
         }
         //Check Outputs
-        if (this.getGatesByRole(GateRole.Output, true).length === 0) {
+        if (GateHelper.getGatesByRole(this.state.chips, GateRole.Output, true).length === 0) {
             NotificationManager.addNotification("Package Error", "A Chip should include at least one Output", NotificationType.Error);
             return;
         }
@@ -257,9 +258,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
     startSimulation() {
         console.log('%cStarting Simulation', 'background-color:green');
 
-        let missingInputs = this.checkValidity(false);
-
-        if (missingInputs.length > 0)
+        if (GateHelper.checkValidity(this.state.chips, this.state.wires).length > 0)
             NotificationManager.addNotification("Some inputs are not connected", "These Pins will be treated as OFF for the Simulation", NotificationType.Warning, 5000);
 
         let context = this.state.context;
@@ -279,7 +278,7 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
             });
         });
 
-        const result = new Simulation(this.getGates()).simulate();
+        const result = new Simulation(GateHelper.buildGates(this.state.chips, this.state.wires)).simulate();
 
         this.setPinState(result.states);
         this.setWireState(result.states);
@@ -302,47 +301,12 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
 
     //#region Simulation helpers
 
-    getGates(): SimulationGate[] {
-        let gates: SimulationGate[] = []
-        let wires = [...this.state.wires];
-
-        //get wires and gates
-        this.state.chips.forEach(chip => {
-            chip.graph.nodes.forEach(gate => {
-                gates.push({ id: gate.id, state: gate.state, type: gate.type, inputs: [] });
-            });
-            chip.graph.edges.forEach(wire => {
-                wires.push({ fromId: wire.from, toId: wire.to, state: false });
-            });
-        });
-
-        gates.forEach(gate => {
-            gate.inputs = wires.filter(wire => gate.id === wire.toId).map(wire => wire.fromId);
-        });
-
-        return gates;
-    }
-
-    checkValidity(highlight: boolean = true): Gate[] {
-        let allGates: Gate[] = [];
-        let allWires: WireModel[] = [...this.state.wires];
-        let missingInputs: Gate[] = [];
-
-        this.state.chips.forEach(chip => {
-            allGates.push(...chip.graph.nodes);
-            chip.graph.edges.forEach(edge => {
-                allWires.push({ fromId: edge.from, toId: edge.to, state: false });
-            });
-        });
-
-        allGates.forEach(gate => {
-            if (gate.type !== GateType.Controlled && allWires.filter(wire => wire.toId === gate.id).length === 0)
-                missingInputs.push(gate);
-        })
+    checkValidityAndHighlight(): Gate[] {
+        const missingInputs = GateHelper.checkValidity(this.state.chips, this.state.wires);
 
         this.resetPinError();
 
-        if (highlight && missingInputs.length > 0)
+        if (missingInputs.length > 0)
             this.setPinError(missingInputs);
 
         this.forceUpdate();
@@ -377,47 +341,11 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
 
     setPinError(missingConnections: Gate[]) {
         missingConnections.forEach(gate => {
-            this.getGateById(gate.id)!.error = true;
+            GateHelper.getGateById(this.state.chips, gate.id)!.error = true;
         });
     }
 
     //#endregion
-    //#endregion
-
-    //#region Helpers
-    getGateById(id: string): Gate | undefined {
-        let result = undefined;
-
-        this.state.chips.forEach(chip => {
-            let gate = chip.graph.nodes.find(gate => gate.id === id);
-
-            if (gate)
-                result = gate;
-        });
-
-        return result;
-    }
-
-    getGatesByType(type: GateType): Gate[] {
-        let result: Gate[] = [];
-
-        this.state.chips.forEach(chip => {
-            result.push(...chip.graph.nodes.filter(gate => gate.type === type));
-        });
-
-        return result;
-    }
-
-    getGatesByRole(role: GateRole, inFirstLayer: boolean): Gate[] {
-        let result: Gate[] = [];
-
-        this.state.chips.forEach(chip => {
-            result.push(...chip.graph.nodes.filter(gate => gate.role === role && gate.firstLayer === true));
-        });
-
-        return result;
-    }
-
     //#endregion
 
     render() {
