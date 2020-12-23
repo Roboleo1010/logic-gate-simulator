@@ -440,8 +440,6 @@ class CircuitBuilder extends Component<ChipBuilderProps, CircuitBuilderState> {
                         </ToolbarGroup>
                         <ToolbarGroup>
                             <ToolbarButtonToggle iconInactive={Icons.iconPlay} iconActive={Icons.iconPause} textInctive="Start Simulation" textActive="Stop Simulation" isActive={this.state.context.isSimulationRunning} onClick={this.state.context.isSimulationRunning ? this.stopSimulation.bind(this) : this.startSimulation.bind(this)}></ToolbarButtonToggle>
-                        </ToolbarGroup>
-                        <ToolbarGroup>
                             <ToolbarButton icon={Icons.iconChip} text="Package Chip" onClick={this.onPackageChip.bind(this)}></ToolbarButton>
                         </ToolbarGroup>
                         <ToolbarGroup>

@@ -2,6 +2,24 @@
 
 .toolbar-group {
     display: inline-block;
-    margin: $toolbar-group-margin-height $toolbar-group-margin-width;
+
     height: $toolbar-height;
+
+    background-color: var(--primary-light);
+}
+
+@media only screen and (min-width: 750px) {
+    .toolbar-group {
+        margin: $toolbar-group-margin-height $toolbar-group-margin-width;
+        border-radius: 3px 3px 0 0;
+        padding: 2px 5px;
+    }
+}
+
+@media only screen and (max-width: 750px) {
+    .toolbar-group {
+        margin: 0 $toolbar-group-margin-width;
+        border-radius: 0 0 3px 3px;
+        padding: 2px 5px;
+    }
 }
